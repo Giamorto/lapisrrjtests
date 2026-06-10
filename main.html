@@ -1,439 +1,703 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Тест РПП RRJ-95</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<title>RRJ-95 Limits</title>
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family: Inter, Arial, sans-serif;
-    background:#0f172a;
-    color:#fff;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-.card{
-    width:100%;
-    max-width:800px;
-    background:#1e293b;
-    border-radius:24px;
-    padding:32px;
-    box-shadow:0 20px 50px rgba(0,0,0,.4);
-}
-
-.title{
-    text-align:center;
-    margin-bottom:24px;
-}
-
-.title h1{
-    font-size:32px;
-    margin-bottom:8px;
-}
-
-.title p{
-    color:#94a3b8;
-}
-
-.progress-container{
-    background:#334155;
-    height:12px;
-    border-radius:999px;
-    overflow:hidden;
-    margin-bottom:30px;
-}
-
-.progress-bar{
-    height:100%;
-    width:0%;
-    background:#3b82f6;
-    transition:.3s;
-}
-
-.counter{
-    color:#94a3b8;
-    margin-bottom:16px;
-}
-
-.question{
-    font-size:26px;
-    font-weight:600;
-    line-height:1.4;
-    margin-bottom:24px;
-}
-
-.unit{
-    color:#94a3b8;
-    margin-bottom:12px;
-}
-
-input{
-    width:100%;
-    padding:18px;
-    border-radius:14px;
-    border:1px solid #475569;
-    background:#0f172a;
-    color:white;
-    font-size:20px;
-    outline:none;
-}
-
-input:focus{
-    border-color:#3b82f6;
-}
-
-button{
-    width:100%;
-    margin-top:24px;
-    padding:18px;
-    border:none;
-    border-radius:14px;
-    background:#2563eb;
-    color:white;
-    font-size:18px;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s;
-}
-
-button:hover{
-    background:#1d4ed8;
-}
-
-.result{
-    text-align:center;
-}
-
-.score{
-    font-size:64px;
-    font-weight:700;
-    color:#3b82f6;
-}
-
-.percent{
-    font-size:28px;
-    margin-bottom:20px;
-}
-
-.error-card{
-    background:#0f172a;
-    border:1px solid #334155;
-    border-radius:12px;
-    padding:16px;
-    text-align:left;
-    margin-top:12px;
-}
-
-.error-card h4{
-    color:#ef4444;
-    margin-bottom:8px;
-}
-
-.correct{
-    color:#22c55e;
-}
-
-.user{
-    color:#f59e0b;
-}
-
-@media(max-width:768px){
-
-    .question{
-        font-size:20px;
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f4;
+    --bg3: #eeece9;
+    --text: #1a1a18;
+    --text2: #6b6b67;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --green-bg: #eaf3de;
+    --green: #3b6d11;
+    --red-bg: #fcebeb;
+    --red: #a32d2d;
+    --radius: 10px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg2: #262624;
+      --bg3: #2e2e2b;
+      --text: #f0ede8;
+      --text2: #8a8a84;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.2);
+      --green-bg: #1a2e0a;
+      --green: #7fc44e;
+      --red-bg: #2e1010;
+      --red: #e07070;
     }
+  }
+  html { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 0 0 calc(1rem + var(--safe-bottom));
+    min-height: 100vh;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
 
-    .score{
-        font-size:48px;
-    }
+  /* Nav header */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .nav-title { font-size: 17px; font-weight: 600; color: var(--text); }
+  .back-btn {
+    width: 32px; height: 32px;
+    border: none; background: var(--bg2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text);
+    font-size: 18px; line-height: 1;
+    flex-shrink: 0;
+  }
+  .back-btn:active { opacity: 0.6; }
 
-    .card{
-        padding:20px;
-    }
-}
+  /* Home */
+  .home-top {
+    padding: 2rem 1rem 1.5rem;
+  }
+  .home-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+  .home-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 1rem 1.5rem;
+  }
+  .stat {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .stat-n { font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
+  .stat-l { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .menu-list {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .menu-btn {
+    width: 100%;
+    padding: 15px 16px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+  }
+  .menu-btn:active { background: var(--bg2); }
+  .menu-btn.primary {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .menu-btn.primary:active { opacity: 0.85; }
+  .menu-icon { font-size: 20px; width: 24px; text-align: center; }
+  .menu-btn .arrow { margin-left: auto; color: var(--text2); font-size: 18px; }
+  .menu-btn.primary .arrow { color: var(--bg); opacity: 0.5; }
+
+  /* Quiz */
+  .quiz-header {
+    padding: 1rem 1rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .q-counter { font-size: 14px; color: var(--text2); font-weight: 500; }
+  .cat-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    background: var(--bg2);
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+  .progress-bar {
+    height: 3px;
+    background: var(--bg3);
+    margin: 0 1rem;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--text);
+    border-radius: 2px;
+    transition: width 0.35s ease;
+  }
+  .question-text {
+    padding: 1.25rem 1rem 1.5rem;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    letter-spacing: -0.3px;
+  }
+  .options {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt {
+    padding: 15px 16px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+  .opt:active:not(:disabled) { background: var(--bg2); }
+  .opt.correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 500; }
+  .opt.wrong   { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+  .opt.reveal  { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .opt:disabled { cursor: default; }
+  .num-area { padding: 0 1rem; }
+  .num-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .num-input {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 600;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    max-width: 180px;
+  }
+  .num-input::-webkit-outer-spin-button,
+  .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .num-input:focus { outline: none; border-color: var(--text); }
+  .num-unit { font-size: 16px; color: var(--text2); font-weight: 500; }
+  .check-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .check-btn:active { opacity: 0.8; }
+  .check-btn:disabled { opacity: 0.4; cursor: default; }
+  .feedback {
+    margin: 14px 1rem 0;
+    padding: 13px 16px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.45;
+    display: none;
+  }
+  .feedback.ok { background: var(--green-bg); color: var(--green); }
+  .feedback.no { background: var(--red-bg);   color: var(--red); }
+  .next-btn {
+    margin: 14px 1rem 0;
+    width: calc(100% - 2rem);
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: none;
+  }
+  .next-btn:active { background: var(--bg2); }
+
+  /* Result */
+  .result-wrap {
+    padding: 2.5rem 1rem 1.5rem;
+  }
+  .result-label { font-size: 13px; color: var(--text2); font-weight: 500; margin-bottom: 6px; }
+  .result-score {
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .result-pct { font-size: 20px; color: var(--text2); margin-bottom: 0.5rem; }
+  .result-comment { font-size: 16px; color: var(--text2); margin-bottom: 2.5rem; }
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  /* Import */
+  .import-body { padding: 1rem; }
+  .drop-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 3rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    color: var(--text2);
+  }
+  .drop-zone:active { background: var(--bg2); }
+  .drop-icon { font-size: 40px; margin-bottom: 12px; }
+  .drop-text { font-size: 16px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+  .drop-sub { font-size: 14px; color: var(--text2); }
+  .import-status {
+    font-size: 14px;
+    color: var(--text2);
+    margin-bottom: 1.5rem;
+    min-height: 20px;
+  }
+  .import-status.ok { color: var(--green); }
+  .import-status.err { color: var(--red); }
+
+  /* Prompt */
+  .prompt-body { padding: 1rem; }
+  .prompt-box {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text2);
+    white-space: pre-wrap;
+    margin-bottom: 1rem;
+    max-height: 50vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    font-family: 'SF Mono', 'Menlo', monospace;
+  }
+  .copy-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .copy-btn:active { background: var(--bg2); }
 </style>
-
 </head>
-
 <body>
+<div id="app">
 
-<div class="card">
-
-<div id="quiz">
-
-<div class="title">
-<h1>Ограничения RRJ-95</h1>
-<p>Проверка знаний РПП</p>
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="home-label">Тест по ограничениям</div>
+    <div class="home-title">RRJ-95 Limits</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-n" id="stat-total">30</div>
+      <div class="stat-l">вопросов</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="stat-best">—</div>
+      <div class="stat-l">лучший результат</div>
+    </div>
+  </div>
+  <div class="menu-list">
+    <button class="menu-btn primary" onclick="startQuiz()">
+      <span class="menu-icon">▶</span> Начать тест
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showScreen('import')">
+      <span class="menu-icon">⬆</span> Импорт вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showScreen('prompt')">
+      <span class="menu-icon">✦</span> Промпт для генерации
+      <span class="arrow">›</span>
+    </button>
+  </div>
 </div>
 
-<div class="progress-container">
-<div class="progress-bar" id="progress"></div>
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <span class="q-counter" id="q-counter">1 / 15</span>
+    <span class="cat-tag" id="q-cat"></span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width:0%"></div>
+  </div>
+  <p class="question-text" id="q-text"></p>
+  <div id="q-body"></div>
+  <div class="feedback" id="q-feedback"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQ()">Далее →</button>
 </div>
 
-<div class="counter" id="counter"></div>
-
-<div class="question" id="question"></div>
-
-<div class="unit" id="unit"></div>
-
-<input
-id="answer"
-type="text"
-placeholder="Введите ответ"
-autocomplete="off"
-/>
-
-<button onclick="nextQuestion()">
-Далее
-</button>
-
+<!-- RESULT -->
+<div id="result" class="screen">
+  <div class="result-wrap">
+    <div class="result-label">Результат теста</div>
+    <div class="result-score" id="res-score"></div>
+    <div class="result-pct" id="res-pct"></div>
+    <div class="result-comment" id="res-comment"></div>
+    <div class="result-btns">
+      <button class="menu-btn primary" onclick="startQuiz()">
+        <span class="menu-icon">↺</span> Ещё раз
+        <span class="arrow">›</span>
+      </button>
+      <button class="menu-btn" onclick="showScreen('home')">
+        <span class="menu-icon">⌂</span> На главную
+        <span class="arrow">›</span>
+      </button>
+    </div>
+  </div>
 </div>
 
-<div id="result" style="display:none"></div>
+<!-- IMPORT -->
+<div id="import" class="screen">
+  <div class="nav">
+    <button class="back-btn" onclick="showScreen('home')">‹</button>
+    <span class="nav-title">Импорт вопросов</span>
+  </div>
+  <div class="import-body">
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-inp').click()">
+      <div class="drop-icon">📄</div>
+      <div class="drop-text">Выберите JSON-файл</div>
+      <div class="drop-sub">Нажмите для выбора</div>
+    </div>
+    <input type="file" id="file-inp" accept=".json" style="display:none" onchange="loadFile(this)">
+    <div class="import-status" id="import-status"></div>
+    <button class="menu-btn primary" onclick="showScreen('home')">
+      <span class="menu-icon">✓</span> Готово
+      <span class="arrow">›</span>
+    </button>
+  </div>
+</div>
+
+<!-- PROMPT -->
+<div id="prompt" class="screen">
+  <div class="nav">
+    <button class="back-btn" onclick="showScreen('home')">‹</button>
+    <span class="nav-title">Промпт для нейронки</span>
+  </div>
+  <div class="prompt-body">
+    <div class="prompt-box" id="prompt-box"></div>
+    <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">📋 Скопировать промпт</button>
+  </div>
+</div>
 
 </div>
 
 <script>
+const PROMPT = `Ты — генератор тестовых вопросов по Руководству полётной эксплуатации RRJ-95. Прочитай предоставленный текст РЛЭ и создай список вопросов для проверки знаний лётного экипажа.
 
-const questions = [
+Формат ответа — только JSON, без каких-либо других слов, без markdown-блоков. Структура:
 
-{
-question:"Максимальная эксплуатационная скорость VMO",
-answer:"308",
-unit:"kt"
-},
+[
+  {
+    "id": 1,
+    "category": "Масса и центровка",
+    "question": "Максимальная взлётная масса (тормоза отпущены)?",
+    "type": "number",
+    "answer": 49450,
+    "unit": "кг",
+    "tolerance": 0
+  },
+  {
+    "id": 2,
+    "category": "Скорости",
+    "question": "Максимальная скорость VMO?",
+    "type": "choice",
+    "options": ["295 kt", "308 kt", "320 kt", "285 kt"],
+    "answer": 1
+  }
+]
 
-{
-question:"Максимальное число Маха MMO",
-answer:"0.81",
-unit:""
-},
+Правила:
+- type "number": числовой ответ, поля answer (число), unit (единица), tolerance (допуск ±)
+- type "choice": 4 варианта, answer — индекс правильного (0–3)
+- category: краткая тема (Масса и центровка / Скорости / Ветровые ограничения / Шасси / Двигатель / ВПП / Автопилот / APU / Топливо)
+- Минимум 20 вопросов, охватывай разные разделы
+- Вопросы только с конкретными числовыми значениями из РЛЭ
+- Не включай вопросы без чёткого однозначного ответа
 
-{
-question:"Максимальная боковая составляющая ветра на сухой ВПП",
-answer:"36",
-unit:"kt"
-},
+Текст РЛЭ для обработки:
+[ВСТАВИТЬ ТЕКСТ РЛЭ]`;
 
-{
-question:"Максимальная встречная составляющая ветра",
-answer:"50",
-unit:"kt"
-},
-
-{
-question:"Максимальная скорость с выпущенным шасси VLE",
-answer:"255",
-unit:"kt"
-},
-
-{
-question:"Максимальная скорость выпуска шасси VLO EXT",
-answer:"255",
-unit:"kt"
-},
-
-{
-question:"Максимальная скорость уборки шасси VLO RET",
-answer:"215",
-unit:"kt"
-},
-
-{
-question:"Максимальная скорость полета с открытой форточкой",
-answer:"200",
-unit:"kt"
-},
-
-{
-question:"Максимальная скорость работы стеклоочистителей",
-answer:"230",
-unit:"kt"
-},
-
-{
-question:"Максимальный дисбаланс топлива между крыльевыми баками",
-answer:"500",
-unit:"кг"
-}
-
+const DEFAULT_QS = [
+  {id:1,category:"Масса и центровка",question:"Максимальная взлётная масса (тормоза отпущены)?",type:"number",answer:49450,unit:"кг",tolerance:0},
+  {id:2,category:"Масса и центровка",question:"Максимальная посадочная масса?",type:"number",answer:41000,unit:"кг",tolerance:0},
+  {id:3,category:"Масса и центровка",question:"Максимальная масса без топлива?",type:"number",answer:40000,unit:"кг",tolerance:0},
+  {id:4,category:"Масса и центровка",question:"Минимальная полётная масса?",type:"number",answer:27400,unit:"кг",tolerance:0},
+  {id:5,category:"Масса и центровка",question:"Максимальная рулёжная масса?",type:"number",answer:49650,unit:"кг",tolerance:0},
+  {id:6,category:"Скорости",question:"Максимальная эксплуатационная скорость VMO?",type:"choice",options:["295 kt","308 kt","320 kt","285 kt"],answer:1},
+  {id:7,category:"Скорости",question:"Максимальное эксплуатационное число Маха MMO?",type:"number",answer:0.81,unit:"М",tolerance:0},
+  {id:8,category:"Скорости",question:"Максимальная скорость при выпуске шасси VLO EXT?",type:"number",answer:255,unit:"kt",tolerance:0},
+  {id:9,category:"Скорости",question:"Максимальная скорость при уборке шасси VLO RET?",type:"number",answer:215,unit:"kt",tolerance:0},
+  {id:10,category:"Скорости",question:"Максимальная скорость с выпущенным шасси VLE?",type:"number",answer:255,unit:"kt",tolerance:0},
+  {id:11,category:"Скорости",question:"Максимальная скорость с механизацией FLAP 1+F (VFE)?",type:"number",answer:230,unit:"kt",tolerance:0},
+  {id:12,category:"Скорости",question:"Максимальная скорость с механизацией FLAP FULL (VFE)?",type:"number",answer:180,unit:"kt",tolerance:0},
+  {id:13,category:"Скорости",question:"Максимальная скорость FLAP 2 (VFE)?",type:"number",answer:200,unit:"kt",tolerance:0},
+  {id:14,category:"Скорости",question:"Максимальная скорость FLAP 3 (VFE)?",type:"number",answer:190,unit:"kt",tolerance:0},
+  {id:15,category:"Ветровые ограничения",question:"Максимальная встречная составляющая ветра на взлёте и посадке?",type:"number",answer:50,unit:"kt",tolerance:0},
+  {id:16,category:"Ветровые ограничения",question:"Максимальная боковая составляющая ветра на сухой ВПП?",type:"number",answer:36,unit:"kt",tolerance:0},
+  {id:17,category:"Ветровые ограничения",question:"Максимальная попутная составляющая на взлёте FLAP 1+F?",type:"number",answer:10,unit:"kt",tolerance:0},
+  {id:18,category:"Ветровые ограничения",question:"Максимальная попутная составляющая на взлёте FLAP 2/3?",type:"number",answer:15,unit:"kt",tolerance:0},
+  {id:19,category:"Ветровые ограничения",question:"Максимальная попутная составляющая на посадке FLAP 3?",type:"number",answer:10,unit:"kt",tolerance:0},
+  {id:20,category:"ВПП",question:"Максимальный уклон ВПП?",type:"choice",options:["± 1%","± 1.5%","± 2%","± 2.5%"],answer:2},
+  {id:21,category:"ВПП",question:"Минимальная ширина ВПП (стандартная)?",type:"number",answer:42,unit:"м",tolerance:0},
+  {id:22,category:"ВПП",question:"Минимальная ширина ВПП (узкая)?",type:"number",answer:30,unit:"м",tolerance:0},
+  {id:23,category:"ВПП",question:"Максимальная глубина сухого снега для взлёта и посадки?",type:"number",answer:60,unit:"мм",tolerance:0},
+  {id:24,category:"ВПП",question:"Максимальная глубина мокрого снега для взлёта и посадки?",type:"number",answer:15,unit:"мм",tolerance:0},
+  {id:25,category:"Двигатель",question:"Максимальная температура EGT в режиме TO/GA?",type:"number",answer:972,unit:"°C",tolerance:0},
+  {id:26,category:"Двигатель",question:"Максимальная температура EGT в режиме MCT?",type:"number",answer:928,unit:"°C",tolerance:0},
+  {id:27,category:"Двигатель",question:"Максимальные допустимые обороты N1?",type:"number",answer:105,unit:"%",tolerance:0},
+  {id:28,category:"Двигатель",question:"Максимальная скорость использования реверса тяги?",type:"number",answer:170,unit:"kt",tolerance:0},
+  {id:29,category:"Двигатель",question:"Запрещается использовать режим REV MAX на скорости менее?",type:"number",answer:65,unit:"kt",tolerance:0},
+  {id:30,category:"APU",question:"Максимальная высота запуска APU?",type:"number",answer:35500,unit:"ft",tolerance:0},
+  {id:31,category:"APU",question:"Максимальная высота работы APU с включённым генератором?",type:"number",answer:40000,unit:"ft",tolerance:0},
+  {id:32,category:"APU",question:"Максимальная температура EGT APU при запуске?",type:"number",answer:1038,unit:"°C",tolerance:0},
+  {id:33,category:"Топливо",question:"Максимальный дисбаланс топлива между баками?",type:"number",answer:500,unit:"кг",tolerance:0},
+  {id:34,category:"Автопилот",question:"Минимальная высота включения автопилота при взлёте?",type:"number",answer:100,unit:"ft AGL",tolerance:0},
+  {id:35,category:"Автопилот",question:"Минимальная высота автопилота на этапах, кроме особых?",type:"number",answer:500,unit:"ft AGL",tolerance:0},
+  {id:36,category:"Перегрузка",question:"Максимальная перегрузка при убранных предкрылках и закрылках?",type:"number",answer:2.5,unit:"g",tolerance:0},
+  {id:37,category:"Перегрузка",question:"Максимальная перегрузка при выпущенных предкрылках и закрылках?",type:"number",answer:2.0,unit:"g",tolerance:0},
+  {id:38,category:"Гидравлика",question:"Минимальное давление в гидросистеме?",type:"number",answer:1800,unit:"Psi",tolerance:0},
+  {id:39,category:"Шасси",question:"Максимальный угол поворота колёс передней опоры при буксировке?",type:"number",answer:85,unit:"°",tolerance:0},
+  {id:40,category:"Кондиционирование",question:"Максимальный положительный перепад давления в кабине?",type:"number",answer:8.7,unit:"Psi",tolerance:0}
 ];
 
+let questions = [...DEFAULT_QS];
+let queue = [];
 let current = 0;
 let score = 0;
-let mistakes = [];
+let best = null;
+let answered = false;
 
-function normalize(value){
-
-return value
-.toString()
-.toLowerCase()
-.replace("kt","")
-.replace("уз","")
-.replace("узлов","")
-.replace("кг","")
-.replace(/\s+/g,"")
-.replace(",",".")
-.trim();
-
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  updateHomeStats();
 }
 
-function loadQuestion(){
-
-document.getElementById("question").innerText =
-questions[current].question;
-
-document.getElementById("unit").innerText =
-questions[current].unit
-? `Ответ в ${questions[current].unit}`
-: "";
-
-document.getElementById("counter").innerText =
-`Вопрос ${current + 1} из ${questions.length}`;
-
-document.getElementById("progress").style.width =
-`${((current)/questions.length)*100}%`;
-
-document.getElementById("answer").value = "";
-
-document.getElementById("answer").focus();
+function updateHomeStats() {
+  document.getElementById('stat-total').textContent = questions.length;
+  document.getElementById('stat-best').textContent = best !== null ? best + '%' : '—';
 }
 
-function nextQuestion(){
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 
-const userAnswer =
-document.getElementById("answer").value;
-
-if(userAnswer.trim()===""){
-alert("Введите ответ");
-return;
+function startQuiz() {
+  queue = shuffle(questions).slice(0, Math.min(questions.length, 15));
+  current = 0; score = 0; answered = false;
+  showScreen('quiz');
+  renderQ();
 }
 
-const correct =
-normalize(questions[current].answer);
+function renderQ() {
+  const q = queue[current];
+  answered = false;
+  document.getElementById('q-counter').textContent = (current + 1) + ' / ' + queue.length;
+  document.getElementById('q-cat').textContent = q.category;
+  document.getElementById('progress').style.width = (current / queue.length * 100) + '%';
+  document.getElementById('q-text').textContent = q.question;
+  const fb = document.getElementById('q-feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback';
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'none';
+  const body = document.getElementById('q-body');
+  if (q.type === 'choice') {
+    body.innerHTML = '<div class="options">' +
+      q.options.map((o, i) => `<button class="opt" onclick="checkChoice(${i})">${o}</button>`).join('') +
+      '</div>';
+  } else {
+    body.innerHTML = `<div class="num-area">
+      <div class="num-row">
+        <input type="number" class="num-input" id="num-ans" inputmode="decimal" placeholder="0" step="any" onkeydown="if(event.key==='Enter')checkNumber()">
+        <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
+    </div>`;
+    setTimeout(() => { const el = document.getElementById('num-ans'); if (el) el.focus(); }, 100);
+  }
+}
 
-const user =
-normalize(userAnswer);
+function showFeedback(ok, text) {
+  const fb = document.getElementById('q-feedback');
+  fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+  fb.textContent = text;
+  fb.style.display = 'block';
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'block';
+  nb.textContent = current + 1 >= queue.length ? 'Завершить' : 'Далее →';
+}
 
-if(user === correct){
+function checkChoice(i) {
+  if (answered) return;
+  answered = true;
+  const q = queue[current];
+  const btns = document.querySelectorAll('.opt');
+  btns.forEach(b => b.disabled = true);
+  if (i === q.answer) {
+    btns[i].classList.add('correct');
+    score++;
+    showFeedback(true, '✓ Верно');
+  } else {
+    btns[i].classList.add('wrong');
+    btns[q.answer].classList.add('reveal');
+    showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.options[q.answer]);
+  }
+}
 
-score++;
+function checkNumber() {
+  if (answered) return;
+  const inp = document.getElementById('num-ans');
+  if (!inp || inp.value === '') return;
+  answered = true;
+  const q = queue[current];
+  const val = parseFloat(inp.value);
+  const tol = q.tolerance || 0;
+  const ok = Math.abs(val - q.answer) <= tol;
+  inp.disabled = true;
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  if (ok) { score++; showFeedback(true, '✓ Верно: ' + q.answer + ' ' + (q.unit || '')); }
+  else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.answer + ' ' + (q.unit || '')); }
+}
 
-}else{
+function nextQ() {
+  current++;
+  if (current >= queue.length) { showResult(); return; }
+  renderQ();
+  window.scrollTo(0, 0);
+}
 
-mistakes.push({
-question:questions[current].question,
-correct:questions[current].answer,
-user:userAnswer
+function showResult() {
+  const pct = Math.round(score / queue.length * 100);
+  if (best === null || pct > best) best = pct;
+  document.getElementById('res-score').textContent = score + ' / ' + queue.length;
+  document.getElementById('res-pct').textContent = pct + '%';
+  document.getElementById('res-comment').textContent =
+    pct >= 90 ? 'Отлично! Ограничения знаешь.' :
+    pct >= 70 ? 'Хорошо, есть над чем работать.' :
+    pct >= 50 ? 'Нужно повторить материал.' : 'Серьёзно повторить РЛЭ.';
+  showScreen('result');
+}
+
+function loadFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  const status = document.getElementById('import-status');
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) throw new Error('Должен быть массив JSON');
+      if (!data.length) throw new Error('Файл пустой');
+      questions = data;
+      status.className = 'import-status ok';
+      status.textContent = '✓ Загружено вопросов: ' + data.length;
+      updateHomeStats();
+    } catch (err) {
+      status.className = 'import-status err';
+      status.textContent = '✗ Ошибка: ' + err.message;
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function copyPrompt() {
+  const btn = document.getElementById('copy-btn');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(PROMPT).then(() => {
+      btn.textContent = '✓ Скопировано!';
+      setTimeout(() => { btn.textContent = '📋 Скопировать промпт'; }, 2000);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = PROMPT;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Скопировано!';
+    setTimeout(() => { btn.textContent = '📋 Скопировать промпт'; }, 2000);
+  }
+}
+
+document.getElementById('prompt-box').textContent = PROMPT;
+
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.background = 'var(--bg2)'; });
+dz.addEventListener('dragleave', () => { dz.style.background = ''; });
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.style.background = '';
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const inp = document.getElementById('file-inp');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    inp.files = dt.files;
+    loadFile(inp);
+  }
 });
 
-}
-
-current++;
-
-if(current < questions.length){
-
-loadQuestion();
-
-}else{
-
-showResults();
-
-}
-
-}
-
-function showResults(){
-
-document.getElementById("quiz").style.display="none";
-
-const percent =
-Math.round((score/questions.length)*100);
-
-let html = `
-
-<div class="result">
-
-<h1>Результат</h1>
-
-<div class="score">
-${score}/${questions.length}
-</div>
-
-<div class="percent">
-${percent}%
-</div>
-
-`;
-
-if(mistakes.length){
-
-html += "<h2>Ошибки</h2>";
-
-mistakes.forEach(item=>{
-
-html += `
-
-<div class="error-card">
-
-<h4>${item.question}</h4>
-
-<div class="user">
-Ваш ответ: ${item.user}
-</div>
-
-<div class="correct">
-Правильный ответ: ${item.correct}
-</div>
-
-</div>
-
-`;
-
-});
-
-}
-
-html += `
-
-<button onclick="location.reload()">
-Пройти заново
-</button>
-
-</div>
-
-`;
-
-document.getElementById("result").innerHTML = html;
-document.getElementById("result").style.display = "block";
-
-}
-
-loadQuestion();
-
-document
-.getElementById("answer")
-.addEventListener("keydown",function(e){
-
-if(e.key==="Enter"){
-nextQuestion();
-}
-
-});
-
+updateHomeStats();
 </script>
-
 </body>
 </html>
