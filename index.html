@@ -282,23 +282,32 @@
 
   /* Import */
   .import-body { padding: 1rem; }
-  .drop-zone {
-    border: 1.5px dashed var(--border2);
-    border-radius: var(--radius);
-    padding: 3rem 1rem;
-    text-align: center;
-    cursor: pointer;
-    margin-bottom: 1rem;
+  .import-hint {
+    font-size: 14px;
     color: var(--text2);
+    margin-bottom: 12px;
+    line-height: 1.5;
   }
-  .drop-zone:active { background: var(--bg2); }
-  .drop-icon { font-size: 40px; margin-bottom: 12px; }
-  .drop-text { font-size: 16px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
-  .drop-sub { font-size: 14px; color: var(--text2); }
+  .json-textarea {
+    width: 100%;
+    height: 220px;
+    padding: 14px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    line-height: 1.5;
+    resize: none;
+    margin-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .json-textarea:focus { outline: none; border-color: var(--text); }
   .import-status {
     font-size: 14px;
     color: var(--text2);
-    margin-bottom: 1.5rem;
+    margin-bottom: 10px;
     min-height: 20px;
   }
   .import-status.ok { color: var(--green); }
@@ -354,8 +363,12 @@
     </div>
   </div>
   <div class="menu-list">
-    <button class="menu-btn primary" onclick="startQuiz()">
-      <span class="menu-icon">▶</span> Начать тест
+    <button class="menu-btn primary" onclick="startQuiz(10)">
+      <span class="menu-icon">▶</span> 10 случайных вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="startQuiz(null)">
+      <span class="menu-icon">▶▶</span> Все вопросы
       <span class="arrow">›</span>
     </button>
     <button class="menu-btn" onclick="showScreen('import')">
@@ -392,7 +405,7 @@
     <div class="result-pct" id="res-pct"></div>
     <div class="result-comment" id="res-comment"></div>
     <div class="result-btns">
-      <button class="menu-btn primary" onclick="startQuiz()">
+      <button class="menu-btn primary" onclick="startQuiz(lastCount)">
         <span class="menu-icon">↺</span> Ещё раз
         <span class="arrow">›</span>
       </button>
@@ -411,15 +424,15 @@
     <span class="nav-title">Импорт вопросов</span>
   </div>
   <div class="import-body">
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-inp').click()">
-      <div class="drop-icon">📄</div>
-      <div class="drop-text">Выберите JSON-файл</div>
-      <div class="drop-sub">Нажмите для выбора</div>
-    </div>
-    <input type="file" id="file-inp" accept=".json" style="display:none" onchange="loadFile(this)">
+    <div class="import-hint">Вставьте JSON с вопросами — получить его можно через промпт для нейронки</div>
+    <textarea id="json-text" class="json-textarea" placeholder='[{"id":1,"category":"...","question":"...","type":"choice","options":[...],"answer":0}, ...]' spellcheck="false"></textarea>
     <div class="import-status" id="import-status"></div>
-    <button class="menu-btn primary" onclick="showScreen('home')">
-      <span class="menu-icon">✓</span> Готово
+    <button class="menu-btn primary" onclick="loadText()" style="margin-bottom:10px">
+      <span class="menu-icon">⬆</span> Загрузить
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showScreen('home')">
+      <span class="menu-icon">‹</span> Назад
       <span class="arrow">›</span>
     </button>
   </div>
@@ -539,8 +552,12 @@ function updateHomeStats() {
 
 function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 
-function startQuiz() {
-  queue = shuffle(questions).slice(0, Math.min(questions.length, 15));
+let lastCount = 10;
+
+function startQuiz(count) {
+  lastCount = count;
+  const n = count ? Math.min(count, questions.length) : questions.length;
+  queue = shuffle(questions).slice(0, n);
   current = 0; score = 0; answered = false;
   showScreen('quiz');
   renderQ();
@@ -637,26 +654,26 @@ function showResult() {
   showScreen('result');
 }
 
-function loadFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
+function loadText() {
+  const raw = document.getElementById('json-text').value.trim();
   const status = document.getElementById('import-status');
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!Array.isArray(data)) throw new Error('Должен быть массив JSON');
-      if (!data.length) throw new Error('Файл пустой');
-      questions = data;
-      status.className = 'import-status ok';
-      status.textContent = '✓ Загружено вопросов: ' + data.length;
-      updateHomeStats();
-    } catch (err) {
-      status.className = 'import-status err';
-      status.textContent = '✗ Ошибка: ' + err.message;
-    }
-  };
-  reader.readAsText(file, 'utf-8');
+  if (!raw) {
+    status.className = 'import-status err';
+    status.textContent = '✗ Поле пустое — вставьте JSON';
+    return;
+  }
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error('Должен быть массив JSON');
+    if (!data.length) throw new Error('Массив пустой');
+    questions = data;
+    status.className = 'import-status ok';
+    status.textContent = '✓ Загружено вопросов: ' + data.length;
+    updateHomeStats();
+  } catch (err) {
+    status.className = 'import-status err';
+    status.textContent = '✗ Ошибка: ' + err.message;
+  }
 }
 
 function copyPrompt() {
@@ -680,22 +697,6 @@ function copyPrompt() {
 }
 
 document.getElementById('prompt-box').textContent = PROMPT;
-
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.background = 'var(--bg2)'; });
-dz.addEventListener('dragleave', () => { dz.style.background = ''; });
-dz.addEventListener('drop', e => {
-  e.preventDefault();
-  dz.style.background = '';
-  const file = e.dataTransfer.files[0];
-  if (file) {
-    const inp = document.getElementById('file-inp');
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    inp.files = dt.files;
-    loadFile(inp);
-  }
-});
 
 updateHomeStats();
 </script>
