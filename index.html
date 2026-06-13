@@ -354,7 +354,7 @@
   </div>
   <div class="stat-row">
     <div class="stat">
-      <div class="stat-n" id="stat-total">30</div>
+      <div class="stat-n" id="stat-total">80</div>
       <div class="stat-l">вопросов</div>
     </div>
     <div class="stat">
@@ -528,8 +528,49 @@ const DEFAULT_QS = [
   {id:37,category:"Перегрузка",question:"Максимальная перегрузка при выпущенных предкрылках и закрылках?",type:"number",answer:2.0,unit:"g",tolerance:0},
   {id:38,category:"Гидравлика",question:"Минимальное давление в гидросистеме?",type:"number",answer:1800,unit:"Psi",tolerance:0},
   {id:39,category:"Шасси",question:"Максимальный угол поворота колёс передней опоры при буксировке?",type:"number",answer:85,unit:"°",tolerance:0},
-  {id:40,category:"Кондиционирование",question:"Максимальный положительный перепад давления в кабине?",type:"number",answer:8.7,unit:"Psi",tolerance:0}
+  {id:40,category:"Кондиционирование",question:"Максимальный положительный перепад давления в кабине?",type:"number",answer:8.7,unit:"Psi",tolerance:0},
+  {id:41,category:"Экипаж",question:"Минимальный состав летного экипажа RRJ-95?",type:"choice",options:["1 пилот","2 пилота","3 пилота","1 пилот + инженер"],answer:1},
+  {id:42,category:"Масса и центровка",question:"Допускается ли посадка с превышением максимальной посадочной массы?",type:"choice",options:["Нет, никогда","Да, всегда","Только при необходимости (возврат или запас)","Только ночью"],answer:2},
+  {id:43,category:"Буксировка",question:"Максимальная скорость ветра при буксировке?",type:"number",answer:50,unit:"kt",tolerance:0},
+  {id:44,category:"Буксировка",question:"Максимальная скорость ветра при рулении (N1≤35%)?",type:"number",answer:35,unit:"kt",tolerance:0},
+  {id:45,category:"Скорости",question:"Максимальная маневренная скорость VA в режиме DIRECT MODE?",type:"number",answer:236,unit:"kt",tolerance:0},
+  {id:46,category:"Скорости",question:"Максимальная путевая скорость по условиям прочности шин?",type:"number",answer:195,unit:"kt",tolerance:0},
+  {id:47,category:"Скорости",question:"Максимальная скорость полета при работе стеклоочистителей?",type:"number",answer:230,unit:"kt",tolerance:0},
+  {id:48,category:"Скорости",question:"Максимальная скорость полета с открытой форточкой?",type:"number",answer:200,unit:"kt",tolerance:0},
+  {id:49,category:"Минимальная эволютивная скорость",question:"VMCG конфигурация FLAP 1+F/2/3?",type:"number",answer:111,unit:"kt CAS",tolerance:0},
+  {id:50,category:"Минимальная эволютивная скорость",question:"VMC конфигурация FLAP 1+F/2/3?",type:"number",answer:116,unit:"kt CAS",tolerance:0},
+  {id:51,category:"Топливо",question:"Какие сорта топлива разрешены для RRJ-95?",type:"choice",options:["Только TS-1","TS-1, РТ, JET A-1, JET A","Только JET A-1","TS-1 и JET A-1"],answer:1},
+  {id:52,category:"Топливо",question:"Максимальная температура топлива?",type:"number",answer:47,unit:"°C",tolerance:0},
+  {id:53,category:"Топливо",question:"Минимальная температура топлива JET A-1?",type:"number",answer:-47,unit:"°C",tolerance:0},
+  {id:54,category:"Топливо",question:"Общий объём топливных баков?",type:"number",answer:15805,unit:"л",tolerance:50},
+  {id:55,category:"Гидравлика",question:"Рабочее давление в гидросистеме?",type:"choice",options:["1200-1800 Psi","1800-2500 Psi","1800-3200 Psi","2000-3500 Psi"],answer:2},
+  {id:56,category:"Гидравлика",question:"Минимальная температура гидрожидкости перед взлетом?",type:"number",answer:-20,unit:"°C",tolerance:0},
+  {id:57,category:"Двигатель",question:"Минимальная температура масла перед взлетом?",type:"number",answer:10,unit:"°C",tolerance:0},
+  {id:58,category:"Двигатель",question:"Максимальная температура масла без ограничения по времени?",type:"number",answer:140,unit:"°C",tolerance:0},
+  {id:59,category:"Двигатель",question:"Максимальная температура масла не более 15 минут?",type:"number",answer:155,unit:"°C",tolerance:0},
+  {id:60,category:"Запуск двигателя",question:"Максимальный интервал между запусками (включениями стартера)?",type:"number",answer:10,unit:"сек",tolerance:0},
+  {id:61,category:"Запуск двигателя",question:"Время непрерывной работы турбостартера?",type:"number",answer:2,unit:"мин",tolerance:0},
+  {id:62,category:"Запуск двигателя",question:"Запрещается включать турбостартер если обороты N2 более?",type:"number",answer:36,unit:"%",tolerance:0},
+  {id:63,category:"Запуск двигателя",question:"Максимальное количество последовательных запусков двигателя?",type:"number",answer:4,unit:"раз",tolerance:0},
+  {id:64,category:"Запуск двигателя",question:"Время охлаждения двигателя после 4-х запусков?",type:"number",answer:5,unit:"мин",tolerance:0},
+  {id:65,category:"APU",question:"Минимальный перерыв между запусками APU?",type:"number",answer:1,unit:"мин",tolerance:0},
+  {id:66,category:"APU",question:"Максимально допустимые обороты ротора APU?",type:"number",answer:106,unit:"%",tolerance:0},
+  {id:67,category:"APU",question:"Максимальная высота отбора воздуха для запуска двигателя?",type:"number",answer:14000,unit:"ft",tolerance:0},
+  {id:68,category:"APU",question:"Максимальная высота отбора воздуха для СКВ (кондиционирования)?",type:"number",answer:15000,unit:"ft",tolerance:0},
+  {id:69,category:"Кислород",question:"Минимальное давление кислорода перед вылетом (2 пилота)?",type:"number",answer:1200,unit:"Psi",tolerance:0},
+  {id:70,category:"Кислород",question:"Минимальное давление кислорода перед вылетом (3 человека)?",type:"number",answer:1700,unit:"Psi",tolerance:0},
+  {id:71,category:"Навигация",question:"На какой широте запрещён вход в зону RNAV 1 в режиме INERTIAL?",type:"choice",options:["Выше 60°","Выше 73°","Выше 82°","Выше 90°"],answer:0},
+  {id:72,category:"Навигация",question:"Максимальное время использования режима INERTIAL в B-RNAV?",type:"number",answer:148,unit:"мин",tolerance:2},
+  {id:73,category:"Навигация",question:"Максимальное время INERTIAL в режиме RNAV 1 и P-RNAV?",type:"number",answer:30,unit:"мин",tolerance:0},
+  {id:74,category:"Навигация",question:"Какая система координат требуется для LNAV/VNAV?",type:"choice",options:["MAGNA","WGS-84","NAD83","ETRS89"],answer:1},
+  {id:75,category:"Обледенение",question:"При какой температуре воздуха условия обледенения возможны?",type:"choice",options:["Выше 15°C","От 0 до 10°C","10°C и менее","Ниже -40°C"],answer:2},
+  {id:76,category:"Шасси",question:"Максимальная скорость руления при одной спущенной шине?",type:"number",answer:7,unit:"kt",tolerance:0},
+  {id:77,category:"Шасси",question:"При двух спущенных шинах на одной опоре максимальная скорость руления?",type:"number",answer:3,unit:"kt",tolerance:0},
+  {id:78,category:"Шасси",question:"При двух спущенных шинах максимальный угол отклонения передней опоры?",type:"number",answer:30,unit:"°",tolerance:0},
+  {id:79,category:"ВПП",question:"Минимальный допустимый нормативный коэффициент сцепления?",type:"number",answer:0.3,unit:"",tolerance:0},
+  {id:80,category:"Электроснабжение",question:"Максимальное напряжение в сети постоянного тока при нормальной работе?",type:"number",answer:29.5,unit:"V",tolerance:0}
 ];
+
 
 let questions = [...DEFAULT_QS];
 let queue = [];
