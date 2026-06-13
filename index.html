@@ -2,11 +2,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#ffffff">
-<title>RRJ-95 Limits — тест по ограничениям</title>
+<title>RRJ-95 Limits</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -341,35 +341,6 @@
     cursor: pointer;
   }
   .copy-btn:active { background: var(--bg2); }
-
-  /* Topic list & quantity */
-  .topic-item {
-    width: 100%;
-    padding: 14px 16px;
-    background: var(--bg2);
-    border: none;
-    border-radius: var(--radius);
-    text-align: left;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .topic-item:active { background: var(--bg3); }
-  .topic-list-container { padding: 0 1rem; display: flex; flex-direction: column; gap: 8px; max-height: 65vh; overflow-y: auto; margin-bottom: 1rem; }
-  .quantity-actions { padding: 1rem; display: flex; flex-direction: column; gap: 12px; }
-  .selected-topic-badge {
-    background: var(--bg2);
-    padding: 10px 16px;
-    border-radius: 30px;
-    font-size: 15px;
-    font-weight: 500;
-    text-align: center;
-    margin-bottom: 16px;
-  }
 </style>
 </head>
 <body>
@@ -392,12 +363,26 @@
     </div>
   </div>
   <div class="menu-list">
-    <button class="menu-btn primary" id="btn-random-10">▶ 10 случайных вопросов<span class="arrow">›</span></button>
-    <button class="menu-btn" id="btn-random-20">▶ 20 вопросов<span class="arrow">›</span></button>
-    <button class="menu-btn" id="btn-random-all">▶▶ Все вопросы<span class="arrow">›</span></button>
-    <button class="menu-btn" id="btn-topics">📚 Вопросы по теме<span class="arrow">›</span></button>
-    <button class="menu-btn" id="btn-import">⬆ Импорт вопросов<span class="arrow">›</span></button>
-    <button class="menu-btn" id="btn-prompt">✦ Промпт для генерации<span class="arrow">›</span></button>
+    <button class="menu-btn primary" onclick="startQuiz(10)">
+      <span class="menu-icon">▶</span> 10 случайных вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="startQuiz(20)">
+      <span class="menu-icon">▶</span> 20 вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="startQuiz(null)">
+      <span class="menu-icon">▶▶</span> Все вопросы
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showScreen('import')">
+      <span class="menu-icon">⬆</span> Импорт вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showScreen('prompt')">
+      <span class="menu-icon">✦</span> Промпт для генерации
+      <span class="arrow">›</span>
+    </button>
   </div>
 </div>
 
@@ -424,8 +409,14 @@
     <div class="result-pct" id="res-pct"></div>
     <div class="result-comment" id="res-comment"></div>
     <div class="result-btns">
-      <button class="menu-btn primary" id="retry-last-btn">↺ Ещё раз<span class="arrow">›</span></button>
-      <button class="menu-btn" id="home-from-result">⌂ На главную<span class="arrow">›</span></button>
+      <button class="menu-btn primary" onclick="startQuiz(lastCount)">
+        <span class="menu-icon">↺</span> Ещё раз
+        <span class="arrow">›</span>
+      </button>
+      <button class="menu-btn" onclick="showScreen('home')">
+        <span class="menu-icon">⌂</span> На главную
+        <span class="arrow">›</span>
+      </button>
     </div>
   </div>
 </div>
@@ -437,11 +428,17 @@
     <span class="nav-title">Импорт вопросов</span>
   </div>
   <div class="import-body">
-    <div class="import-hint">Вставьте JSON с вопросами — получить его можно через промпт для нейронки (тема "Экипаж" автоматически отфильтруется)</div>
-    <textarea id="json-text" class="json-textarea" placeholder='[{"id":1,"category":"Масса и центровка","question":"...","type":"choice","options":[...],"answer":0}, ...]' spellcheck="false"></textarea>
+    <div class="import-hint">Вставьте JSON с вопросами — получить его можно через промпт для нейронки</div>
+    <textarea id="json-text" class="json-textarea" placeholder='[{"id":1,"category":"...","question":"...","type":"choice","options":[...],"answer":0}, ...]' spellcheck="false"></textarea>
     <div class="import-status" id="import-status"></div>
-    <button class="menu-btn primary" id="do-import" style="margin-bottom:10px">⬆ Загрузить<span class="arrow">›</span></button>
-    <button class="menu-btn" onclick="showScreen('home')">‹ Назад<span class="arrow">›</span></button>
+    <button class="menu-btn primary" onclick="loadText()" style="margin-bottom:10px">
+      <span class="menu-icon">⬆</span> Загрузить
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showScreen('home')">
+      <span class="menu-icon">‹</span> Назад
+      <span class="arrow">›</span>
+    </button>
   </div>
 </div>
 
@@ -457,35 +454,45 @@
   </div>
 </div>
 
-<!-- TOPIC LIST -->
-<div id="topic-list" class="screen">
-  <div class="nav">
-    <button class="back-btn" onclick="showScreen('home')">‹</button>
-    <span class="nav-title">Выберите тему</span>
-  </div>
-  <div class="topic-list-container" id="topic-list-container"></div>
-</div>
-
-<!-- TOPIC QUANTITY -->
-<div id="topic-quantity" class="screen">
-  <div class="nav">
-    <button class="back-btn" onclick="showScreen('topic-list')">‹</button>
-    <span class="nav-title">Количество вопросов</span>
-  </div>
-  <div class="quantity-actions">
-    <div class="selected-topic-badge" id="selected-topic-display"></div>
-    <button class="menu-btn primary" id="topic-quantity-10">🔟 10 вопросов по теме<span class="arrow">›</span></button>
-    <button class="menu-btn" id="topic-quantity-20">🔟 20 вопросов по теме<span class="arrow">›</span></button>
-    <button class="menu-btn" id="topic-quantity-all">📖 Все вопросы по теме<span class="arrow">›</span></button>
-  </div>
-</div>
-
 </div>
 
 <script>
-// --------------------------------------------------------------
-// БАЗА ВОПРОСОВ (без темы "Экипаж")
-const RAW_DEFAULT_QS = [
+const PROMPT = `Ты — генератор тестовых вопросов по Руководству полётной эксплуатации RRJ-95. Прочитай предоставленный текст РЛЭ и создай список вопросов для проверки знаний лётного экипажа.
+
+Формат ответа — только JSON, без каких-либо других слов, без markdown-блоков. Структура:
+
+[
+  {
+    "id": 1,
+    "category": "Масса и центровка",
+    "question": "Максимальная взлётная масса (тормоза отпущены)?",
+    "type": "number",
+    "answer": 49450,
+    "unit": "кг",
+    "tolerance": 0
+  },
+  {
+    "id": 2,
+    "category": "Скорости",
+    "question": "Максимальная скорость VMO?",
+    "type": "choice",
+    "options": ["295 kt", "308 kt", "320 kt", "285 kt"],
+    "answer": 1
+  }
+]
+
+Правила:
+- type "number": числовой ответ, поля answer (число), unit (единица), tolerance (допуск ±)
+- type "choice": 4 варианта, answer — индекс правильного (0–3)
+- category: краткая тема (Масса и центровка / Скорости / Ветровые ограничения / Шасси / Двигатель / ВПП / Автопилот / APU / Топливо)
+- Минимум 20 вопросов, охватывай разные разделы
+- Вопросы только с конкретными числовыми значениями из РЛЭ
+- Не включай вопросы без чёткого однозначного ответа
+
+Текст РЛЭ для обработки:
+[ВСТАВИТЬ ТЕКСТ РЛЭ]`;
+
+const DEFAULT_QS = [
   {id:1,category:"Масса и центровка",question:"Максимальная взлётная масса (тормоза отпущены)?",type:"number",answer:49450,unit:"кг",tolerance:0},
   {id:2,category:"Масса и центровка",question:"Максимальная посадочная масса?",type:"number",answer:41000,unit:"кг",tolerance:0},
   {id:3,category:"Масса и центровка",question:"Максимальная масса без топлива?",type:"number",answer:40000,unit:"кг",tolerance:0},
@@ -526,7 +533,7 @@ const RAW_DEFAULT_QS = [
   {id:38,category:"Гидравлика",question:"Минимальное давление в гидросистеме?",type:"number",answer:1800,unit:"Psi",tolerance:0},
   {id:39,category:"Шасси",question:"Максимальный угол поворота колёс передней опоры при буксировке?",type:"number",answer:85,unit:"°",tolerance:0},
   {id:40,category:"Кондиционирование",question:"Максимальный положительный перепад давления в кабине?",type:"number",answer:8.7,unit:"Psi",tolerance:0},
-  // Вопрос 41 (Экипаж) удалён согласно требованию
+  {id:41,category:"Экипаж",question:"Минимальный состав летного экипажа RRJ-95?",type:"choice",options:["1 пилот","2 пилота","3 пилота","1 пилот + инженер"],answer:1},
   {id:42,category:"Масса и центровка",question:"Допускается ли посадка с превышением максимальной посадочной массы?",type:"choice",options:["Нет, никогда","Да, всегда","Только при необходимости (возврат или запас)","Только ночью"],answer:2},
   {id:43,category:"Буксировка",question:"Максимальная скорость ветра при буксировке?",type:"number",answer:50,unit:"kt",tolerance:0},
   {id:44,category:"Буксировка",question:"Максимальная скорость ветра при рулении (N1≤35%)?",type:"number",answer:35,unit:"kt",tolerance:0},
@@ -565,123 +572,218 @@ const RAW_DEFAULT_QS = [
   {id:77,category:"Шасси",question:"При двух спущенных шинах на одной опоре максимальная скорость руления?",type:"number",answer:3,unit:"kt",tolerance:0},
   {id:78,category:"Шасси",question:"При двух спущенных шинах максимальный угол отклонения передней опоры?",type:"number",answer:30,unit:"°",tolerance:0},
   {id:79,category:"ВПП",question:"Минимальный допустимый нормативный коэффициент сцепления?",type:"number",answer:0.3,unit:"",tolerance:0},
-  {id:81,category:"Теория полёта",question:"Что такое угол атаки (AOA)?",type:"choice",options:["Угол между траекторией и горизонтом","Угол между хордой крыла и вектором скорости","Угол крена самолёта","Угол атмосферного ветра"],answer:1}
+  {id:81,category:"Теория полёта",question:"Что такое угол атаки (AOA)?",type:"choice",options:["Угол между траекторией и горизонтом","Угол между хордой крыла и вектором скорости","Угол крена самолёта","Угол атмосферного ветра"],answer:1},
+  {id:82,category:"Теория полёта",question:"При каком угле атаки происходит срыв потока (сваливание)?",type:"choice",options:["Зависит от конфигурации самолёта","При 5-10°","При 15-18°","При 25-35°"],answer:0},
+  {id:83,category:"Системы самолёта",question:"Какая система отвечает за выпуск и уборку шасси?",type:"choice",options:["Гидравлическая","Электрическая","Пневматическая","Комбинированная"],answer:0},
+  {id:84,category:"Системы самолёта",question:"Сколько независимых гидравлических систем на RRJ-95?",type:"choice",options:["1","2","3","4"],answer:2},
+  {id:85,category:"Электроснабжение",question:"Минимальное напряжение аккумуляторной батареи при аварийной работе?",type:"number",answer:20,unit:"V",tolerance:0},
+  {id:86,category:"Электроснабжение",question:"Максимальная нагрузка на генератор при нормальной работе?",type:"number",answer:100,unit:"%",tolerance:0},
+  {id:87,category:"Механизация крыла",question:"Максимальная высота полёта с выпущенной механизацией крыла?",type:"number",answer:20000,unit:"ft",tolerance:0},
+  {id:88,category:"Механизация крыла",question:"Что означает FLAP 1+F?",type:"choice",options:["Предкрылки 18°, закрылки 9°","Предкрылки 24°, закрылки 16°","Предкрылки убраны, закрылки 1°","Полный отпуск механизации"],answer:0},
+  {id:89,category:"Взлёт",question:"Что такое V1 (скорость принятия решения)?",type:"choice",options:["Максимальная скорость на ВПП","Скорость отрыва от земли","Скорость, выше которой отказ двигателя не позволяет прервать взлёт","Минимальная скорость сваливания"],answer:2},
+  {id:90,category:"Взлёт",question:"Запрещается ли взлёт при пониженном уровне тяги на ВПП с осадками более?",type:"number",answer:3,unit:"мм",tolerance:0},
+  {id:91,category:"Посадка",question:"Что означает DH (Decision Height)?",type:"choice",options:["Высота перехвата глиссады","Высота, на которой пилот принимает решение о посадке","Максимальная высота полёта","Высота начала снижения"],answer:1},
+  {id:92,category:"Посадка",question:"При какой относительной высоте DH возможна категория II посадка без автоматической посадки?",type:"number",answer:100,unit:"ft",tolerance:0},
+  {id:93,category:"Посадка",question:"При какой DH возможна категория III с автоматической посадкой?",type:"number",answer:50,unit:"ft",tolerance:0},
+  {id:94,category:"Посадка",question:"Максимальная попутная составляющая при автоматической посадке?",type:"number",answer:10,unit:"kt",tolerance:0},
+  {id:95,category:"Система кислорода",question:"При какой высоте может потребоваться кислород экипажу?",type:"choice",options:["Выше 8000 ft","Выше 10000 ft","Выше 15000 ft","Выше 20000 ft"],answer:1},
+  {id:96,category:"Противообледенение",question:"При какой температуре воздуха активируется система противообледенения?",type:"choice",options:["Ниже 0°C","При 10°C и менее и наличии влаги","При 5°C и менее","Всегда при полёте в облаках"],answer:1},
+  {id:97,category:"Светосигнальное оборудование",question:"Что означает красный маячный свет?",type:"choice",options:["Антиколлизионная система","Посадочные огни","Огни опасности","Система аварийного оповещения"],answer:0},
+  {id:98,category:"РЛЭ и документация",question:"Что такое V-диаграмма скоростей?",type:"choice",options:["График зависимости высоты от скорости","График, показывающий критические скорости на разных высотах","График тяги двигателя","График планирования полёта"],answer:1},
+  {id:99,category:"Процедуры",question:"Что означает сокращение FCOM?",type:"choice",options:["Flight Configuration Manual","Flight Crew Operating Manual","Flight Control and Operations Manual","Flight Characteristics and Operations Module"],answer:1},
+  {id:100,category:"Ограничения конструкции",question:"Максимальная отрицательная перегрузка при убранной механизации?",type:"number",answer:-1.0,unit:"g",tolerance:0},
+  {id:101,category:"Трансмиссия",question:"При каком режиме используется реверс тяги?",type:"choice",options:["Только при посадке","Взлёт и посадка","Посадка и руление назад","Любое время полёта"],answer:2},
+  {id:102,category:"Визуальное пилотирование",question:"Минимальная видимость для полётов по правилам VFR?",type:"choice",options:["1 км","1.5 км","3 км","5 км"],answer:2},
+  {id:103,category:"Инструментальное пилотирование",question:"Что означает ILS?",type:"choice",options:["Instrumental Landing System","Internal Load Schedule","Integrated Lighting System","Instrument Location System"],answer:0},
+  {id:104,category:"Навигационное оборудование",question:"Что такое NDB?",type:"choice",options:["Non-Directional Beacon","Navigation Display Box","Network Data Broadcast","National Data Bank"],answer:0},
+  {id:105,category:"Навигационное оборудование",question:"Что такое DME?",type:"choice",options:["Distance Measuring Equipment","Data Management Engine","Digital Monitoring Equipment","Dynamic Movement Extension"],answer:0},
+  {id:106,category:"Система управления полётом",question:"Что означает FMS?",type:"choice",options:["Flight Management System","Fuel Management System","Flight Monitoring Station","Frequency Management System"],answer:0},
+  {id:107,category:"Автопилот",question:"Что означает режим APP (Approach)?",type:"choice",options:["Режим полёта по маршруту","Режим захода на посадку по приборам","Режим подъёма","Режим утановки на высоте"],answer:1},
+  {id:108,category:"Автопилот",question:"Что означает режим LAND в автопилоте?",type:"choice",options:["Режим руления","Режим автоматической посадки","Режим полёта у земли","Режим начисления высоты"],answer:1},
+  {id:109,category:"Турбулентность",question:"На какой высоте турбулентность обычно максимальна?",type:"choice",options:["На малых высотах до 5000 ft","На высотах 10000-15000 ft","Везде одинаково","Зависит от погоды и высоты"],answer:3},
+  {id:110,category:"Гроза",question:"При каком расстоянии от грозы рекомендуется изменить курс?",type:"choice",options:["5 морских миль","10 морских миль","20 морских миль","30 морских миль"],answer:2},
+  {id:111,category:"Эксплуатация в жару",question:"Как жара влияет на взлётные характеристики?",type:"choice",options:["Улучшает характеристики","Ухудшает характеристики","Не влияет","Зависит от давления"],answer:1},
+  {id:112,category:"Эксплуатация в холод",question:"Минимальная температура масла APU перед запуском на земле?",type:"number",answer:-40,unit:"°C",tolerance:0},
+  {id:113,category:"Слякоть и грязь на ВПП",question:"Максимальная боковая составляющая ветра на слякоти более 3 мм?",type:"number",answer:20,unit:"kt",tolerance:0},
+  {id:114,category:"Технический надзор",question:"Кто несёт ответственность за безопасность полёта?",type:"choice",options:["Только командир","Командир и второй пилот","Авиакомпания","Командир самолёта"],answer:3},
+  {id:115,category:"Процедуры безопасности",question:"Что должно быть в кабине при взлёте и посадке?",type:"choice",options:["Только обязательные предметы","Предметы согласно чек-листу","Все закреплено, двери закрыты","Только топливо и масло"],answer:2},
+  {id:116,category:"Коммуникация",question:"На какой частоте передают аварийный сигнал в гражданской авиации?",type:"choice",options:["121.5 MHz","118.0 MHz","125.0 MHz","130.5 MHz"],answer:0},
+  {id:117,category:"Эволютивность",question:"Что означает VMCL?",type:"choice",options:["Максимальная скорость полёта в облаках","Минимальная эволютивная скорость на подъёме","Максимальная скорость у земли","Минимальная скорость со скольжением"],answer:1},
+  {id:118,category:"Кренование",question:"Максимальный угол крена в нормальных операциях?",type:"choice",options:["15°","25°","30°","45°"],answer:2},
+  {id:119,category:"Ожидание в воздухе",question:"Как долго самолёт может ждать в зоне ожидания при нормальном режиме?",type:"choice",options:["10 минут","30 минут","Зависит от топлива","Неограниченно при работающих двигателях"],answer:2},
+  {id:120,category:"Экстренные процедуры",question:"При отказе обоих двигателей экипаж должен?",type:"choice",options:["Сразу выполнить посадку","Найти наилучшее место для посадки","Включить APU","Выполнить процедуру планирования"],answer:1},
+  {id:121,category:"Эксплуатационные ограничения",question:"Максимальное количество полётов в сутки для одного экипажа?",type:"choice",options:["2 полёта","3 полёта","4 полёта","Зависит от регламента авиакомпании"],answer:3}
 ];
-// Фильтруем всё, где category = "Экипаж" (если вдруг осталось)
-let questions = [...RAW_DEFAULT_QS.filter(q => q.category !== "Экипаж")];
 
-// --------------------------------------------------------------
-let queue = [], current = 0, score = 0, best = null, answered = false;
-let lastRunParams = { type: null, count: null, topic: null };
 
-function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); updateHomeStats(); if(id==='home') renderTopicListIfVisible(); }
-function updateHomeStats() { document.getElementById('stat-total').textContent = questions.length; document.getElementById('stat-best').textContent = best !== null ? best + '%' : '—'; }
+let questions = [...DEFAULT_QS];
+let queue = [];
+let current = 0;
+let score = 0;
+let best = null;
+let answered = false;
 
-// Запуск теста на основе массива вопросов
-function runTest(questionArray, count) {
-  const n = count ? Math.min(count, questionArray.length) : questionArray.length;
-  if (n === 0) { alert("Нет вопросов для выбранной темы"); showScreen('home'); return; }
-  queue = shuffle(questionArray).slice(0, n);
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  updateHomeStats();
+}
+
+function updateHomeStats() {
+  document.getElementById('stat-total').textContent = questions.length;
+  document.getElementById('stat-best').textContent = best !== null ? best + '%' : '—';
+}
+
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+let lastCount = 10;
+
+function startQuiz(count) {
+  lastCount = count;
+  const n = count ? Math.min(count, questions.length) : questions.length;
+  queue = shuffle(questions).slice(0, n);
   current = 0; score = 0; answered = false;
   showScreen('quiz');
   renderQ();
 }
 
-function startAllTest(count) { lastRunParams = { type: 'all', count: count, topic: null }; runTest(questions, count); }
-function startTopicTest(count) { if (!lastRunParams.topic) return; const filtered = questions.filter(q => q.category === lastRunParams.topic); runTest(filtered, count); }
-
 function renderQ() {
   const q = queue[current];
   answered = false;
-  document.getElementById('q-counter').textContent = (current+1)+' / '+queue.length;
+  document.getElementById('q-counter').textContent = (current + 1) + ' / ' + queue.length;
   document.getElementById('q-cat').textContent = q.category;
-  document.getElementById('progress').style.width = (current/queue.length*100)+'%';
+  document.getElementById('progress').style.width = (current / queue.length * 100) + '%';
   document.getElementById('q-text').textContent = q.question;
-  const fb = document.getElementById('q-feedback'); fb.style.display='none'; fb.className='feedback';
-  const nb = document.getElementById('next-btn'); nb.style.display='none';
+  const fb = document.getElementById('q-feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback';
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'none';
   const body = document.getElementById('q-body');
   if (q.type === 'choice') {
-    body.innerHTML = `<div class="options">${q.options.map((o,i)=>`<button class="opt" onclick="checkChoice(${i})">${o}</button>`).join('')}</div>`;
+    body.innerHTML = '<div class="options">' +
+      q.options.map((o, i) => `<button class="opt" onclick="checkChoice(${i})">${o}</button>`).join('') +
+      '</div>';
   } else {
-    body.innerHTML = `<div class="num-area"><div class="num-row"><input type="number" class="num-input" id="num-ans" inputmode="decimal" placeholder="0" step="any"><span class="num-unit">${q.unit||''}</span></div><button class="check-btn" onclick="checkNumber()">Проверить</button></div>`;
-    setTimeout(()=>{let el=document.getElementById('num-ans'); if(el) el.focus();},100);
+    body.innerHTML = `<div class="num-area">
+      <div class="num-row">
+        <input type="number" class="num-input" id="num-ans" inputmode="decimal" placeholder="0" step="any" onkeydown="if(event.key==='Enter')checkNumber()">
+        <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
+    </div>`;
+    setTimeout(() => { const el = document.getElementById('num-ans'); if (el) el.focus(); }, 100);
   }
 }
-window.checkChoice = function(i) {
-  if(answered) return; answered=true;
-  const q=queue[current]; const btns=document.querySelectorAll('.opt'); btns.forEach(b=>b.disabled=true);
-  if(i===q.answer){ btns[i].classList.add('correct'); score++; showFeedback(true,'✓ Верно'); }
-  else { btns[i].classList.add('wrong'); btns[q.answer].classList.add('reveal'); showFeedback(false,'✗ Неверно. Правильный ответ: '+q.options[q.answer]); }
-};
-window.checkNumber = function() {
-  if(answered) return; const inp=document.getElementById('num-ans'); if(!inp || inp.value==='') return; answered=true;
-  const q=queue[current]; const val=parseFloat(inp.value); const ok=Math.abs(val-q.answer)<=(q.tolerance||0);
-  inp.disabled=true; let cb=document.getElementById('check-btn'); if(cb) cb.disabled=true;
-  if(ok){ score++; showFeedback(true,`✓ Верно: ${q.answer} ${q.unit||''}`); }
-  else { showFeedback(false,`✗ Неверно. Правильный ответ: ${q.answer} ${q.unit||''}`); }
-};
-function showFeedback(ok,text){ const fb=document.getElementById('q-feedback'); fb.className='feedback '+(ok?'ok':'no'); fb.textContent=text; fb.style.display='block'; document.getElementById('next-btn').style.display='block'; }
-window.nextQ = function(){ current++; if(current>=queue.length){ showResult(); return; } renderQ(); window.scrollTo(0,0); };
-function showResult(){
-  const pct=Math.round(score/queue.length*100); if(best===null||pct>best) best=pct;
-  document.getElementById('res-score').textContent=score+' / '+queue.length;
-  document.getElementById('res-pct').textContent=pct+'%';
-  document.getElementById('res-comment').textContent=pct>=90?'Отлично! Ограничения знаешь.':pct>=70?'Хорошо, есть над чем работать.':pct>=50?'Нужно повторить материал.':'Серьёзно повторить РЛЭ.';
+
+function showFeedback(ok, text) {
+  const fb = document.getElementById('q-feedback');
+  fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+  fb.textContent = text;
+  fb.style.display = 'block';
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'block';
+  nb.textContent = current + 1 >= queue.length ? 'Завершить' : 'Далее →';
+}
+
+function checkChoice(i) {
+  if (answered) return;
+  answered = true;
+  const q = queue[current];
+  const btns = document.querySelectorAll('.opt');
+  btns.forEach(b => b.disabled = true);
+  if (i === q.answer) {
+    btns[i].classList.add('correct');
+    score++;
+    showFeedback(true, '✓ Верно');
+  } else {
+    btns[i].classList.add('wrong');
+    btns[q.answer].classList.add('reveal');
+    showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.options[q.answer]);
+  }
+}
+
+function checkNumber() {
+  if (answered) return;
+  const inp = document.getElementById('num-ans');
+  if (!inp || inp.value === '') return;
+  answered = true;
+  const q = queue[current];
+  const val = parseFloat(inp.value);
+  const tol = q.tolerance || 0;
+  const ok = Math.abs(val - q.answer) <= tol;
+  inp.disabled = true;
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  if (ok) { score++; showFeedback(true, '✓ Верно: ' + q.answer + ' ' + (q.unit || '')); }
+  else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.answer + ' ' + (q.unit || '')); }
+}
+
+function nextQ() {
+  current++;
+  if (current >= queue.length) { showResult(); return; }
+  renderQ();
+  window.scrollTo(0, 0);
+}
+
+function showResult() {
+  const pct = Math.round(score / queue.length * 100);
+  if (best === null || pct > best) best = pct;
+  document.getElementById('res-score').textContent = score + ' / ' + queue.length;
+  document.getElementById('res-pct').textContent = pct + '%';
+  document.getElementById('res-comment').textContent =
+    pct >= 90 ? 'Отлично! Ограничения знаешь.' :
+    pct >= 70 ? 'Хорошо, есть над чем работать.' :
+    pct >= 50 ? 'Нужно повторить материал.' : 'Серьёзно повторить РЛЭ.';
   showScreen('result');
 }
-function retryLastRun(){
-  if(lastRunParams.type === 'all') startAllTest(lastRunParams.count);
-  else if(lastRunParams.type === 'topic' && lastRunParams.topic) startTopicTest(lastRunParams.count);
-  else startAllTest(10);
-}
 
-// темы
-function getUniqueCategories(){ return [...new Set(questions.map(q=>q.category))].filter(c=>c && c!=='Экипаж').sort(); }
-function renderTopicList(){
-  const container=document.getElementById('topic-list-container'); if(!container) return;
-  const cats=getUniqueCategories();
-  container.innerHTML=cats.map(cat=>`<button class="topic-item" data-topic="${cat}">${cat}<span class="arrow">›</span></button>`).join('');
-  document.querySelectorAll('.topic-item').forEach(btn=>{ btn.addEventListener('click',()=>{ lastRunParams.topic=btn.dataset.topic; document.getElementById('selected-topic-display').textContent=`Тема: ${lastRunParams.topic}`; showScreen('topic-quantity'); }); });
-}
-function renderTopicListIfVisible(){ if(document.getElementById('topic-list').classList.contains('active')) renderTopicList(); }
-
-// импорт с фильтром "Экипаж"
-function importQuestions(rawJson){
-  const statusDiv=document.getElementById('import-status');
-  try{
-    const data=JSON.parse(rawJson);
-    if(!Array.isArray(data)) throw new Error('Должен быть массив');
-    const filtered=data.filter(q=>q.category!=='Экипаж');
-    if(filtered.length===0) throw new Error('После фильтрации темы "Экипаж" нет вопросов');
-    questions=filtered;
-    statusDiv.className='import-status ok';
-    statusDiv.textContent=`✓ Загружено ${filtered.length} вопросов (тема "Экипаж" исключена)`;
+function loadText() {
+  const raw = document.getElementById('json-text').value.trim();
+  const status = document.getElementById('import-status');
+  if (!raw) {
+    status.className = 'import-status err';
+    status.textContent = '✗ Поле пустое — вставьте JSON';
+    return;
+  }
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error('Должен быть массив JSON');
+    if (!data.length) throw new Error('Массив пустой');
+    questions = data;
+    status.className = 'import-status ok';
+    status.textContent = '✓ Загружено вопросов: ' + data.length;
     updateHomeStats();
-    renderTopicList();
-  }catch(err){ statusDiv.className='import-status err'; statusDiv.textContent=`✗ Ошибка: ${err.message}`; }
+  } catch (err) {
+    status.className = 'import-status err';
+    status.textContent = '✗ Ошибка: ' + err.message;
+  }
 }
 
-// Event listeners
-document.getElementById('btn-random-10').onclick=()=>startAllTest(10);
-document.getElementById('btn-random-20').onclick=()=>startAllTest(20);
-document.getElementById('btn-random-all').onclick=()=>startAllTest(null);
-document.getElementById('btn-topics').onclick=()=>{ renderTopicList(); showScreen('topic-list'); };
-document.getElementById('btn-import').onclick=()=>showScreen('import');
-document.getElementById('btn-prompt').onclick=()=>showScreen('prompt');
-document.getElementById('do-import').onclick=()=>{ const raw=document.getElementById('json-text').value.trim(); if(raw) importQuestions(raw); else document.getElementById('import-status').innerHTML='✗ Вставьте JSON'; };
-document.getElementById('retry-last-btn').onclick=retryLastRun;
-document.getElementById('home-from-result').onclick=()=>showScreen('home');
-document.getElementById('topic-quantity-10').onclick=()=>{ if(lastRunParams.topic) startTopicTest(10); else showScreen('topic-list'); };
-document.getElementById('topic-quantity-20').onclick=()=>{ if(lastRunParams.topic) startTopicTest(20); else showScreen('topic-list'); };
-document.getElementById('topic-quantity-all').onclick=()=>{ if(lastRunParams.topic) startTopicTest(null); else showScreen('topic-list'); };
-document.getElementById('prompt-box').textContent = `Ты — генератор тестовых вопросов по Руководству полётной эксплуатации RRJ-95. ... (полный промпт в коде)`;
-window.copyPrompt=function(){
-  const promptText=document.getElementById('prompt-box').innerText;
-  navigator.clipboard.writeText(promptText).then(()=>{ let btn=document.getElementById('copy-btn'); btn.textContent='✓ Скопировано!'; setTimeout(()=>btn.textContent='📋 Скопировать промпт',2000); });
-};
+function copyPrompt() {
+  const btn = document.getElementById('copy-btn');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(PROMPT).then(() => {
+      btn.textContent = '✓ Скопировано!';
+      setTimeout(() => { btn.textContent = '📋 Скопировать промпт'; }, 2000);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = PROMPT;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Скопировано!';
+    setTimeout(() => { btn.textContent = '📋 Скопировать промпт'; }, 2000);
+  }
+}
+
+document.getElementById('prompt-box').textContent = PROMPT;
+
 updateHomeStats();
-renderTopicList();
 </script>
 </body>
 </html>
