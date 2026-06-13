@@ -354,7 +354,7 @@
   </div>
   <div class="stat-row">
     <div class="stat">
-      <div class="stat-n" id="stat-total">80</div>
+      <div class="stat-n" id="stat-total">121</div>
       <div class="stat-l">вопросов</div>
     </div>
     <div class="stat">
@@ -365,6 +365,10 @@
   <div class="menu-list">
     <button class="menu-btn primary" onclick="startQuiz(10)">
       <span class="menu-icon">▶</span> 10 случайных вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="startQuiz(20)">
+      <span class="menu-icon">▶</span> 20 вопросов
       <span class="arrow">›</span>
     </button>
     <button class="menu-btn" onclick="startQuiz(null)">
@@ -568,7 +572,47 @@ const DEFAULT_QS = [
   {id:77,category:"Шасси",question:"При двух спущенных шинах на одной опоре максимальная скорость руления?",type:"number",answer:3,unit:"kt",tolerance:0},
   {id:78,category:"Шасси",question:"При двух спущенных шинах максимальный угол отклонения передней опоры?",type:"number",answer:30,unit:"°",tolerance:0},
   {id:79,category:"ВПП",question:"Минимальный допустимый нормативный коэффициент сцепления?",type:"number",answer:0.3,unit:"",tolerance:0},
-  {id:80,category:"Электроснабжение",question:"Максимальное напряжение в сети постоянного тока при нормальной работе?",type:"number",answer:29.5,unit:"V",tolerance:0}
+  {id:81,category:"Теория полёта",question:"Что такое угол атаки (AOA)?",type:"choice",options:["Угол между траекторией и горизонтом","Угол между хордой крыла и вектором скорости","Угол крена самолёта","Угол атмосферного ветра"],answer:1},
+  {id:82,category:"Теория полёта",question:"При каком угле атаки происходит срыв потока (сваливание)?",type:"choice",options:["Зависит от конфигурации самолёта","При 5-10°","При 15-18°","При 25-35°"],answer:0},
+  {id:83,category:"Системы самолёта",question:"Какая система отвечает за выпуск и уборку шасси?",type:"choice",options:["Гидравлическая","Электрическая","Пневматическая","Комбинированная"],answer:0},
+  {id:84,category:"Системы самолёта",question:"Сколько независимых гидравлических систем на RRJ-95?",type:"choice",options:["1","2","3","4"],answer:2},
+  {id:85,category:"Электроснабжение",question:"Минимальное напряжение аккумуляторной батареи при аварийной работе?",type:"number",answer:20,unit:"V",tolerance:0},
+  {id:86,category:"Электроснабжение",question:"Максимальная нагрузка на генератор при нормальной работе?",type:"number",answer:100,unit:"%",tolerance:0},
+  {id:87,category:"Механизация крыла",question:"Максимальная высота полёта с выпущенной механизацией крыла?",type:"number",answer:20000,unit:"ft",tolerance:0},
+  {id:88,category:"Механизация крыла",question:"Что означает FLAP 1+F?",type:"choice",options:["Предкрылки 18°, закрылки 9°","Предкрылки 24°, закрылки 16°","Предкрылки убраны, закрылки 1°","Полный отпуск механизации"],answer:0},
+  {id:89,category:"Взлёт",question:"Что такое V1 (скорость принятия решения)?",type:"choice",options:["Максимальная скорость на ВПП","Скорость отрыва от земли","Скорость, выше которой отказ двигателя не позволяет прервать взлёт","Минимальная скорость сваливания"],answer:2},
+  {id:90,category:"Взлёт",question:"Запрещается ли взлёт при пониженном уровне тяги на ВПП с осадками более?",type:"number",answer:3,unit:"мм",tolerance:0},
+  {id:91,category:"Посадка",question:"Что означает DH (Decision Height)?",type:"choice",options:["Высота перехвата глиссады","Высота, на которой пилот принимает решение о посадке","Максимальная высота полёта","Высота начала снижения"],answer:1},
+  {id:92,category:"Посадка",question:"При какой относительной высоте DH возможна категория II посадка без автоматической посадки?",type:"number",answer:100,unit:"ft",tolerance:0},
+  {id:93,category:"Посадка",question:"При какой DH возможна категория III с автоматической посадкой?",type:"number",answer:50,unit:"ft",tolerance:0},
+  {id:94,category:"Посадка",question:"Максимальная попутная составляющая при автоматической посадке?",type:"number",answer:10,unit:"kt",tolerance:0},
+  {id:95,category:"Система кислорода",question:"При какой высоте может потребоваться кислород экипажу?",type:"choice",options:["Выше 8000 ft","Выше 10000 ft","Выше 15000 ft","Выше 20000 ft"],answer:1},
+  {id:96,category:"Противообледенение",question:"При какой температуре воздуха активируется система противообледенения?",type:"choice",options:["Ниже 0°C","При 10°C и менее и наличии влаги","При 5°C и менее","Всегда при полёте в облаках"],answer:1},
+  {id:97,category:"Светосигнальное оборудование",question:"Что означает красный маячный свет?",type:"choice",options:["Антиколлизионная система","Посадочные огни","Огни опасности","Система аварийного оповещения"],answer:0},
+  {id:98,category:"РЛЭ и документация",question:"Что такое V-диаграмма скоростей?",type:"choice",options:["График зависимости высоты от скорости","График, показывающий критические скорости на разных высотах","График тяги двигателя","График планирования полёта"],answer:1},
+  {id:99,category:"Процедуры",question:"Что означает сокращение FCOM?",type:"choice",options:["Flight Configuration Manual","Flight Crew Operating Manual","Flight Control and Operations Manual","Flight Characteristics and Operations Module"],answer:1},
+  {id:100,category:"Ограничения конструкции",question:"Максимальная отрицательная перегрузка при убранной механизации?",type:"number",answer:-1.0,unit:"g",tolerance:0},
+  {id:101,category:"Трансмиссия",question:"При каком режиме используется реверс тяги?",type:"choice",options:["Только при посадке","Взлёт и посадка","Посадка и руление назад","Любое время полёта"],answer:2},
+  {id:102,category:"Визуальное пилотирование",question:"Минимальная видимость для полётов по правилам VFR?",type:"choice",options:["1 км","1.5 км","3 км","5 км"],answer:2},
+  {id:103,category:"Инструментальное пилотирование",question:"Что означает ILS?",type:"choice",options:["Instrumental Landing System","Internal Load Schedule","Integrated Lighting System","Instrument Location System"],answer:0},
+  {id:104,category:"Навигационное оборудование",question:"Что такое NDB?",type:"choice",options:["Non-Directional Beacon","Navigation Display Box","Network Data Broadcast","National Data Bank"],answer:0},
+  {id:105,category:"Навигационное оборудование",question:"Что такое DME?",type:"choice",options:["Distance Measuring Equipment","Data Management Engine","Digital Monitoring Equipment","Dynamic Movement Extension"],answer:0},
+  {id:106,category:"Система управления полётом",question:"Что означает FMS?",type:"choice",options:["Flight Management System","Fuel Management System","Flight Monitoring Station","Frequency Management System"],answer:0},
+  {id:107,category:"Автопилот",question:"Что означает режим APP (Approach)?",type:"choice",options:["Режим полёта по маршруту","Режим захода на посадку по приборам","Режим подъёма","Режим утановки на высоте"],answer:1},
+  {id:108,category:"Автопилот",question:"Что означает режим LAND в автопилоте?",type:"choice",options:["Режим руления","Режим автоматической посадки","Режим полёта у земли","Режим начисления высоты"],answer:1},
+  {id:109,category:"Турбулентность",question:"На какой высоте турбулентность обычно максимальна?",type:"choice",options:["На малых высотах до 5000 ft","На высотах 10000-15000 ft","Везде одинаково","Зависит от погоды и высоты"],answer:3},
+  {id:110,category:"Гроза",question:"При каком расстоянии от грозы рекомендуется изменить курс?",type:"choice",options:["5 морских миль","10 морских миль","20 морских миль","30 морских миль"],answer:2},
+  {id:111,category:"Эксплуатация в жару",question:"Как жара влияет на взлётные характеристики?",type:"choice",options:["Улучшает характеристики","Ухудшает характеристики","Не влияет","Зависит от давления"],answer:1},
+  {id:112,category:"Эксплуатация в холод",question:"Минимальная температура масла APU перед запуском на земле?",type:"number",answer:-40,unit:"°C",tolerance:0},
+  {id:113,category:"Слякоть и грязь на ВПП",question:"Максимальная боковая составляющая ветра на слякоти более 3 мм?",type:"number",answer:20,unit:"kt",tolerance:0},
+  {id:114,category:"Технический надзор",question:"Кто несёт ответственность за безопасность полёта?",type:"choice",options:["Только командир","Командир и второй пилот","Авиакомпания","Командир самолёта"],answer:3},
+  {id:115,category:"Процедуры безопасности",question:"Что должно быть в кабине при взлёте и посадке?",type:"choice",options:["Только обязательные предметы","Предметы согласно чек-листу","Все закреплено, двери закрыты","Только топливо и масло"],answer:2},
+  {id:116,category:"Коммуникация",question:"На какой частоте передают аварийный сигнал в гражданской авиации?",type:"choice",options:["121.5 MHz","118.0 MHz","125.0 MHz","130.5 MHz"],answer:0},
+  {id:117,category:"Эволютивность",question:"Что означает VMCL?",type:"choice",options:["Максимальная скорость полёта в облаках","Минимальная эволютивная скорость на подъёме","Максимальная скорость у земли","Минимальная скорость со скольжением"],answer:1},
+  {id:118,category:"Кренование",question:"Максимальный угол крена в нормальных операциях?",type:"choice",options:["15°","25°","30°","45°"],answer:2},
+  {id:119,category:"Ожидание в воздухе",question:"Как долго самолёт может ждать в зоне ожидания при нормальном режиме?",type:"choice",options:["10 минут","30 минут","Зависит от топлива","Неограниченно при работающих двигателях"],answer:2},
+  {id:120,category:"Экстренные процедуры",question:"При отказе обоих двигателей экипаж должен?",type:"choice",options:["Сразу выполнить посадку","Найти наилучшее место для посадки","Включить APU","Выполнить процедуру планирования"],answer:1},
+  {id:121,category:"Эксплуатационные ограничения",question:"Максимальное количество полётов в сутки для одного экипажа?",type:"choice",options:["2 полёта","3 полёта","4 полёта","Зависит от регламента авиакомпании"],answer:3}
 ];
 
 
