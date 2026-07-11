@@ -700,7 +700,7 @@ function renderQ() {
   } else {
     body.innerHTML = `<div class="num-area">
       <div class="num-row">
-        <input type="number" class="num-input" id="num-ans" inputmode="decimal" placeholder="0" step="any" onkeydown="if(event.key==='Enter')checkNumber()">
+        <input type="text" class="num-input" id="num-ans" inputmode="decimal" placeholder="0" onkeydown="if(event.key==='Enter')checkNumber()" oninput="this.value=this.value.replace(/[^0-9.,\-]/g,'')">
         <span class="num-unit">${q.unit || ''}</span>
       </div>
       <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
@@ -742,7 +742,7 @@ function checkNumber() {
   if (!inp || inp.value === '') return;
   answered = true;
   const q = queue[current];
-  const val = parseFloat(inp.value);
+  const val = parseFloat(inp.value.replace(',', '.'));
   const tol = q.tolerance || 0;
   const ok = Math.abs(val - q.answer) <= tol;
   inp.disabled = true;
