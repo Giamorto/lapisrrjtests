@@ -224,6 +224,25 @@
   .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
   .num-input:focus { outline: none; border-color: var(--text); }
   .num-unit { font-size: 16px; color: var(--text2); font-weight: 500; }
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .kp-btn {
+    padding: 16px 0;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .kp-btn:active { background: var(--border2); }
+  .kp-minus { color: var(--red); font-size: 26px; }
+  .kp-back { font-size: 18px; color: var(--text2); }
   .check-btn {
     width: 100%;
     padding: 15px;
@@ -700,12 +719,26 @@ function renderQ() {
   } else {
     body.innerHTML = `<div class="num-area">
       <div class="num-row">
-        <input type="text" class="num-input" id="num-ans" inputmode="decimal" placeholder="0" onkeydown="if(event.key==='Enter')checkNumber()" oninput="this.value=this.value.replace(/[^0-9.,\-]/g,'')">
+        <input type="text" class="num-input" id="num-ans" inputmode="none" placeholder="0" readonly>
         <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      <div class="keypad">
+        <button type="button" class="kp-btn" onclick="kpInput('1')">1</button>
+        <button type="button" class="kp-btn" onclick="kpInput('2')">2</button>
+        <button type="button" class="kp-btn" onclick="kpInput('3')">3</button>
+        <button type="button" class="kp-btn" onclick="kpInput('4')">4</button>
+        <button type="button" class="kp-btn" onclick="kpInput('5')">5</button>
+        <button type="button" class="kp-btn" onclick="kpInput('6')">6</button>
+        <button type="button" class="kp-btn" onclick="kpInput('7')">7</button>
+        <button type="button" class="kp-btn" onclick="kpInput('8')">8</button>
+        <button type="button" class="kp-btn" onclick="kpInput('9')">9</button>
+        <button type="button" class="kp-btn kp-minus" onclick="kpInput('-')">&minus;</button>
+        <button type="button" class="kp-btn" onclick="kpInput('0')">0</button>
+        <button type="button" class="kp-btn" onclick="kpInput('.')">.</button>
+        <button type="button" class="kp-btn kp-back" onclick="kpBackspace()">⌫</button>
       </div>
       <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
     </div>`;
-    setTimeout(() => { const el = document.getElementById('num-ans'); if (el) el.focus(); }, 100);
   }
 }
 
@@ -734,6 +767,24 @@ function checkChoice(i) {
     btns[q.answer].classList.add('reveal');
     showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.options[q.answer]);
   }
+}
+
+function kpInput(ch) {
+  const inp = document.getElementById('num-ans');
+  if (!inp || inp.disabled) return;
+  if (ch === '-') {
+    inp.value = inp.value.startsWith('-') ? inp.value.slice(1) : '-' + inp.value;
+  } else if (ch === '.') {
+    if (!inp.value.includes('.')) inp.value += (inp.value === '' || inp.value === '-') ? '0.' : '.';
+  } else {
+    inp.value += ch;
+  }
+}
+
+function kpBackspace() {
+  const inp = document.getElementById('num-ans');
+  if (!inp || inp.disabled) return;
+  inp.value = inp.value.slice(0, -1);
 }
 
 function checkNumber() {
