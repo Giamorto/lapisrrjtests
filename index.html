@@ -687,7 +687,26 @@ const DEFAULT_QS = [
   {id:166,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте до 14000 ft (4250 м) включительно?",type:"number",answer:230,unit:"kt",tolerance:0},
   {id:167,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте выше 14000 ft (4250 м) до 20000 ft (6100 м) включительно?",type:"number",answer:240,unit:"kt",tolerance:0},
   {id:168,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте выше 20000 ft (6100 м) до 34000 ft (10350 м) включительно (обычные условия)?",type:"number",answer:265,unit:"kt",tolerance:0},
-  {id:169,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте выше 34000 ft (10350 м)?",type:"number",answer:0.82,unit:"M",tolerance:0}
+  {id:169,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте выше 34000 ft (10350 м)?",type:"number",answer:0.82,unit:"M",tolerance:0},
+  {id:170,category:"Стабилизированный заход",question:"При каком отклонении вертикальной скорости на заходе на посадку подается доклад «SINK RATE»?",type:"number",answer:1000,unit:"ft/min",tolerance:0},
+  {id:171,category:"Стабилизированный заход",question:"При каком отклонении от заданной скорости захода на посадку подается доклад «SPEED» (верхний предел)?",type:"choice",options:["+5 kt","+10 kt (VAPP-5)","+15 kt","+20 kt"],answer:1},
+  {id:173,category:"Стабилизированный заход",question:"При каком отклонении тангажа на пикирование (nose down) на заходе на посадку подается доклад «PITCH»?",type:"number",answer:-2.5,unit:"°",tolerance:0},
+  {id:174,category:"Стабилизированный заход",question:"При каком отклонении тангажа на кабрирование (nose up) на заходе на посадку подается доклад «PITCH»?",type:"number",answer:10,unit:"°",tolerance:0},
+  {id:175,category:"Стабилизированный заход",question:"При каком крене на заходе на посадку подается доклад «BANK»?",type:"choice",options:["> 5°","> 7°","> 10°","> 15°"],answer:1},
+  {id:176,category:"Посадка (контроль положения)",question:"При каком угле тангажа PNF подает доклад «PITCH PITCH» на посадке?",type:"number",answer:7.5,unit:"°",tolerance:0},
+  {id:177,category:"Посадка (контроль положения)",question:"При каком угле крена PNF подает доклад «BANK BANK» на посадке?",type:"number",answer:7,unit:"°",tolerance:0},
+  {id:178,category:"Посадка (контроль положения)",question:"При превышении какого угла крена происходит касание земли двигателем или законцовкой крыла?",type:"number",answer:20,unit:"°",tolerance:0},
+  {id:179,category:"Посадка (контроль положения)",question:"При превышении какого угла тангажа согласно SOP происходит касание земли хвостовой частью ВС (tail strike)?",type:"number",answer:13.5,unit:"°",tolerance:0},
+  {id:180,category:"Габариты ВС",question:"Высота воздушного судна?",type:"number",answer:10.28,unit:"м",tolerance:0},
+  {id:181,category:"Габариты ВС",question:"Длина воздушного судна?",type:"number",answer:29.94,unit:"м",tolerance:0},
+  {id:182,category:"Габариты ВС",question:"Размах крыла (ширина) воздушного судна?",type:"number",answer:27.8,unit:"м",tolerance:0},
+  {id:183,category:"Автопилот",question:"Высота включения режима TO TRK?",type:"number",answer:35,unit:"ft",tolerance:0},
+  {id:184,category:"Радиосвязное оборудование",question:"Через сколько секунд непрерывной работы VHF радиостанции в режиме «передача» происходит автоматическое отключение этого режима (защита от заклиненной кнопки PTT)?",type:"number",answer:35,unit:"с",tolerance:0},
+  {id:185,category:"Система электроснабжения",question:"Номинальная мощность каждого основного генератора (L GEN, R GEN)?",type:"number",answer:40,unit:"KVA",tolerance:0},
+  {id:186,category:"Система электроснабжения",question:"Номинальная мощность генератора ветродвигателя (RAT GEN) на скорости полета более 125 kt?",type:"number",answer:15,unit:"KVA",tolerance:0},
+  {id:187,category:"Система электроснабжения",question:"Номинальная мощность статического преобразователя (ST INV)?",type:"number",answer:1,unit:"KVA",tolerance:0},
+  {id:188,category:"Система электроснабжения",question:"До скольких минут ограничивается время полета при отказе двух двигателей (питание постоянного тока от аккумуляторных батарей)?",type:"number",answer:27,unit:"мин",tolerance:0},
+  {id:189,category:"Система электроснабжения",question:"Максимальное время выпуска ветродвигателя и подключения генератора RAT GEN?",type:"number",answer:8,unit:"сек",tolerance:0}
 ];
 
 
