@@ -95,6 +95,30 @@
     letter-spacing: -0.5px;
     line-height: 1.1;
   }
+  .deck-switch {
+    display: flex;
+    gap: 6px;
+    margin: 0 1rem 1.25rem;
+    background: var(--bg2);
+    padding: 4px;
+    border-radius: var(--radius);
+  }
+  .deck-btn {
+    flex: 1;
+    padding: 9px 10px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: calc(var(--radius) - 4px);
+    cursor: pointer;
+  }
+  .deck-btn.active {
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
   .stat-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -377,8 +401,12 @@
 <!-- HOME -->
 <div id="home" class="screen active">
   <div class="home-top">
-    <div class="home-label">Тест по ограничениям</div>
-    <div class="home-title">RRJ-95 Limits</div>
+    <div class="home-label" id="home-label">Тест по ограничениям</div>
+    <div class="home-title" id="home-title">RRJ-95 Limits</div>
+  </div>
+  <div class="deck-switch">
+    <button class="deck-btn active" data-deck="rrj95" onclick="selectDeck('rrj95')">RRJ-95 Limits</button>
+    <button class="deck-btn" data-deck="ozp" onclick="selectDeck('ozp')">❄️ ОЗП</button>
   </div>
   <div class="stat-row">
     <div class="stat">
@@ -709,21 +737,62 @@ const DEFAULT_QS = [
   {id:189,category:"Система электроснабжения",question:"Максимальное время выпуска ветродвигателя и подключения генератора RAT GEN?",type:"number",answer:8,unit:"сек",tolerance:0}
 ];
 
+const OZP_QS = [
+  {id:1,category:"ОЗП",question:"Какая минимальная температура наружного воздуха допускается для эксплуатации ВС RRJ-95B?",type:"number",answer:-54,unit:"°C",tolerance:0},
+  {id:2,category:"ОЗП",question:"При какой температуре OAT (на земле) или TAT (в полете) официально возникают условия обледенения?",type:"number",answer:10,unit:"°C",tolerance:0},
+  {id:3,category:"ОЗП",question:"При какой температуре топлива в баках на земле использование ПВК-жидкости становится строго обязательным?",type:"number",answer:-40,unit:"°C",tolerance:0},
+  {id:4,category:"ОЗП",question:"Какая минимальная температура допускается для топлива марки JET A-1?",type:"number",answer:-47,unit:"°C",tolerance:0},
+  {id:5,category:"ОЗП",question:"При снижении температуры TAT в полете до какого значения необходимо выполнить процедуру FUEL LO TEMP для топлива JET A?",type:"number",answer:-33,unit:"°C",tolerance:0},
+  {id:6,category:"ОЗП",question:"Ниже какой температуры гидрожидкости технический персонал обязан выполнить подогрев гидробаков?",type:"number",answer:-30,unit:"°C",tolerance:0},
+  {id:7,category:"ОЗП",question:"До какой минимальной температуры необходимо подогреть гидробаки, если температура гидрожидкости была ниже –30°C?",type:"number",answer:-20,unit:"°C",tolerance:0},
+  {id:8,category:"ОЗП",question:"Какая минимальная температура масла допускается перед запуском двигателя на земле?",type:"number",answer:-40,unit:"°C",tolerance:0},
+  {id:9,category:"ОЗП",question:"Ниже какой температуры наружного воздуха (ТНВ) запрещается включать блоки авионики?",type:"number",answer:-15,unit:"°C",tolerance:0},
+  {id:10,category:"ОЗП",question:"При какой температуре наружного воздуха и ниже аккумуляторные батареи обязательно снимаются с борта при стоянке?",type:"number",answer:-30,unit:"°C",tolerance:0},
+  {id:11,category:"ОЗП",question:"Ниже какой температуры наружного воздуха необходимо снять гарнитуру экипажа для хранения в отапливаемом помещении?",type:"number",answer:-45,unit:"°C",tolerance:0},
+  {id:12,category:"ОЗП",question:"Теплым воздухом какой максимальной температуры разрешается удалять снег или лед с приемников давления и датчиков?",type:"number",answer:50,unit:"°C",tolerance:0},
+  {id:13,category:"ОЗП",question:"Какова минимальная скорость набегающего потока для устойчивой работы датчика обледенения?",type:"number",answer:30,unit:"kt",tolerance:0},
+  {id:14,category:"ОЗП",question:"Каково максимально допустимое время непрерывной работы турбостартера при температуре наружного воздуха ниже –15°C?",type:"number",answer:4,unit:"мин",tolerance:0},
+  {id:15,category:"ОЗП",question:"Сколько минут необходимо прогревать двигатель на режиме IDLE, если после стоянки при температуре ниже –30°C наблюдается течь топлива, прежде чем принять решение о его выключении?",type:"number",answer:5,unit:"мин",tolerance:0},
+  {id:16,category:"ОЗП",question:"Через какой максимальный интервал времени необходимо повторять процедуру увеличения режима работы двигателя до 70% N1 на 20 секунд при рулении в условиях обледенения?",type:"number",answer:5,unit:"мин",tolerance:0},
+  {id:17,category:"ОЗП",question:"На сколько часов максимум разрешена стоянка самолета с установленными аккумуляторными батареями при ТНВ от –15°C до –30°C?",type:"number",answer:6,unit:"ч",tolerance:0},
+  {id:18,category:"ОЗП",question:"Более скольких часов стоянки при ТНВ от –15°C до –54°C требуется для обязательного закрытия подачи кислорода от баллона?",type:"number",answer:3,unit:"ч",tolerance:0},
+  {id:19,category:"ОЗП",question:"Какая максимальная глубина мокрого снега или слякоти на ВПП запрещает взлет в конфигурации FLAP 1+F?",type:"number",answer:3,unit:"мм",tolerance:0},
+  {id:20,category:"ОЗП",question:"Какая максимальная глубина сухого снега на ВПП запрещает взлет в конфигурации FLAP 1+F?",type:"number",answer:10,unit:"мм",tolerance:0},
+  {id:21,category:"ОЗП",question:"Ниже какого значения коэффициента сцепления на ВПП посадку обязан выполнять только КВС?",type:"number",answer:0.4,unit:"",tolerance:0},
+  {id:22,category:"ОЗП",question:"Ниже какого значения коэффициента сцепления на ВПП вторым пилотам запрещено выполнение взлетов и посадок?",type:"number",answer:0.4,unit:"",tolerance:0},
+  {id:23,category:"ОЗП",question:"Какой процент от предельно допустимой боковой составляющей ветра разрешен для взлета второму пилоту под контролем КВС-инструктора в закрепленном составе?",type:"number",answer:80,unit:"%",tolerance:0},
+  {id:24,category:"ОЗП",question:"На сколько процентов располагаемая посадочная дистанция должна превышать потребную для выполнения посадки вторым пилотом?",type:"number",answer:15,unit:"%",tolerance:0},
+  {id:25,category:"ОЗП",question:"На сколько метров должна превышать фактическая видимость минимум захода для посадки вторым пилотом под контролем КВС (в незакрепленном составе)?",type:"number",answer:300,unit:"м",tolerance:0},
+  {id:26,category:"ОЗП",question:"Какова минимальная допустимая видимость на ВПП для взлета вторым пилотом под контролем КВС?",type:"number",answer:400,unit:"м",tolerance:0},
+  {id:27,category:"ОЗП",question:"Какова максимальная допустимая вертикальная скорость при стабилизированном заходе на посадку?",type:"number",answer:1000,unit:"ft/min",tolerance:0},
+  {id:28,category:"ОЗП",question:"На сколько градусов максимум не должны превышать угол упреждения и крен при компенсации сильного бокового ветра перед касанием?",type:"number",answer:5,unit:"°",tolerance:0},
+  {id:29,category:"ОЗП",question:"На сколько примерно метров увеличивается посадочная дистанция при пролете порога ВПП на высоте 100 ft вместо расчетной?",type:"number",answer:300,unit:"м",tolerance:0},
+  {id:30,category:"ОЗП",question:"Какой дополнительный коэффициент безопасности (Safety Factor) установлен в авиакомпании АЗИМУТ для расчета ALD в полете по рекомендации разработчика?",type:"number",answer:1.15,unit:"",tolerance:0},
+  {id:31,category:"ОЗП",question:"Какой коэффициент увеличения применяется к ALD для расчета RLD на сухую ВПП для основного аэродрома?",type:"number",answer:1.67,unit:"",tolerance:0}
+];
 
-let questions = [...DEFAULT_QS];
+const DECKS = {
+  rrj95: { label: "RRJ-95 Limits", tagline: "Тест по ограничениям", qs: DEFAULT_QS, weakKey: "rrj95_weak" },
+  ozp:   { label: "ОЗП", tagline: "Тест по эксплуатации в зимний период", qs: OZP_QS, weakKey: "ozp_weak" }
+};
+let deckKey = "rrj95";
+let questions = [...DECKS[deckKey].qs];
 let queue = [];
 let current = 0;
 let score = 0;
-let best = null;
+let bestByDeck = { rrj95: null, ozp: null };
 let answered = false;
 let quizletMode = false;
 
-// --- Quizlet: слабые вопросы (id -> счётчик ошибок), хранятся в localStorage ---
+// --- Quizlet: слабые вопросы (id -> счётчик ошибок), хранятся в localStorage отдельно на каждую колоду ---
 let weakStats = {};
-try { weakStats = JSON.parse(localStorage.getItem('rrj95_weak') || '{}'); } catch(e) { weakStats = {}; }
-function saveWeak() {
-  try { localStorage.setItem('rrj95_weak', JSON.stringify(weakStats)); } catch(e) {}
+function loadWeak() {
+  try { weakStats = JSON.parse(localStorage.getItem(DECKS[deckKey].weakKey) || '{}'); } catch(e) { weakStats = {}; }
 }
+function saveWeak() {
+  try { localStorage.setItem(DECKS[deckKey].weakKey, JSON.stringify(weakStats)); } catch(e) {}
+}
+loadWeak();
 function weakCount() {
   return Object.keys(weakStats).length;
 }
@@ -742,9 +811,21 @@ function showScreen(id) {
   updateHomeStats();
 }
 
+function selectDeck(key) {
+  if (key === deckKey) return;
+  deckKey = key;
+  questions = [...DECKS[key].qs];
+  loadWeak();
+  document.querySelectorAll('.deck-btn').forEach(b => b.classList.toggle('active', b.dataset.deck === key));
+  document.getElementById('home-label').textContent = DECKS[key].tagline;
+  document.getElementById('home-title').textContent = DECKS[key].label;
+  updateHomeStats();
+}
+
 function updateHomeStats() {
   document.getElementById('stat-total').textContent = questions.length;
-  document.getElementById('stat-best').textContent = best !== null ? best + '%' : '—';
+  const b = bestByDeck[deckKey];
+  document.getElementById('stat-best').textContent = b !== null ? b + '%' : '—';
   updateWeakBadge();
 }
 
@@ -908,7 +989,7 @@ function restartLast() {
 
 function showResult() {
   const pct = Math.round(score / queue.length * 100);
-  if (!quizletMode && (best === null || pct > best)) best = pct;
+  if (!quizletMode && (bestByDeck[deckKey] === null || pct > bestByDeck[deckKey])) bestByDeck[deckKey] = pct;
   document.getElementById('res-score').textContent = score + ' / ' + queue.length;
   document.getElementById('res-pct').textContent = pct + '%';
   let txt =
