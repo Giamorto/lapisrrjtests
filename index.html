@@ -257,6 +257,29 @@
   .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
   .num-input:focus { outline: none; border-color: var(--text); }
   .num-unit { font-size: 16px; color: var(--text2); font-weight: 500; }
+  .range-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .range-label {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+  }
+  .range-dash {
+    font-size: 20px;
+    color: var(--text2);
+    padding-bottom: 12px;
+  }
+  .num-input.range-input { width: 100px; max-width: 100px; }
+  .num-input.range-input.active { border-color: var(--text); }
   .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -783,6 +806,7 @@ let score = 0;
 let bestByDeck = { rrj95: null, ozp: null };
 let answered = false;
 let quizletMode = false;
+let activeInputId = 'num-ans';
 
 // --- Quizlet: слабые вопросы (id -> счётчик ошибок), хранятся в localStorage отдельно на каждую колоду ---
 let weakStats = {};
@@ -869,6 +893,22 @@ function recordAnswer(q, ok) {
   }
 }
 
+const KEYPAD_HTML = `<div class="keypad">
+        <button type="button" class="kp-btn" onclick="kpInput('1')">1</button>
+        <button type="button" class="kp-btn" onclick="kpInput('2')">2</button>
+        <button type="button" class="kp-btn" onclick="kpInput('3')">3</button>
+        <button type="button" class="kp-btn" onclick="kpInput('4')">4</button>
+        <button type="button" class="kp-btn" onclick="kpInput('5')">5</button>
+        <button type="button" class="kp-btn" onclick="kpInput('6')">6</button>
+        <button type="button" class="kp-btn" onclick="kpInput('7')">7</button>
+        <button type="button" class="kp-btn" onclick="kpInput('8')">8</button>
+        <button type="button" class="kp-btn" onclick="kpInput('9')">9</button>
+        <button type="button" class="kp-btn kp-minus" onclick="kpInput('-')">&minus;</button>
+        <button type="button" class="kp-btn" onclick="kpInput('0')">0</button>
+        <button type="button" class="kp-btn" onclick="kpInput('.')">.</button>
+        <button type="button" class="kp-btn kp-back" onclick="kpBackspace()">⌫</button>
+      </div>`;
+
 function renderQ() {
   const q = queue[current];
   answered = false;
@@ -886,27 +926,32 @@ function renderQ() {
     body.innerHTML = '<div class="options">' +
       q.options.map((o, i) => `<button class="opt" onclick="checkChoice(${i})">${o}</button>`).join('') +
       '</div>';
+  } else if (q.type === 'range') {
+    activeInputId = 'num-ans-min';
+    body.innerHTML = `<div class="num-area">
+      <div class="range-row">
+        <div class="range-field">
+          <span class="range-label">от</span>
+          <input type="text" class="num-input range-input active" id="num-ans-min" onclick="focusRangeField('num-ans-min')" inputmode="none" placeholder="0" readonly>
+        </div>
+        <span class="range-dash">–</span>
+        <div class="range-field">
+          <span class="range-label">до</span>
+          <input type="text" class="num-input range-input" id="num-ans-max" onclick="focusRangeField('num-ans-max')" inputmode="none" placeholder="0" readonly>
+        </div>
+        <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkRange()">Проверить</button>
+    </div>`;
   } else {
+    activeInputId = 'num-ans';
     body.innerHTML = `<div class="num-area">
       <div class="num-row">
         <input type="text" class="num-input" id="num-ans" inputmode="none" placeholder="0" readonly>
         <span class="num-unit">${q.unit || ''}</span>
       </div>
-      <div class="keypad">
-        <button type="button" class="kp-btn" onclick="kpInput('1')">1</button>
-        <button type="button" class="kp-btn" onclick="kpInput('2')">2</button>
-        <button type="button" class="kp-btn" onclick="kpInput('3')">3</button>
-        <button type="button" class="kp-btn" onclick="kpInput('4')">4</button>
-        <button type="button" class="kp-btn" onclick="kpInput('5')">5</button>
-        <button type="button" class="kp-btn" onclick="kpInput('6')">6</button>
-        <button type="button" class="kp-btn" onclick="kpInput('7')">7</button>
-        <button type="button" class="kp-btn" onclick="kpInput('8')">8</button>
-        <button type="button" class="kp-btn" onclick="kpInput('9')">9</button>
-        <button type="button" class="kp-btn kp-minus" onclick="kpInput('-')">&minus;</button>
-        <button type="button" class="kp-btn" onclick="kpInput('0')">0</button>
-        <button type="button" class="kp-btn" onclick="kpInput('.')">.</button>
-        <button type="button" class="kp-btn kp-back" onclick="kpBackspace()">⌫</button>
-      </div>
+      ${KEYPAD_HTML}
       <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
     </div>`;
   }
@@ -941,8 +986,13 @@ function checkChoice(i) {
   }
 }
 
+function focusRangeField(id) {
+  activeInputId = id;
+  document.querySelectorAll('.range-input').forEach(el => el.classList.toggle('active', el.id === id));
+}
+
 function kpInput(ch) {
-  const inp = document.getElementById('num-ans');
+  const inp = document.getElementById(activeInputId);
   if (!inp || inp.disabled) return;
   if (ch === '-') {
     inp.value = inp.value.startsWith('-') ? inp.value.slice(1) : '-' + inp.value;
@@ -954,7 +1004,7 @@ function kpInput(ch) {
 }
 
 function kpBackspace() {
-  const inp = document.getElementById('num-ans');
+  const inp = document.getElementById(activeInputId);
   if (!inp || inp.disabled) return;
   inp.value = inp.value.slice(0, -1);
 }
@@ -974,6 +1024,27 @@ function checkNumber() {
   recordAnswer(q, ok);
   if (ok) { score++; showFeedback(true, '✓ Верно: ' + q.answer + ' ' + (q.unit || '')); }
   else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.answer + ' ' + (q.unit || '')); }
+}
+
+function checkRange() {
+  if (answered) return;
+  const inpMin = document.getElementById('num-ans-min');
+  const inpMax = document.getElementById('num-ans-max');
+  if (!inpMin || !inpMax || inpMin.value === '' || inpMax.value === '') return;
+  answered = true;
+  const q = queue[current];
+  const valMin = parseFloat(inpMin.value.replace(',', '.'));
+  const valMax = parseFloat(inpMax.value.replace(',', '.'));
+  const tol = q.tolerance || 0;
+  const ok = Math.abs(valMin - q.answerMin) <= tol && Math.abs(valMax - q.answerMax) <= tol;
+  inpMin.disabled = true;
+  inpMax.disabled = true;
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  recordAnswer(q, ok);
+  const correctText = q.answerMin + '–' + q.answerMax + ' ' + (q.unit || '');
+  if (ok) { score++; showFeedback(true, '✓ Верно: ' + correctText); }
+  else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + correctText); }
 }
 
 function nextQ() {
