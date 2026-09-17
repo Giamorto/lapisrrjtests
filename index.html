@@ -737,8 +737,8 @@ const DEFAULT_QS = [
   {id:187,category:"Система электроснабжения",question:"Номинальная мощность статического преобразователя (ST INV)?",type:"number",answer:1,unit:"KVA",tolerance:0},
   {id:188,category:"Система электроснабжения",question:"До скольких минут ограничивается время полета при отказе двух двигателей (питание постоянного тока от аккумуляторных батарей)?",type:"number",answer:27,unit:"мин",tolerance:0},
   {id:189,category:"Система электроснабжения",question:"Максимальное время выпуска ветродвигателя и подключения генератора RAT GEN?",type:"number",answer:8,unit:"сек",tolerance:0},
-  {id:190,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95LR?",type:"range",answerMin:12,answerMax:32,unit:"%",tolerance:0},
-  {id:191,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95B?",type:"range",answerMin:12,answerMax:36,unit:"%",tolerance:0},
+  {id:190,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95LR при взлётной массе?",type:"range",answerMin:12,answerMax:32,unit:"%",tolerance:0},
+  {id:191,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95B при взлётной массе?",type:"range",answerMin:12,answerMax:36,unit:"%",tolerance:0},
   {id:192,category:"Условия эксплуатации",question:"Какой диапазон допустимой температуры наружного воздуха на эшелоне?",type:"range",answerMin:-70,answerMax:-32,unit:"°C",tolerance:0},
   {id:193,category:"Условия эксплуатации",question:"Какой диапазон допустимой температуры наружного воздуха на земле?",type:"range",answerMin:-54,answerMax:45,unit:"°C",tolerance:0},
   {id:194,category:"Условия эксплуатации",question:"Какой диапазон превышения аэродрома, допустимого для взлёта и посадки?",type:"range",answerMin:-1000,answerMax:5000,unit:"ft",tolerance:0},
@@ -752,7 +752,10 @@ const DEFAULT_QS = [
   {id:202,category:"Стабилизированный заход",question:"В каком диапазоне отклонения скорости от VAPP на стабилизированном заходе доклад «SPEED» не подаётся?",type:"range",answerMin:-5,answerMax:10,unit:"kt",tolerance:0},
   {id:203,category:"Маневрирование на земле",question:"Какой максимальный угол поворота колёс передней опоры при буксировке (в каждую сторону)?",type:"symmetric",answer:85,unit:"°",tolerance:0},
   {id:204,category:"Маневрирование на земле",question:"На каком угле (в каждую сторону) срабатывают датчик и механические свидетели превышения предельного угла поворота колёс?",type:"symmetric",answer:90,unit:"°",tolerance:0},
-  {id:205,category:"Система управления поворотом колес",question:"Какой максимальный угол поворота колёс передней опоры шасси от ручки управления поворотом колес (в каждую сторону)?",type:"symmetric",answer:65,unit:"°",tolerance:0}
+  {id:205,category:"Система управления поворотом колес",question:"Какой максимальный угол поворота колёс передней опоры шасси от ручки управления поворотом колес (в каждую сторону)?",type:"symmetric",answer:65,unit:"°",tolerance:0},
+  {id:206,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при убранных предкрылках и закрылках?",type:"range",answerMin:-1.0,answerMax:2.5,unit:"g",tolerance:0},
+  {id:207,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при убранных предкрылках и выпущенных закрылках?",type:"range",answerMin:0.0,answerMax:2.0,unit:"g",tolerance:0},
+  {id:208,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при выпущенных предкрылках и закрылках?",type:"range",answerMin:0.0,answerMax:2.0,unit:"g",tolerance:0}
 ];
 
 const OZP_QS = [
