@@ -757,7 +757,20 @@ const DEFAULT_QS = [
   {id:186,category:"Система электроснабжения",question:"Номинальная мощность генератора ветродвигателя (RAT GEN) на скорости полета более 125 kt?",type:"number",answer:15,unit:"KVA",tolerance:0},
   {id:187,category:"Система электроснабжения",question:"Номинальная мощность статического преобразователя (ST INV)?",type:"number",answer:1,unit:"KVA",tolerance:0},
   {id:188,category:"Система электроснабжения",question:"До скольких минут ограничивается время полета при отказе двух двигателей (питание постоянного тока от аккумуляторных батарей)?",type:"number",answer:27,unit:"мин",tolerance:0},
-  {id:189,category:"Система электроснабжения",question:"Максимальное время выпуска ветродвигателя и подключения генератора RAT GEN?",type:"number",answer:8,unit:"сек",tolerance:0}
+  {id:189,category:"Система электроснабжения",question:"Максимальное время выпуска ветродвигателя и подключения генератора RAT GEN?",type:"number",answer:8,unit:"сек",tolerance:0},
+  {id:190,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95LR?",type:"range",answerMin:12,answerMax:32,unit:"%",tolerance:0},
+  {id:191,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95B?",type:"range",answerMin:12,answerMax:36,unit:"%",tolerance:0},
+  {id:192,category:"Условия эксплуатации",question:"Какой диапазон допустимой температуры наружного воздуха на эшелоне?",type:"range",answerMin:-70,answerMax:-32,unit:"°C",tolerance:0},
+  {id:193,category:"Условия эксплуатации",question:"Какой диапазон допустимой температуры наружного воздуха на земле?",type:"range",answerMin:-54,answerMax:45,unit:"°C",tolerance:0},
+  {id:194,category:"Условия эксплуатации",question:"Какой диапазон превышения аэродрома, допустимого для взлёта и посадки?",type:"range",answerMin:-1000,answerMax:5000,unit:"ft",tolerance:0},
+  {id:195,category:"Система кондиционирования",question:"Какой диапазон перепада давления в кабине (отрицательный / положительный)?",type:"range",answerMin:-1.4,answerMax:8.7,unit:"Psi",tolerance:0},
+  {id:196,category:"Гидравлическая жидкость",question:"Какой диапазон рабочего давления в гидросистеме?",type:"range",answerMin:1800,answerMax:3200,unit:"Psi",tolerance:0},
+  {id:197,category:"Стабилизированный заход",question:"В каком диапазоне тангажа на заходе на посадку доклад «PITCH» не подаётся?",type:"range",answerMin:-2.5,answerMax:10,unit:"°",tolerance:0},
+  {id:198,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки JET A-1?",type:"range",answerMin:-47,answerMax:47,unit:"°C",tolerance:0},
+  {id:199,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки РТ?",type:"range",answerMin:-50,answerMax:47,unit:"°C",tolerance:0},
+  {id:200,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки ТС-1?",type:"range",answerMin:-50,answerMax:47,unit:"°C",tolerance:0},
+  {id:201,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки JET A?",type:"range",answerMin:-35,answerMax:47,unit:"°C",tolerance:0},
+  {id:202,category:"Стабилизированный заход",question:"В каком диапазоне отклонения скорости от VAPP на стабилизированном заходе доклад «SPEED» не подаётся?",type:"range",answerMin:-5,answerMax:10,unit:"kt",tolerance:0}
 ];
 
 const OZP_QS = [
