@@ -257,6 +257,7 @@
   .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
   .num-input:focus { outline: none; border-color: var(--text); }
   .num-unit { font-size: 16px; color: var(--text2); font-weight: 500; }
+  .num-prefix { font-size: 22px; font-weight: 600; color: var(--text); }
   .range-row {
     display: flex;
     align-items: flex-end;
@@ -749,9 +750,9 @@ const DEFAULT_QS = [
   {id:200,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки ТС-1?",type:"range",answerMin:-50,answerMax:47,unit:"°C",tolerance:0},
   {id:201,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки JET A?",type:"range",answerMin:-35,answerMax:47,unit:"°C",tolerance:0},
   {id:202,category:"Стабилизированный заход",question:"В каком диапазоне отклонения скорости от VAPP на стабилизированном заходе доклад «SPEED» не подаётся?",type:"range",answerMin:-5,answerMax:10,unit:"kt",tolerance:0},
-  {id:203,category:"Маневрирование на земле",question:"Какой диапазон угла поворота колёс передней опоры при буксировке?",type:"range",answerMin:-85,answerMax:85,unit:"°",tolerance:0},
-  {id:204,category:"Маневрирование на земле",question:"В каком диапазоне угла срабатывают датчик и механические свидетели превышения предельного угла поворота колёс?",type:"range",answerMin:-90,answerMax:90,unit:"°",tolerance:0},
-  {id:205,category:"Система управления поворотом колес",question:"Какой диапазон угла поворота колёс передней опоры шасси от ручки управления поворотом колес?",type:"range",answerMin:-65,answerMax:65,unit:"°",tolerance:0}
+  {id:203,category:"Маневрирование на земле",question:"Какой максимальный угол поворота колёс передней опоры при буксировке (в каждую сторону)?",type:"symmetric",answer:85,unit:"°",tolerance:0},
+  {id:204,category:"Маневрирование на земле",question:"На каком угле (в каждую сторону) срабатывают датчик и механические свидетели превышения предельного угла поворота колёс?",type:"symmetric",answer:90,unit:"°",tolerance:0},
+  {id:205,category:"Система управления поворотом колес",question:"Какой максимальный угол поворота колёс передней опоры шасси от ручки управления поворотом колес (в каждую сторону)?",type:"symmetric",answer:65,unit:"°",tolerance:0}
 ];
 
 const OZP_QS = [
@@ -938,6 +939,17 @@ function renderQ() {
       ${KEYPAD_HTML}
       <button class="check-btn" id="check-btn" onclick="checkRange()">Проверить</button>
     </div>`;
+  } else if (q.type === 'symmetric') {
+    activeInputId = 'num-ans';
+    body.innerHTML = `<div class="num-area">
+      <div class="num-row">
+        <span class="num-prefix">±</span>
+        <input type="text" class="num-input" id="num-ans" inputmode="none" placeholder="0" readonly>
+        <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
+    </div>`;
   } else {
     activeInputId = 'num-ans';
     body.innerHTML = `<div class="num-area">
@@ -1016,8 +1028,9 @@ function checkNumber() {
   const cb = document.getElementById('check-btn');
   if (cb) cb.disabled = true;
   recordAnswer(q, ok);
-  if (ok) { score++; showFeedback(true, '✓ Верно: ' + q.answer + ' ' + (q.unit || '')); }
-  else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.answer + ' ' + (q.unit || '')); }
+  const prefix = q.type === 'symmetric' ? '±' : '';
+  if (ok) { score++; showFeedback(true, '✓ Верно: ' + prefix + q.answer + ' ' + (q.unit || '')); }
+  else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + prefix + q.answer + ' ' + (q.unit || '')); }
 }
 
 function checkRange() {
