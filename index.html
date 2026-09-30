@@ -121,14 +121,14 @@
   }
   .stat-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 10px;
     padding: 0 1rem 1.5rem;
   }
   .stat {
     background: var(--bg2);
     border-radius: var(--radius);
-    padding: 14px 16px;
+    padding: 14px 12px;
   }
   .stat-n { font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
   .stat-l { font-size: 13px; color: var(--text2); margin-top: 2px; }
@@ -162,15 +162,6 @@
   .menu-btn.primary:active { opacity: 0.85; }
   .menu-icon { font-size: 20px; width: 24px; text-align: center; }
   .menu-btn .arrow { margin-left: auto; color: var(--text2); font-size: 18px; }
-  .weak-badge {
-    background: var(--red-bg);
-    color: var(--red);
-    font-size: 12px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-    margin-left: 6px;
-  }
   .menu-btn.primary .arrow { color: var(--bg); opacity: 0.5; }
 
   /* Quiz */
@@ -471,6 +462,10 @@
       <div class="stat-n" id="stat-best">—</div>
       <div class="stat-l">лучший результат</div>
     </div>
+    <div class="stat">
+      <div class="stat-n" id="stat-weak">0</div>
+      <div class="stat-l">слабых карточек</div>
+    </div>
   </div>
   <div class="menu-list">
     <button class="menu-btn primary" onclick="startQuiz(10)">
@@ -483,10 +478,6 @@
     </button>
     <button class="menu-btn" onclick="startQuiz(null)">
       <span class="menu-icon">▶▶</span> Все вопросы
-      <span class="arrow">›</span>
-    </button>
-    <button class="menu-btn" onclick="startQuizlet()">
-      <span class="menu-icon">🗂</span> Режим Quizlet <span class="weak-badge" id="weak-badge" style="display:none"></span>
       <span class="arrow">›</span>
     </button>
     <button class="menu-btn" onclick="showScreen('import')">
@@ -778,10 +769,9 @@ let current = 0;
 let score = 0;
 let bestByDeck = { rrj95: null, ozp: null };
 let answered = false;
-let quizletMode = false;
 let activeInputId = 'num-ans';
 
-// --- Quizlet: слабые вопросы (id -> счётчик ошибок), хранятся в localStorage отдельно на каждую колоду ---
+// --- Слабые вопросы (id -> счётчик ошибок), хранятся в localStorage отдельно на каждую колоду ---
 let weakStats = {};
 function loadWeak() {
   try { weakStats = JSON.parse(localStorage.getItem(DECKS[deckKey].weakKey) || '{}'); } catch(e) { weakStats = {}; }
@@ -794,11 +784,8 @@ function weakCount() {
   return Object.keys(weakStats).length;
 }
 function updateWeakBadge() {
-  const b = document.getElementById('weak-badge');
-  if (!b) return;
-  const n = weakCount();
-  b.style.display = n > 0 ? 'inline-block' : 'none';
-  b.textContent = n;
+  const el = document.getElementById('stat-weak');
+  if (el) el.textContent = weakCount();
 }
 
 function showScreen(id) {
@@ -831,7 +818,6 @@ function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 let lastCount = 10;
 
 function startQuiz(count) {
-  quizletMode = false;
   lastCount = count;
   const n = count ? Math.min(count, questions.length) : questions.length;
   queue = shuffle(questions).slice(0, n);
@@ -840,25 +826,17 @@ function startQuiz(count) {
   renderQ();
 }
 
-function startQuizlet() {
-  quizletMode = true;
-  // Колода: все вопросы + дополнительная копия каждого слабого (чаще попадаются)
-  const extra = questions.filter(q => weakStats[q.id] > 0);
-  queue = shuffle([...questions, ...extra]);
-  current = 0; score = 0; answered = false;
-  showScreen('quiz');
-  renderQ();
-}
-
-// Учёт ответа в режиме Quizlet
+// Учёт ответа — слабые вопросы копятся в localStorage и чаще повторяются
 function recordAnswer(q, ok) {
-  if (!quizletMode) return;
   if (!ok) {
     weakStats[q.id] = (weakStats[q.id] || 0) + 1;
     saveWeak();
-    // Возвращаем карточку в колоду через 3–7 позиций
-    const pos = Math.min(queue.length, current + 3 + Math.floor(Math.random() * 5));
-    queue.splice(pos, 0, q);
+    // Не увеличиваем колоду: меняем местами с вопросом на 3–7 позиций дальше, чтобы он вернулся позже
+    const swapPos = Math.min(queue.length - 1, current + 3 + Math.floor(Math.random() * 5));
+    if (swapPos > current) {
+      queue[current] = queue[swapPos];
+      queue[swapPos] = q;
+    }
   } else if (weakStats[q.id] > 0) {
     weakStats[q.id]--;
     if (weakStats[q.id] <= 0) delete weakStats[q.id];
@@ -1108,24 +1086,22 @@ function nextQ() {
 }
 
 function restartLast() {
-  if (quizletMode) startQuizlet(); else startQuiz(lastCount);
+  startQuiz(lastCount);
 }
 
 function showResult() {
   const pct = Math.round(score / queue.length * 100);
-  if (!quizletMode && (bestByDeck[deckKey] === null || pct > bestByDeck[deckKey])) bestByDeck[deckKey] = pct;
+  if (bestByDeck[deckKey] === null || pct > bestByDeck[deckKey]) bestByDeck[deckKey] = pct;
   document.getElementById('res-score').textContent = score + ' / ' + queue.length;
   document.getElementById('res-pct').textContent = pct + '%';
   let txt =
     pct >= 90 ? 'Отлично! Ограничения знаешь.' :
     pct >= 70 ? 'Хорошо, есть над чем работать.' :
     pct >= 50 ? 'Нужно повторить материал.' : 'Серьёзно повторить РЛЭ.';
-  if (quizletMode) {
-    const n = weakCount();
-    txt += n > 0
-      ? ' На повторении осталось карточек: ' + n + '.'
-      : ' Все карточки закрыты — слабых тем не осталось!';
-  }
+  const n = weakCount();
+  txt += n > 0
+    ? ' На повторении осталось карточек: ' + n + '.'
+    : ' Все карточки закрыты — слабых тем не осталось!';
   document.getElementById('res-comment').textContent = txt;
   showScreen('result');
 }
