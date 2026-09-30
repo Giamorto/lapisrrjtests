@@ -653,25 +653,11 @@ const DEFAULT_QS = [
   {id:64,category:"Автопилот",question:"Минимальная высота использования автопилота при заходе на посадку по ILS с индицированием APP1 на FMA?",type:"number",answer:160,unit:"ft AGL",tolerance:0},
   {id:65,category:"Автопилот",question:"Минимальная высота использования автопилота при уходе на второй круг в ручном режиме?",type:"number",answer:100,unit:"ft AGL",tolerance:0},
   {id:66,category:"Автопилот",question:"Минимальная высота использования автопилота на других этапах полета (кроме указанных выше)?",type:"number",answer:500,unit:"ft AGL",tolerance:0},
-  {id:67,category:"Категория II/III",question:"Минимальная высота использования автопилота при заходе на посадку по КАТЕГОРИИ II БЕЗ автоматической посадки?",type:"number",answer:80,unit:"ft",tolerance:0},
-  {id:68,category:"Категория II/III",question:"Относительная высота принятия решения (DH) при КАТЕГОРИИ II БЕЗ автоматической посадки?",type:"number",answer:100,unit:"ft",tolerance:0},
-  {id:69,category:"Категория II/III",question:"Относительная высота принятия решения (DH) при КАТЕГОРИИ II C автоматической посадкой?",type:"number",answer:100,unit:"ft",tolerance:0},
   {id:70,category:"Категория II/III",question:"Минимальная относительная высота принятия решения (DH) при КАТЕГОРИИ III C автоматической посадкой?",type:"number",answer:50,unit:"ft",tolerance:0},
   {id:71,category:"Категория II/III",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ II БЕЗ автоматической посадки?",type:"choice",options:["APP1","APP2 или APP3 LAND","APP3 LAND","только APP3"],answer:1},
   {id:72,category:"Категория II/III",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ II C автоматической посадкой?",type:"choice",options:["APP1 или APP2","APP2 или APP3 LAND","APP3 LAND","любая APP"],answer:2},
-  {id:73,category:"Категория I",question:"Минимальная относительная высота принятия решения (DH) при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"number",answer:200,unit:"ft",tolerance:0},
-  {id:74,category:"Категория I",question:"Минимальная высота использования автопилота при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"number",answer:160,unit:"ft",tolerance:0},
-  {id:75,category:"Категория I",question:"Минимальная относительная высота принятия решения (DH) при КАТЕГОРИИ I C автоматической посадкой?",type:"number",answer:200,unit:"ft",tolerance:0},
   {id:76,category:"Категория I",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"choice",options:["только APP1","APP1 или APP2 или APP3 LAND","APP3 LAND","APP2 или APP3"],answer:1},
   {id:77,category:"Категория I",question:"Максимальная боковая составляющая ветра при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"number",answer:36,unit:"kt",tolerance:0},
-  {id:78,category:"Категория I",question:"Максимальная встречная составляющая ветра при КАТЕГОРИИ I C автоматической посадкой?",type:"number",answer:30,unit:"kt",tolerance:0},
-  {id:79,category:"Категория I",question:"Максимальная боковая составляющая ветра при КАТЕГОРИИ I C автоматической посадкой?",type:"number",answer:30,unit:"kt",tolerance:0},
-  {id:80,category:"Категория II/III",question:"Максимальная встречная составляющая ветра при КАТЕГОРИИ II БЕЗ автоматической посадки?",type:"number",answer:30,unit:"kt",tolerance:0},
-  {id:81,category:"Категория II/III",question:"Максимальная боковая составляющая ветра при КАТЕГОРИИ II БЕЗ автоматической посадки?",type:"number",answer:16,unit:"kt",tolerance:0},
-  {id:82,category:"Категория II/III",question:"Максимальная встречная составляющая ветра при КАТЕГОРИИ II C автоматической посадкой?",type:"number",answer:30,unit:"kt",tolerance:0},
-  {id:83,category:"Категория II/III",question:"Максимальная боковая составляющая ветра при КАТЕГОРИИ II C автоматической посадкой?",type:"number",answer:20,unit:"kt",tolerance:0},
-  {id:84,category:"Категория II/III",question:"Максимальная встречная составляющая ветра при КАТЕГОРИИ III C автоматической посадкой?",type:"number",answer:30,unit:"kt",tolerance:0},
-  {id:85,category:"Категория II/III",question:"Максимальная боковая составляющая ветра при КАТЕГОРИИ III C автоматической посадкой?",type:"number",answer:20,unit:"kt",tolerance:0},
   {id:86,category:"Топливные баки",question:"Объем центрального топливного бака в литрах?",type:"number",answer:5665,unit:"л",tolerance:0},
   {id:87,category:"Топливные баки",question:"Масса топлива в центральном баке (при плотности 0.78 кг/л)?",type:"number",answer:4419,unit:"кг",tolerance:0},
   {id:88,category:"Топливные баки",question:"Общий объем одного крыльевого бака (левого или правого)?",type:"number",answer:5070,unit:"л",tolerance:0},
@@ -787,7 +773,9 @@ const DEFAULT_QS = [
   {id:209,category:"Категория I",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ I, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:30,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
   {id:210,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, без автоматической посадки",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:16,unit:"kt"},{label:"Попутная составляющая",answer:15,unit:"kt"}],tolerance:0},
   {id:211,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
-  {id:212,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ III, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0}
+  {id:212,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ III, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
+  {id:213,category:"Категория I",question:"Минимальная высота автопилота и высота принятия решения (DH): КАТЕГОРИЯ I",type:"multi",fields:[{label:"Мин. высота автопилота, без автопосадки",answer:160,unit:"ft"},{label:"DH, без автопосадки",answer:200,unit:"ft"},{label:"DH, с автопосадкой",answer:200,unit:"ft"}],tolerance:0},
+  {id:214,category:"Категория II/III",question:"Минимальная высота автопилота и высота принятия решения (DH): КАТЕГОРИЯ II",type:"multi",fields:[{label:"Мин. высота автопилота, без автопосадки",answer:80,unit:"ft"},{label:"DH, без автопосадки",answer:100,unit:"ft"},{label:"DH, с автопосадкой",answer:100,unit:"ft"}],tolerance:0}
 ];
 
 const OZP_QS = [
