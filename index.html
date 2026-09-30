@@ -307,7 +307,9 @@
     gap: 6px;
     flex-shrink: 0;
   }
-  .num-input.multi-input { width: 72px; max-width: 72px; padding: 10px 10px; font-size: 17px; }
+  .num-input.multi-input { width: 78px; max-width: 78px; padding: 10px 8px; font-size: 17px; }
+  .multi-input-wrap .num-prefix { font-size: 17px; }
+  .multi-input-wrap .range-dash { font-size: 16px; padding-bottom: 0; }
   .multi-hint { font-size: 12px; color: var(--red); font-weight: 600; white-space: nowrap; }
   .keypad {
     display: grid;
@@ -653,15 +655,10 @@ const DEFAULT_QS = [
   {id:64,category:"Автопилот",question:"Минимальная высота использования автопилота при заходе на посадку по ILS с индицированием APP1 на FMA?",type:"number",answer:160,unit:"ft AGL",tolerance:0},
   {id:65,category:"Автопилот",question:"Минимальная высота использования автопилота при уходе на второй круг в ручном режиме?",type:"number",answer:100,unit:"ft AGL",tolerance:0},
   {id:66,category:"Автопилот",question:"Минимальная высота использования автопилота на других этапах полета (кроме указанных выше)?",type:"number",answer:500,unit:"ft AGL",tolerance:0},
-  {id:70,category:"Категория II/III",question:"Минимальная относительная высота принятия решения (DH) при КАТЕГОРИИ III C автоматической посадкой?",type:"number",answer:50,unit:"ft",tolerance:0},
   {id:71,category:"Категория II/III",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ II БЕЗ автоматической посадки?",type:"choice",options:["APP1","APP2 или APP3 LAND","APP3 LAND","только APP3"],answer:1},
   {id:72,category:"Категория II/III",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ II C автоматической посадкой?",type:"choice",options:["APP1 или APP2","APP2 или APP3 LAND","APP3 LAND","любая APP"],answer:2},
   {id:76,category:"Категория I",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"choice",options:["только APP1","APP1 или APP2 или APP3 LAND","APP3 LAND","APP2 или APP3"],answer:1},
   {id:77,category:"Категория I",question:"Максимальная боковая составляющая ветра при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"number",answer:36,unit:"kt",tolerance:0},
-  {id:86,category:"Топливные баки",question:"Объем центрального топливного бака в литрах?",type:"number",answer:5665,unit:"л",tolerance:0},
-  {id:87,category:"Топливные баки",question:"Масса топлива в центральном баке (при плотности 0.78 кг/л)?",type:"number",answer:4419,unit:"кг",tolerance:0},
-  {id:88,category:"Топливные баки",question:"Общий объем одного крыльевого бака (левого или правого)?",type:"number",answer:5070,unit:"л",tolerance:0},
-  {id:89,category:"Топливные баки",question:"Общая масса топлива в одном крыльевом баке (левом или правом, при плотности 0.78 кг/л)?",type:"number",answer:3954,unit:"кг",tolerance:0},
   {id:90,category:"Топливные баки",question:"Общий объем всех топливных баков?",type:"number",answer:15805,unit:"л",tolerance:0},
   {id:91,category:"Топливные баки",question:"Максимальный дисбаланс топлива между левым и правым крыльевыми баками в полете?",type:"number",answer:500,unit:"кг",tolerance:0},
   {id:97,category:"Температура топлива",question:"При какой температуре топлива в баках на земле требуется использование противоводокристаллизационной жидкости?",type:"choice",options:["-35°C и менее","-40°C и менее","-47°C и менее","-50°C и менее"],answer:1},
@@ -735,8 +732,6 @@ const DEFAULT_QS = [
   {id:167,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте выше 14000 ft (4250 м) до 20000 ft (6100 м) включительно?",type:"number",answer:240,unit:"kt",tolerance:0},
   {id:168,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте выше 20000 ft (6100 м) до 34000 ft (10350 м) включительно (обычные условия)?",type:"number",answer:265,unit:"kt",tolerance:0},
   {id:169,category:"Зона ожидания",question:"Рекомендованная скорость в зоне ожидания на высоте выше 34000 ft (10350 м)?",type:"number",answer:0.82,unit:"M",tolerance:0},
-  {id:170,category:"Стабилизированный заход",question:"При каком отклонении вертикальной скорости на заходе на посадку подается доклад «SINK RATE»?",type:"number",answer:1000,unit:"ft/min",tolerance:0},
-  {id:175,category:"Стабилизированный заход",question:"При каком крене на заходе на посадку подается доклад «BANK»?",type:"choice",options:["> 5°","> 7°","> 10°","> 15°"],answer:1},
   {id:176,category:"Посадка (контроль положения)",question:"При каком угле тангажа PNF подает доклад «PITCH PITCH» на посадке?",type:"number",answer:7.5,unit:"°",tolerance:0},
   {id:177,category:"Посадка (контроль положения)",question:"При каком угле крена PNF подает доклад «BANK BANK» на посадке?",type:"number",answer:7,unit:"°",tolerance:0},
   {id:178,category:"Посадка (контроль положения)",question:"При превышении какого угла крена происходит касание земли двигателем или законцовкой крыла?",type:"number",answer:20,unit:"°",tolerance:0},
@@ -758,12 +753,10 @@ const DEFAULT_QS = [
   {id:194,category:"Условия эксплуатации",question:"Какой диапазон превышения аэродрома, допустимого для взлёта и посадки?",type:"range",answerMin:-1000,answerMax:5000,unit:"ft",tolerance:0},
   {id:195,category:"Система кондиционирования",question:"Какой диапазон перепада давления в кабине (отрицательный / положительный)?",type:"range",answerMin:-1.4,answerMax:8.7,unit:"Psi",tolerance:0},
   {id:196,category:"Гидравлическая жидкость",question:"Какой диапазон рабочего давления в гидросистеме?",type:"range",answerMin:1800,answerMax:3200,unit:"Psi",tolerance:0},
-  {id:197,category:"Стабилизированный заход",question:"В каком диапазоне тангажа на заходе на посадку доклад «PITCH» не подаётся?",type:"range",answerMin:-2.5,answerMax:10,unit:"°",tolerance:0},
   {id:198,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки JET A-1?",type:"range",answerMin:-47,answerMax:47,unit:"°C",tolerance:0},
   {id:199,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки РТ?",type:"range",answerMin:-50,answerMax:47,unit:"°C",tolerance:0},
   {id:200,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки ТС-1?",type:"range",answerMin:-50,answerMax:47,unit:"°C",tolerance:0},
   {id:201,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки JET A?",type:"range",answerMin:-35,answerMax:47,unit:"°C",tolerance:0},
-  {id:202,category:"Стабилизированный заход",question:"В каком диапазоне отклонения скорости от VAPP на стабилизированном заходе доклад «SPEED» не подаётся?",type:"range",answerMin:-5,answerMax:10,unit:"kt",tolerance:0},
   {id:203,category:"Маневрирование на земле",question:"Какой максимальный угол поворота колёс передней опоры при буксировке (в каждую сторону)?",type:"symmetric",answer:85,unit:"°",tolerance:0},
   {id:204,category:"Маневрирование на земле",question:"На каком угле (в каждую сторону) срабатывают датчик и механические свидетели превышения предельного угла поворота колёс?",type:"symmetric",answer:90,unit:"°",tolerance:0},
   {id:205,category:"Система управления поворотом колес",question:"Какой максимальный угол поворота колёс передней опоры шасси от ручки управления поворотом колес (в каждую сторону)?",type:"symmetric",answer:65,unit:"°",tolerance:0},
@@ -774,8 +767,12 @@ const DEFAULT_QS = [
   {id:210,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, без автоматической посадки",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:16,unit:"kt"},{label:"Попутная составляющая",answer:15,unit:"kt"}],tolerance:0},
   {id:211,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
   {id:212,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ III, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
-  {id:213,category:"Категория I",question:"Минимальная высота автопилота и высота принятия решения (DH): КАТЕГОРИЯ I",type:"multi",fields:[{label:"Мин. высота автопилота, без автопосадки",answer:160,unit:"ft"},{label:"Высота принятия решения (DH)",answer:200,unit:"ft"}],tolerance:0},
-  {id:214,category:"Категория II/III",question:"Минимальная высота автопилота и высота принятия решения (DH): КАТЕГОРИЯ II",type:"multi",fields:[{label:"Мин. высота автопилота, без автопосадки",answer:80,unit:"ft"},{label:"Высота принятия решения (DH)",answer:100,unit:"ft"}],tolerance:0}
+  {id:215,category:"Категория I/II",question:"Минимальная высота использования автопилота на посадке",type:"multi",fields:[{label:"Категория I",answer:160,unit:"ft"},{label:"Категория II",answer:80,unit:"ft"}],tolerance:0},
+  {id:216,category:"Категория I/II/III",question:"Относительная высота принятия решения (DH)",type:"multi",fields:[{label:"Категория I",answer:200,unit:"ft"},{label:"Категория II",answer:100,unit:"ft"},{label:"Категория III",answer:50,unit:"ft"}],tolerance:0},
+  {id:217,category:"Ограничение по ветру",question:"Максимальная скорость ветра при выполнении захода на посадку с визуальным маневрированием (circle-to-land)?",type:"number",answer:25,unit:"kt",tolerance:0},
+  {id:218,category:"Стабилизированный заход",question:"Параметры стабилизированного захода на посадку",type:"multi",fields:[{label:"Скорость, отклонение от VAPP",kind:"range",answerMin:-5,answerMax:10,unit:"kt"},{label:"Тангаж",kind:"range",answerMin:-2.5,answerMax:10,unit:"°"},{label:"Крен",kind:"symmetric",answer:7,unit:"°"},{label:"Вертикальная скорость, не более",kind:"number",answer:1000,unit:"ft/min"}],tolerance:0},
+  {id:219,category:"Топливные баки",question:"Центральный топливный бак — объём и масса (при плотности 0.78 кг/л)",type:"multi",fields:[{label:"Объём",answer:5665,unit:"л"},{label:"Масса",answer:4419,unit:"кг"}],tolerance:0},
+  {id:220,category:"Топливные баки",question:"Один крыльевой топливный бак (левый или правый) — объём и масса (при плотности 0.78 кг/л)",type:"multi",fields:[{label:"Объём",answer:5070,unit:"л"},{label:"Масса",answer:3954,unit:"кг"}],tolerance:0}
 ];
 
 const OZP_QS = [
@@ -963,18 +960,32 @@ function renderQ() {
       <button class="check-btn" id="check-btn" onclick="checkRange()">Проверить</button>
     </div>`;
   } else if (q.type === 'multi') {
-    activeInputId = 'multi-ans-0';
+    activeInputId = q.fields[0].kind === 'range' ? 'multi-ans-0-min' : 'multi-ans-0';
     body.innerHTML = `<div class="num-area">
       <div class="multi-list">
-        ${q.fields.map((f, i) => `
+        ${q.fields.map((f, i) => {
+          const active = i === 0 ? ' active' : '';
+          let inputHtml;
+          if (f.kind === 'range') {
+            inputHtml = `<input type="text" class="num-input multi-input${active}" id="multi-ans-${i}-min" onclick="focusField('multi-ans-${i}-min')" inputmode="none" placeholder="0" readonly>
+            <span class="range-dash">–</span>
+            <input type="text" class="num-input multi-input" id="multi-ans-${i}-max" onclick="focusField('multi-ans-${i}-max')" inputmode="none" placeholder="0" readonly>`;
+          } else if (f.kind === 'symmetric') {
+            inputHtml = `<span class="num-prefix">±</span>
+            <input type="text" class="num-input multi-input${active}" id="multi-ans-${i}" onclick="focusField('multi-ans-${i}')" inputmode="none" placeholder="0" readonly>`;
+          } else {
+            inputHtml = `<input type="text" class="num-input multi-input${active}" id="multi-ans-${i}" onclick="focusField('multi-ans-${i}')" inputmode="none" placeholder="0" readonly>`;
+          }
+          return `
         <div class="multi-row">
           <span class="multi-label">${f.label}</span>
           <div class="multi-input-wrap">
-            <input type="text" class="num-input multi-input${i === 0 ? ' active' : ''}" id="multi-ans-${i}" onclick="focusField('multi-ans-${i}')" inputmode="none" placeholder="0" readonly>
+            ${inputHtml}
             <span class="num-unit">${f.unit || ''}</span>
             <span class="multi-hint" id="multi-hint-${i}"></span>
           </div>
-        </div>`).join('')}
+        </div>`;
+        }).join('')}
       </div>
       ${KEYPAD_HTML}
       <button class="check-btn" id="check-btn" onclick="checkMulti()">Проверить</button>
@@ -1097,20 +1108,31 @@ function checkRange() {
 function checkMulti() {
   if (answered) return;
   const q = queue[current];
-  const inputs = q.fields.map((f, i) => document.getElementById('multi-ans-' + i));
-  if (inputs.some(inp => !inp || inp.value === '')) return;
+  const fieldInputs = q.fields.map((f, i) => f.kind === 'range'
+    ? [document.getElementById('multi-ans-' + i + '-min'), document.getElementById('multi-ans-' + i + '-max')]
+    : [document.getElementById('multi-ans-' + i)]);
+  if (fieldInputs.some(arr => arr.some(inp => !inp || inp.value === ''))) return;
   answered = true;
   const tol = q.tolerance || 0;
   let allOk = true;
   q.fields.forEach((f, i) => {
-    const val = parseFloat(inputs[i].value.replace(',', '.'));
-    const ok = Math.abs(val - f.answer) <= tol;
-    inputs[i].disabled = true;
-    inputs[i].classList.add(ok ? 'correct' : 'wrong');
+    const inputs = fieldInputs[i];
+    let ok, correctText;
+    if (f.kind === 'range') {
+      const valMin = parseFloat(inputs[0].value.replace(',', '.'));
+      const valMax = parseFloat(inputs[1].value.replace(',', '.'));
+      ok = Math.abs(valMin - f.answerMin) <= tol && Math.abs(valMax - f.answerMax) <= tol;
+      correctText = f.answerMin + '–' + f.answerMax;
+    } else {
+      const val = parseFloat(inputs[0].value.replace(',', '.'));
+      ok = Math.abs(val - f.answer) <= tol;
+      correctText = (f.kind === 'symmetric' ? '±' : '') + f.answer;
+    }
+    inputs.forEach(inp => { inp.disabled = true; inp.classList.add(ok ? 'correct' : 'wrong'); });
     if (!ok) {
       allOk = false;
       const hint = document.getElementById('multi-hint-' + i);
-      if (hint) hint.textContent = '→ ' + f.answer;
+      if (hint) hint.textContent = '→ ' + correctText;
     }
   });
   const cb = document.getElementById('check-btn');
