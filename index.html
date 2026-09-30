@@ -281,6 +281,34 @@
   }
   .num-input.range-input { width: 100px; max-width: 100px; }
   .num-input.range-input.active { border-color: var(--text); }
+  .num-input.correct { border-color: var(--green); color: var(--green); }
+  .num-input.wrong { border-color: var(--red); color: var(--red); }
+  .multi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .multi-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .multi-label {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.3;
+    flex: 1;
+  }
+  .multi-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .num-input.multi-input { width: 72px; max-width: 72px; padding: 10px 10px; font-size: 17px; }
+  .multi-hint { font-size: 12px; color: var(--red); font-weight: 600; white-space: nowrap; }
   .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -755,7 +783,11 @@ const DEFAULT_QS = [
   {id:205,category:"Система управления поворотом колес",question:"Какой максимальный угол поворота колёс передней опоры шасси от ручки управления поворотом колес (в каждую сторону)?",type:"symmetric",answer:65,unit:"°",tolerance:0},
   {id:206,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при убранных предкрылках и закрылках?",type:"range",answerMin:-1.0,answerMax:2.5,unit:"g",tolerance:0},
   {id:207,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при убранных предкрылках и выпущенных закрылках?",type:"range",answerMin:0.0,answerMax:2.0,unit:"g",tolerance:0},
-  {id:208,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при выпущенных предкрылках и закрылках?",type:"range",answerMin:0.0,answerMax:2.0,unit:"g",tolerance:0}
+  {id:208,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при выпущенных предкрылках и закрылках?",type:"range",answerMin:0.0,answerMax:2.0,unit:"g",tolerance:0},
+  {id:209,category:"Категория I",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ I, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:30,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
+  {id:210,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, без автоматической посадки",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:16,unit:"kt"},{label:"Попутная составляющая",answer:15,unit:"kt"}],tolerance:0},
+  {id:211,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
+  {id:212,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ III, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0}
 ];
 
 const OZP_QS = [
@@ -930,17 +962,34 @@ function renderQ() {
       <div class="range-row">
         <div class="range-field">
           <span class="range-label">от</span>
-          <input type="text" class="num-input range-input active" id="num-ans-min" onclick="focusRangeField('num-ans-min')" inputmode="none" placeholder="0" readonly>
+          <input type="text" class="num-input range-input active" id="num-ans-min" onclick="focusField('num-ans-min')" inputmode="none" placeholder="0" readonly>
         </div>
         <span class="range-dash">–</span>
         <div class="range-field">
           <span class="range-label">до</span>
-          <input type="text" class="num-input range-input" id="num-ans-max" onclick="focusRangeField('num-ans-max')" inputmode="none" placeholder="0" readonly>
+          <input type="text" class="num-input range-input" id="num-ans-max" onclick="focusField('num-ans-max')" inputmode="none" placeholder="0" readonly>
         </div>
         <span class="num-unit">${q.unit || ''}</span>
       </div>
       ${KEYPAD_HTML}
       <button class="check-btn" id="check-btn" onclick="checkRange()">Проверить</button>
+    </div>`;
+  } else if (q.type === 'multi') {
+    activeInputId = 'multi-ans-0';
+    body.innerHTML = `<div class="num-area">
+      <div class="multi-list">
+        ${q.fields.map((f, i) => `
+        <div class="multi-row">
+          <span class="multi-label">${f.label}</span>
+          <div class="multi-input-wrap">
+            <input type="text" class="num-input multi-input${i === 0 ? ' active' : ''}" id="multi-ans-${i}" onclick="focusField('multi-ans-${i}')" inputmode="none" placeholder="0" readonly>
+            <span class="num-unit">${f.unit || ''}</span>
+            <span class="multi-hint" id="multi-hint-${i}"></span>
+          </div>
+        </div>`).join('')}
+      </div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkMulti()">Проверить</button>
     </div>`;
   } else if (q.type === 'symmetric') {
     activeInputId = 'num-ans';
@@ -995,9 +1044,9 @@ function checkChoice(i) {
   }
 }
 
-function focusRangeField(id) {
+function focusField(id) {
   activeInputId = id;
-  document.querySelectorAll('.range-input').forEach(el => el.classList.toggle('active', el.id === id));
+  document.querySelectorAll('.range-input, .multi-input').forEach(el => el.classList.toggle('active', el.id === id));
 }
 
 function kpInput(ch) {
@@ -1055,6 +1104,32 @@ function checkRange() {
   const correctText = q.answerMin + '–' + q.answerMax + ' ' + (q.unit || '');
   if (ok) { score++; showFeedback(true, '✓ Верно: ' + correctText); }
   else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + correctText); }
+}
+
+function checkMulti() {
+  if (answered) return;
+  const q = queue[current];
+  const inputs = q.fields.map((f, i) => document.getElementById('multi-ans-' + i));
+  if (inputs.some(inp => !inp || inp.value === '')) return;
+  answered = true;
+  const tol = q.tolerance || 0;
+  let allOk = true;
+  q.fields.forEach((f, i) => {
+    const val = parseFloat(inputs[i].value.replace(',', '.'));
+    const ok = Math.abs(val - f.answer) <= tol;
+    inputs[i].disabled = true;
+    inputs[i].classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) {
+      allOk = false;
+      const hint = document.getElementById('multi-hint-' + i);
+      if (hint) hint.textContent = '→ ' + f.answer;
+    }
+  });
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  recordAnswer(q, allOk);
+  if (allOk) { score++; showFeedback(true, '✓ Все значения верны'); }
+  else { showFeedback(false, '✗ Есть ошибки — неверные поля красным, верный ответ рядом'); }
 }
 
 function nextQ() {
