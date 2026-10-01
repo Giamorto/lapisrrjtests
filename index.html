@@ -271,7 +271,8 @@
     padding-bottom: 12px;
   }
   .num-input.range-input { width: 100px; max-width: 100px; }
-  .num-input.range-input.active { border-color: var(--text); }
+  .num-input.range-input.active,
+  .num-input.multi-input.active { border-color: var(--text); box-shadow: 0 0 0 1.5px var(--text); }
   .num-input.correct { border-color: var(--green); color: var(--green); }
   .num-input.wrong { border-color: var(--red); color: var(--red); }
   .multi-list {
@@ -777,7 +778,7 @@ function saveWeak() {
 }
 loadWeak();
 function weakCount() {
-  return Object.keys(weakStats).length;
+  return questions.filter(q => weakStats[q.id] > 0).length;
 }
 function updateWeakBadge() {
   const el = document.getElementById('stat-weak');
@@ -812,28 +813,32 @@ function updateHomeStats() {
 function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 
 let lastCount = 10;
+let missed = new Set();
+let requeued = false;
 
 function startQuiz(count) {
   lastCount = count;
   const n = count ? Math.min(count, questions.length) : questions.length;
-  queue = shuffle(questions).slice(0, n);
-  current = 0; score = 0; answered = false;
+  const weak = shuffle(questions.filter(q => weakStats[q.id] > 0));
+  const rest = shuffle(questions.filter(q => !(weakStats[q.id] > 0)));
+  queue = shuffle([...weak, ...rest].slice(0, n));
+  current = 0; score = 0; answered = false; missed = new Set(); requeued = false;
   showScreen('quiz');
   renderQ();
 }
 
-// Учёт ответа — слабые вопросы копятся в localStorage и чаще повторяются
+// Неверный ответ не засчитывается: вопрос уходит на 3–7 позиций дальше, счётчик прогресса не двигается.
+// Отметка «слабый» снимается только при верном ответе с первой попытки в сессии.
 function recordAnswer(q, ok) {
   if (!ok) {
     weakStats[q.id] = (weakStats[q.id] || 0) + 1;
     saveWeak();
-    // Не увеличиваем колоду: меняем местами с вопросом на 3–7 позиций дальше, чтобы он вернулся позже
-    const swapPos = Math.min(queue.length - 1, current + 3 + Math.floor(Math.random() * 5));
-    if (swapPos > current) {
-      queue[current] = queue[swapPos];
-      queue[swapPos] = q;
-    }
-  } else if (weakStats[q.id] > 0) {
+    missed.add(q.id);
+    queue.splice(current, 1);
+    const pos = Math.min(queue.length, current + 3 + Math.floor(Math.random() * 5));
+    queue.splice(pos, 0, q);
+    requeued = true;
+  } else if (!missed.has(q.id) && weakStats[q.id] > 0) {
     weakStats[q.id]--;
     if (weakStats[q.id] <= 0) delete weakStats[q.id];
     saveWeak();
@@ -953,7 +958,7 @@ function showFeedback(ok, text) {
   fb.style.display = 'block';
   const nb = document.getElementById('next-btn');
   nb.style.display = 'block';
-  nb.textContent = current + 1 >= queue.length ? 'Завершить' : 'Далее →';
+  nb.textContent = !requeued && current + 1 >= queue.length ? 'Завершить' : 'Далее →';
 }
 
 function checkChoice(i) {
@@ -966,7 +971,7 @@ function checkChoice(i) {
   recordAnswer(q, ok);
   if (ok) {
     btns[i].classList.add('correct');
-    score++;
+    if (!missed.has(q.id)) score++;
     showFeedback(true, '✓ Верно');
   } else {
     btns[i].classList.add('wrong');
@@ -1012,7 +1017,7 @@ function checkNumber() {
   if (cb) cb.disabled = true;
   recordAnswer(q, ok);
   const prefix = q.type === 'symmetric' ? '±' : '';
-  if (ok) { score++; showFeedback(true, '✓ Верно: ' + prefix + q.answer + ' ' + (q.unit || '')); }
+  if (ok) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Верно: ' + prefix + q.answer + ' ' + (q.unit || '')); }
   else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + prefix + q.answer + ' ' + (q.unit || '')); }
 }
 
@@ -1033,7 +1038,7 @@ function checkRange() {
   if (cb) cb.disabled = true;
   recordAnswer(q, ok);
   const correctText = q.answerMin + '–' + q.answerMax + ' ' + (q.unit || '');
-  if (ok) { score++; showFeedback(true, '✓ Верно: ' + correctText); }
+  if (ok) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Верно: ' + correctText); }
   else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + correctText); }
 }
 
@@ -1060,7 +1065,7 @@ function checkMulti() {
       ok = Math.abs(val - f.answer) <= tol;
       correctText = (f.kind === 'symmetric' ? '±' : '') + f.answer;
     }
-    inputs.forEach(inp => { inp.disabled = true; inp.classList.add(ok ? 'correct' : 'wrong'); });
+    inputs.forEach(inp => { inp.disabled = true; inp.classList.remove('active'); inp.classList.add(ok ? 'correct' : 'wrong'); });
     if (!ok) {
       allOk = false;
       const hint = document.getElementById('multi-hint-' + i);
@@ -1070,12 +1075,12 @@ function checkMulti() {
   const cb = document.getElementById('check-btn');
   if (cb) cb.disabled = true;
   recordAnswer(q, allOk);
-  if (allOk) { score++; showFeedback(true, '✓ Все значения верны'); }
+  if (allOk) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Все значения верны'); }
   else { showFeedback(false, '✗ Есть ошибки — неверные поля красным, верный ответ рядом'); }
 }
 
 function nextQ() {
-  current++;
+  if (requeued) requeued = false; else current++;
   if (current >= queue.length) { showResult(); return; }
   renderQ();
   window.scrollTo(0, 0);
