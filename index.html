@@ -380,39 +380,6 @@
   .result-comment { font-size: 16px; color: var(--text2); margin-bottom: 2.5rem; }
   .result-btns { display: flex; flex-direction: column; gap: 10px; }
 
-  /* Import */
-  .import-body { padding: 1rem; }
-  .import-hint {
-    font-size: 14px;
-    color: var(--text2);
-    margin-bottom: 12px;
-    line-height: 1.5;
-  }
-  .json-textarea {
-    width: 100%;
-    height: 220px;
-    padding: 14px;
-    border-radius: var(--radius);
-    border: 0.5px solid var(--border2);
-    background: var(--bg2);
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'SF Mono', 'Menlo', monospace;
-    line-height: 1.5;
-    resize: none;
-    margin-bottom: 10px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .json-textarea:focus { outline: none; border-color: var(--text); }
-  .import-status {
-    font-size: 14px;
-    color: var(--text2);
-    margin-bottom: 10px;
-    min-height: 20px;
-  }
-  .import-status.ok { color: var(--green); }
-  .import-status.err { color: var(--red); }
-
   /* Prompt */
   .prompt-body { padding: 1rem; }
   .prompt-box {
@@ -483,10 +450,6 @@
       <span class="menu-icon">▶▶</span> Все вопросы
       <span class="arrow">›</span>
     </button>
-    <button class="menu-btn" onclick="showScreen('import')">
-      <span class="menu-icon">⬆</span> Импорт вопросов
-      <span class="arrow">›</span>
-    </button>
     <button class="menu-btn" onclick="showScreen('prompt')">
       <span class="menu-icon">✦</span> Промпт для генерации
       <span class="arrow">›</span>
@@ -526,27 +489,6 @@
         <span class="arrow">›</span>
       </button>
     </div>
-  </div>
-</div>
-
-<!-- IMPORT -->
-<div id="import" class="screen">
-  <div class="nav">
-    <button class="back-btn" onclick="showScreen('home')">‹</button>
-    <span class="nav-title">Импорт вопросов</span>
-  </div>
-  <div class="import-body">
-    <div class="import-hint">Вставьте JSON с вопросами — получить его можно через промпт для нейронки</div>
-    <textarea id="json-text" class="json-textarea" placeholder='[{"id":1,"category":"...","question":"...","type":"choice","options":[...],"answer":0}, ...]' spellcheck="false"></textarea>
-    <div class="import-status" id="import-status"></div>
-    <button class="menu-btn primary" onclick="loadText()" style="margin-bottom:10px">
-      <span class="menu-icon">⬆</span> Загрузить
-      <span class="arrow">›</span>
-    </button>
-    <button class="menu-btn" onclick="showScreen('home')">
-      <span class="menu-icon">‹</span> Назад
-      <span class="arrow">›</span>
-    </button>
   </div>
 </div>
 
@@ -1109,35 +1051,6 @@ function showResult() {
     : ' Все карточки закрыты — слабых тем не осталось!';
   document.getElementById('res-comment').textContent = txt;
   showScreen('result');
-}
-
-function loadText() {
-  const raw = document.getElementById('json-text').value.trim();
-  const status = document.getElementById('import-status');
-  if (!raw) {
-    status.className = 'import-status err';
-    status.textContent = '✗ Поле пустое — вставьте JSON';
-    return;
-  }
-  try {
-    const data = JSON.parse(raw);
-    if (!Array.isArray(data)) throw new Error('Должен быть массив JSON');
-    if (!data.length) throw new Error('Массив пустой');
-    DECKS.import = { label: 'Импорт', tagline: 'Импортированные вопросы', qs: data, weakKey: 'import_weak' };
-    bestByDeck.import = null;
-    deckKey = 'import';
-    questions = [...data];
-    loadWeak();
-    document.querySelectorAll('.deck-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('home-label').textContent = DECKS.import.tagline;
-    document.getElementById('home-title').textContent = DECKS.import.label;
-    status.className = 'import-status ok';
-    status.textContent = '✓ Загружено вопросов: ' + data.length;
-    updateHomeStats();
-  } catch (err) {
-    status.className = 'import-status err';
-    status.textContent = '✗ Ошибка: ' + err.message;
-  }
 }
 
 function copyPrompt() {
