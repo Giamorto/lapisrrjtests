@@ -380,34 +380,6 @@
   .result-comment { font-size: 16px; color: var(--text2); margin-bottom: 2.5rem; }
   .result-btns { display: flex; flex-direction: column; gap: 10px; }
 
-  /* Prompt */
-  .prompt-body { padding: 1rem; }
-  .prompt-box {
-    background: var(--bg2);
-    border-radius: var(--radius);
-    padding: 16px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text2);
-    white-space: pre-wrap;
-    margin-bottom: 1rem;
-    max-height: 50vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    font-family: 'SF Mono', 'Menlo', monospace;
-  }
-  .copy-btn {
-    width: 100%;
-    padding: 15px;
-    border-radius: var(--radius);
-    border: 0.5px solid var(--border2);
-    background: var(--bg);
-    color: var(--text);
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .copy-btn:active { background: var(--bg2); }
 </style>
 </head>
 <body>
@@ -450,10 +422,6 @@
       <span class="menu-icon">▶▶</span> Все вопросы
       <span class="arrow">›</span>
     </button>
-    <button class="menu-btn" onclick="showScreen('prompt')">
-      <span class="menu-icon">✦</span> Промпт для генерации
-      <span class="arrow">›</span>
-    </button>
   </div>
 </div>
 
@@ -492,56 +460,9 @@
   </div>
 </div>
 
-<!-- PROMPT -->
-<div id="prompt" class="screen">
-  <div class="nav">
-    <button class="back-btn" onclick="showScreen('home')">‹</button>
-    <span class="nav-title">Промпт для нейронки</span>
-  </div>
-  <div class="prompt-body">
-    <div class="prompt-box" id="prompt-box"></div>
-    <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">📋 Скопировать промпт</button>
-  </div>
-</div>
-
 </div>
 
 <script>
-const PROMPT = `Ты — генератор тестовых вопросов по Руководству полётной эксплуатации RRJ-95. Прочитай предоставленный текст РЛЭ и создай список вопросов для проверки знаний лётного экипажа.
-
-Формат ответа — только JSON, без каких-либо других слов, без markdown-блоков. Структура:
-
-[
-  {
-    "id": 1,
-    "category": "Масса и центровка",
-    "question": "Максимальная взлётная масса (тормоза отпущены)?",
-    "type": "number",
-    "answer": 49450,
-    "unit": "кг",
-    "tolerance": 0
-  },
-  {
-    "id": 2,
-    "category": "Скорости",
-    "question": "Максимальная скорость VMO?",
-    "type": "choice",
-    "options": ["295 kt", "308 kt", "320 kt", "285 kt"],
-    "answer": 1
-  }
-]
-
-Правила:
-- type "number": числовой ответ, поля answer (число), unit (единица), tolerance (допуск ±)
-- type "choice": 4 варианта, answer — индекс правильного (0–3)
-- category: краткая тема (Масса и центровка / Скорости / Ветровые ограничения / Шасси / Двигатель / ВПП / Автопилот / APU / Топливо)
-- Минимум 20 вопросов, охватывай разные разделы
-- Вопросы только с конкретными числовыми значениями из РЛЭ
-- Не включай вопросы без чёткого однозначного ответа
-
-Текст РЛЭ для обработки:
-[ВСТАВИТЬ ТЕКСТ РЛЭ]`;
-
 const DEFAULT_QS = [
   {id:17,category:"Маневрирование на земле",question:"Максимальная скорость ветра при рулении (N1≤35%)?",type:"number",answer:35,unit:"kt",tolerance:0},
   {id:18,category:"Маневрирование на земле",question:"Максимальная скорость ветра при буксировке?",type:"number",answer:50,unit:"kt",tolerance:0},
@@ -1052,28 +973,6 @@ function showResult() {
   document.getElementById('res-comment').textContent = txt;
   showScreen('result');
 }
-
-function copyPrompt() {
-  const btn = document.getElementById('copy-btn');
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(PROMPT).then(() => {
-      btn.textContent = '✓ Скопировано!';
-      setTimeout(() => { btn.textContent = '📋 Скопировать промпт'; }, 2000);
-    });
-  } else {
-    const ta = document.createElement('textarea');
-    ta.value = PROMPT;
-    ta.style.cssText = 'position:fixed;opacity:0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent = '✓ Скопировано!';
-    setTimeout(() => { btn.textContent = '📋 Скопировать промпт'; }, 2000);
-  }
-}
-
-document.getElementById('prompt-box').textContent = PROMPT;
 
 updateHomeStats();
 </script>
