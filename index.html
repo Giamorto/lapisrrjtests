@@ -283,9 +283,10 @@
   }
   .multi-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 4px 10px;
   }
   .multi-label {
     font-size: 13px;
@@ -302,7 +303,8 @@
   .num-input.multi-input { width: 78px; max-width: 78px; padding: 10px 8px; font-size: 17px; }
   .multi-input-wrap .num-prefix { font-size: 17px; }
   .multi-input-wrap .range-dash { font-size: 16px; padding-bottom: 0; }
-  .multi-hint { font-size: 12px; color: var(--red); font-weight: 600; white-space: nowrap; }
+  .multi-hint { flex-basis: 100%; text-align: right; font-size: 12px; color: var(--red); font-weight: 600; }
+  .multi-hint:empty { display: none; }
   .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -737,7 +739,7 @@ const OZP_QS = [
   {id:13,category:"ОЗП",question:"Какова минимальная скорость набегающего потока для устойчивой работы датчика обледенения?",type:"number",answer:30,unit:"kt",tolerance:0},
   {id:14,category:"ОЗП",question:"Каково максимально допустимое время непрерывной работы турбостартера при температуре наружного воздуха ниже –15°C?",type:"number",answer:4,unit:"мин",tolerance:0},
   {id:15,category:"ОЗП",question:"Сколько минут необходимо прогревать двигатель на режиме IDLE, если после стоянки при температуре ниже –30°C наблюдается течь топлива, прежде чем принять решение о его выключении?",type:"number",answer:5,unit:"мин",tolerance:0},
-  {id:16,category:"ОЗП",question:"Через какой максимальный интервал времени необходимо повторять процедуру увеличения режима работы двигателя до 70% N1 на 20 секунд при рулении в условиях обледенения?",type:"number",answer:5,unit:"мин",tolerance:0},
+  {id:16,category:"ОЗП",question:"Через какой максимальный интервал времени необходимо повторять процедуру увеличения режима работы двигателя до 70% N1 на 20 секунд при рулении в условиях обледенения?",type:"number",answer:30,unit:"мин",tolerance:0},
   {id:17,category:"ОЗП",question:"На сколько часов максимум разрешена стоянка самолета с установленными аккумуляторными батареями при ТНВ от –15°C до –30°C?",type:"number",answer:6,unit:"ч",tolerance:0},
   {id:18,category:"ОЗП",question:"Более скольких часов стоянки при ТНВ от –15°C до –54°C требуется для обязательного закрытия подачи кислорода от баллона?",type:"number",answer:3,unit:"ч",tolerance:0},
   {id:19,category:"ОЗП",question:"Какая максимальная глубина мокрого снега или слякоти на ВПП запрещает взлет в конфигурации FLAP 1+F?",type:"number",answer:3,unit:"мм",tolerance:0},
@@ -806,7 +808,7 @@ function selectDeck(key) {
 function updateHomeStats() {
   document.getElementById('stat-total').textContent = questions.length;
   const b = bestByDeck[deckKey];
-  document.getElementById('stat-best').textContent = b !== null ? b + '%' : '—';
+  document.getElementById('stat-best').textContent = b != null ? b + '%' : '—';
   updateWeakBadge();
 }
 
@@ -919,8 +921,8 @@ function renderQ() {
           <div class="multi-input-wrap">
             ${inputHtml}
             <span class="num-unit">${f.unit || ''}</span>
-            <span class="multi-hint" id="multi-hint-${i}"></span>
           </div>
+          <span class="multi-hint" id="multi-hint-${i}"></span>
         </div>`;
         }).join('')}
       </div>
@@ -1003,10 +1005,12 @@ function kpBackspace() {
   inp.value = inp.value.slice(0, -1);
 }
 
+function isBlank(v) { return isNaN(parseFloat(v.replace(',', '.'))); }
+
 function checkNumber() {
   if (answered) return;
   const inp = document.getElementById('num-ans');
-  if (!inp || inp.value === '') return;
+  if (!inp || isBlank(inp.value)) return;
   answered = true;
   const q = queue[current];
   const val = parseFloat(inp.value.replace(',', '.'));
@@ -1025,7 +1029,7 @@ function checkRange() {
   if (answered) return;
   const inpMin = document.getElementById('num-ans-min');
   const inpMax = document.getElementById('num-ans-max');
-  if (!inpMin || !inpMax || inpMin.value === '' || inpMax.value === '') return;
+  if (!inpMin || !inpMax || isBlank(inpMin.value) || isBlank(inpMax.value)) return;
   answered = true;
   const q = queue[current];
   const valMin = parseFloat(inpMin.value.replace(',', '.'));
@@ -1048,7 +1052,7 @@ function checkMulti() {
   const fieldInputs = q.fields.map((f, i) => f.kind === 'range'
     ? [document.getElementById('multi-ans-' + i + '-min'), document.getElementById('multi-ans-' + i + '-max')]
     : [document.getElementById('multi-ans-' + i)]);
-  if (fieldInputs.some(arr => arr.some(inp => !inp || inp.value === ''))) return;
+  if (fieldInputs.some(arr => arr.some(inp => !inp || isBlank(inp.value)))) return;
   answered = true;
   const tol = q.tolerance || 0;
   let allOk = true;
@@ -1119,7 +1123,14 @@ function loadText() {
     const data = JSON.parse(raw);
     if (!Array.isArray(data)) throw new Error('Должен быть массив JSON');
     if (!data.length) throw new Error('Массив пустой');
-    questions = data;
+    DECKS.import = { label: 'Импорт', tagline: 'Импортированные вопросы', qs: data, weakKey: 'import_weak' };
+    bestByDeck.import = null;
+    deckKey = 'import';
+    questions = [...data];
+    loadWeak();
+    document.querySelectorAll('.deck-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('home-label').textContent = DECKS.import.tagline;
+    document.getElementById('home-title').textContent = DECKS.import.label;
     status.className = 'import-status ok';
     status.textContent = '✓ Загружено вопросов: ' + data.length;
     updateHomeStats();
