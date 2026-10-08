@@ -308,6 +308,8 @@
   .cloze-text { font-size: 16px; line-height: 2.2; color: var(--text); margin-bottom: 12px; }
   .cloze-head { font-weight: 600; }
   .cloze-sub { padding-left: 1rem; }
+  .cloze-note { font-style: italic; color: var(--text2); }
+  .num-input.cloze-input.cloze-word { width: 92px; max-width: 92px; }
   .num-input.cloze-input {
     display: inline-block;
     width: 64px; max-width: 64px;
@@ -636,7 +638,8 @@ const OZP_QS = [
 ];
 
 const AF_QS = [
-  {id:1,category:"APPROACH LOST",question:"Сигнализация APPROACH LOST в зависимости от этапа захода включается:",type:"cloze",text:"• На любой высоте после включения режима LOC*:\n– при потере сигнала [[ILS]] (режимов LOC и/или GS) по любой причине.\n• Ниже [[200]] ft, если индицируется APP3 LAND или APP2 при:\n– отказе двух радиовысотомеров, или\n– рассогласовании радиовысотомеров более [[15]] ft, или\n– предельном отклонении от глиссады или курса ILS.\n• Ниже [[80]] ft, если индицируется APP3 LAND при:\n– отключении A/T на обоих РУД, или\n– отклонении от заданной скорости захода более чем на [[10]] kt.",tolerance:0}
+  {id:1,category:"APPROACH LOST",question:"Сигнализация APPROACH LOST в зависимости от этапа захода включается:",type:"cloze",text:"• На любой высоте после включения режима LOC*:\n– при потере сигнала [[ILS]] (режимов LOC и/или GS) по любой причине.\n• Ниже [[200]] ft, если индицируется APP3 LAND или APP2 при:\n– отказе двух радиовысотомеров, или\n– рассогласовании радиовысотомеров более [[15]] ft, или\n– предельном отклонении от глиссады или курса ILS.\n• Ниже [[80]] ft, если индицируется APP3 LAND при:\n– отключении A/T на обоих РУД, или\n– отклонении от заданной скорости захода более чем на [[10]] kt.",tolerance:0},
+  {id:2,category:"Режим GA",question:"Режим GA (уход на 2-ой круг):",type:"cloze",text:"Режим GA обеспечивает переход из траектории снижения в набор высоты с выдерживанием скорости ухода на 2-ой круг и применением взлётной тяги, устанавливаемой вручную или автоматом тяги.\nРежим GA включается одновременно с горизонтальным режимом [[GA TRK]].\nСкорость ухода на 2-ой круг (заданная скорость в режиме GA) соответствует [[VAPP]] или текущей скорости в момент включения GA, что [[меньше]], со следующими ограничениями:\n– не менее [[VLS]] и не более VLS+[[25]];\n– не менее VLS и не более VLS+[[15]] kt при одном работающем двигателе.\n_Примечание: если режим GA включён на скорости выше VLS+25 kt (VLS+15 kt при одном работающем двигателе), то индекс заданной скорости (независимо от способа управления скоростью — AUTO или FCP) перемещается к значению VLS+25 kt (VLS+15 kt при одном работающем двигателе).\n_При включении режима [[ALT*]] из режима GA и управлении скоростью AUTO индекс заданной скорости устанавливается на значении [[текущей]] скорости.",tolerance:0}
 ];
 
 const DECKS = {
@@ -817,7 +820,9 @@ function renderQ() {
     activeInputId = null;
     let bi = 0;
     const lines = q.text.split('\n').map(line => {
-      const cls = line.startsWith('•') ? 'cloze-head' : line.startsWith('–') ? 'cloze-sub' : '';
+      const note = line.startsWith('_');
+      if (note) line = line.slice(1);
+      const cls = note ? 'cloze-note' : line.startsWith('•') ? 'cloze-head' : line.startsWith('–') ? 'cloze-sub' : '';
       const html = line.split(/\[\[.+?\]\]/).map((part, k, arr) => {
         let out = esc(part);
         if (k < arr.length - 1) {
@@ -827,7 +832,7 @@ function renderQ() {
           const active = numeric && activeInputId === 'cloze-ans-' + i ? ' active' : '';
           out += numeric
             ? `<input type="text" class="num-input cloze-input${active}" id="cloze-ans-${i}" onclick="focusField('cloze-ans-${i}')" inputmode="none" readonly><span class="cloze-hint" id="cloze-hint-${i}"></span>`
-            : `<input type="text" class="num-input cloze-input" id="cloze-ans-${i}" onfocus="focusField('cloze-ans-${i}')" autocapitalize="characters" autocomplete="off" spellcheck="false"><span class="cloze-hint" id="cloze-hint-${i}"></span>`;
+            : `<input type="text" class="num-input cloze-input cloze-word" id="cloze-ans-${i}" onfocus="focusField('cloze-ans-${i}')" autocapitalize="characters" autocomplete="off" spellcheck="false"><span class="cloze-hint" id="cloze-hint-${i}"></span>`;
         }
         return out;
       }).join('');
@@ -918,6 +923,8 @@ function esc(v) {
   return String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
+function normWord(v) { return v.replace(/\s+/g, '').toUpperCase().replace(/Ё/g, 'Е'); }
+
 function clozeBlanks(q) {
   return [...q.text.matchAll(/\[\[(.+?)\]\]/g)].map(m => ({ answer: m[1], numeric: !isNaN(parseFloat(m[1])) && isFinite(m[1]) }));
 }
@@ -935,7 +942,7 @@ function checkCloze() {
     const inp = inputs[i];
     const ok = b.numeric
       ? Math.abs(parseFloat(inp.value.replace(',', '.')) - parseFloat(b.answer)) <= tol
-      : inp.value.trim().toUpperCase() === b.answer.toUpperCase();
+      : normWord(inp.value) === normWord(b.answer);
     inp.disabled = true;
     inp.classList.remove('active');
     inp.classList.add(ok ? 'correct' : 'wrong');
