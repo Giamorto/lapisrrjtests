@@ -305,6 +305,20 @@
   .multi-input-wrap .range-dash { font-size: 16px; padding-bottom: 0; }
   .multi-hint { flex-basis: 100%; text-align: right; font-size: 12px; color: var(--red); font-weight: 600; }
   .multi-hint:empty { display: none; }
+  .cloze-text { font-size: 16px; line-height: 2.2; color: var(--text); margin-bottom: 12px; }
+  .cloze-head { font-weight: 600; }
+  .cloze-sub { padding-left: 1rem; }
+  .num-input.cloze-input {
+    display: inline-block;
+    width: 64px; max-width: 64px;
+    padding: 2px 6px;
+    font-size: 16px;
+    border-radius: 6px;
+    vertical-align: baseline;
+  }
+  .num-input.cloze-input.active { border-color: var(--text); box-shadow: 0 0 0 1.5px var(--text); }
+  .cloze-hint { font-size: 13px; color: var(--red); font-weight: 600; margin-left: 4px; }
+  .cloze-hint:empty { display: none; }
   .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -394,6 +408,7 @@
   <div class="deck-switch">
     <button class="deck-btn active" data-deck="rrj95" onclick="selectDeck('rrj95')">RRJ-95 Limits</button>
     <button class="deck-btn" data-deck="ozp" onclick="selectDeck('ozp')">❄️ ОЗП</button>
+    <button class="deck-btn" data-deck="autoflight" onclick="selectDeck('autoflight')">AutoFlight</button>
   </div>
   <div class="stat-row">
     <div class="stat">
@@ -620,16 +635,21 @@ const OZP_QS = [
   {id:31,category:"ОЗП",question:"Какой коэффициент увеличения применяется к ALD для расчета RLD на сухую ВПП для основного аэродрома?",type:"number",answer:1.67,unit:"",tolerance:0}
 ];
 
+const AF_QS = [
+  {id:1,category:"APPROACH LOST",question:"Сигнализация APPROACH LOST в зависимости от этапа захода включается:",type:"cloze",text:"• На любой высоте после включения режима LOC*:\n– при потере сигнала [[ILS]] (режимов LOC и/или GS) по любой причине.\n• Ниже [[200]] ft, если индицируется APP3 LAND или APP2 при:\n– отказе двух радиовысотомеров, или\n– рассогласовании радиовысотомеров более [[15]] ft, или\n– предельном отклонении от глиссады или курса ILS.\n• Ниже [[80]] ft, если индицируется APP3 LAND при:\n– отключении A/T на обоих РУД, или\n– отклонении от заданной скорости захода более чем на [[10]] kt.",tolerance:0}
+];
+
 const DECKS = {
   rrj95: { label: "RRJ-95 Limits", tagline: "Тест по ограничениям", qs: DEFAULT_QS, weakKey: "rrj95_weak" },
-  ozp:   { label: "ОЗП", tagline: "Тест по эксплуатации в зимний период", qs: OZP_QS, weakKey: "ozp_weak" }
+  ozp:   { label: "ОЗП", tagline: "Тест по эксплуатации в зимний период", qs: OZP_QS, weakKey: "ozp_weak" },
+  autoflight: { label: "AutoFlight", tagline: "Тест по автоматическому управлению полётом", qs: AF_QS, weakKey: "autoflight_weak" }
 };
 let deckKey = "rrj95";
 let questions = [...DECKS[deckKey].qs];
 let queue = [];
 let current = 0;
 let score = 0;
-let bestByDeck = { rrj95: null, ozp: null };
+let bestByDeck = { rrj95: null, ozp: null, autoflight: null };
 let answered = false;
 let activeInputId = 'num-ans';
 
@@ -792,6 +812,32 @@ function renderQ() {
       ${KEYPAD_HTML}
       <button class="check-btn" id="check-btn" onclick="checkMulti()">Проверить</button>
     </div>`;
+  } else if (q.type === 'cloze') {
+    const blanks = clozeBlanks(q);
+    activeInputId = null;
+    let bi = 0;
+    const lines = q.text.split('\n').map(line => {
+      const cls = line.startsWith('•') ? 'cloze-head' : line.startsWith('–') ? 'cloze-sub' : '';
+      const html = line.split(/\[\[.+?\]\]/).map((part, k, arr) => {
+        let out = esc(part);
+        if (k < arr.length - 1) {
+          const i = bi++;
+          const numeric = blanks[i].numeric;
+          if (numeric && activeInputId === null) activeInputId = 'cloze-ans-' + i;
+          const active = numeric && activeInputId === 'cloze-ans-' + i ? ' active' : '';
+          out += numeric
+            ? `<input type="text" class="num-input cloze-input${active}" id="cloze-ans-${i}" onclick="focusField('cloze-ans-${i}')" inputmode="none" readonly><span class="cloze-hint" id="cloze-hint-${i}"></span>`
+            : `<input type="text" class="num-input cloze-input" id="cloze-ans-${i}" onfocus="focusField('cloze-ans-${i}')" autocapitalize="characters" autocomplete="off" spellcheck="false"><span class="cloze-hint" id="cloze-hint-${i}"></span>`;
+        }
+        return out;
+      }).join('');
+      return `<div class="${cls}">${html}</div>`;
+    }).join('');
+    body.innerHTML = `<div class="num-area">
+      <div class="cloze-text">${lines}</div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkCloze()">Проверить</button>
+    </div>`;
   } else if (q.type === 'symmetric') {
     activeInputId = 'num-ans';
     body.innerHTML = `<div class="num-area">
@@ -847,7 +893,7 @@ function checkChoice(i) {
 
 function focusField(id) {
   activeInputId = id;
-  document.querySelectorAll('.range-input, .multi-input').forEach(el => el.classList.toggle('active', el.id === id));
+  document.querySelectorAll('.range-input, .multi-input, .cloze-input').forEach(el => el.classList.toggle('active', el.id === id));
 }
 
 function kpInput(ch) {
@@ -866,6 +912,43 @@ function kpBackspace() {
   const inp = document.getElementById(activeInputId);
   if (!inp || inp.disabled) return;
   inp.value = inp.value.slice(0, -1);
+}
+
+function esc(v) {
+  return String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function clozeBlanks(q) {
+  return [...q.text.matchAll(/\[\[(.+?)\]\]/g)].map(m => ({ answer: m[1], numeric: !isNaN(parseFloat(m[1])) && isFinite(m[1]) }));
+}
+
+function checkCloze() {
+  if (answered) return;
+  const q = queue[current];
+  const blanks = clozeBlanks(q);
+  const inputs = blanks.map((b, i) => document.getElementById('cloze-ans-' + i));
+  if (inputs.some((inp, i) => !inp || (blanks[i].numeric ? isBlank(inp.value) : !inp.value.trim()))) return;
+  answered = true;
+  const tol = q.tolerance || 0;
+  let allOk = true;
+  blanks.forEach((b, i) => {
+    const inp = inputs[i];
+    const ok = b.numeric
+      ? Math.abs(parseFloat(inp.value.replace(',', '.')) - parseFloat(b.answer)) <= tol
+      : inp.value.trim().toUpperCase() === b.answer.toUpperCase();
+    inp.disabled = true;
+    inp.classList.remove('active');
+    inp.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) {
+      allOk = false;
+      document.getElementById('cloze-hint-' + i).textContent = '→ ' + b.answer;
+    }
+  });
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  recordAnswer(q, allOk);
+  if (allOk) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Все значения верны'); }
+  else { showFeedback(false, '✗ Есть ошибки — неверные поля красным, верный ответ рядом'); }
 }
 
 function isBlank(v) { return isNaN(parseFloat(v.replace(',', '.'))); }
