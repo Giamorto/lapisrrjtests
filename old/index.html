@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<title>RRJ-95 Limits</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f4;
+    --bg3: #eeece9;
+    --text: #1a1a18;
+    --text2: #6b6b67;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --green-bg: #eaf3de;
+    --green: #3b6d11;
+    --red-bg: #fcebeb;
+    --red: #a32d2d;
+    --radius: 10px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg2: #262624;
+      --bg3: #2e2e2b;
+      --text: #f0ede8;
+      --text2: #8a8a84;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.2);
+      --green-bg: #1a2e0a;
+      --green: #7fc44e;
+      --red-bg: #2e1010;
+      --red: #e07070;
+    }
+  }
+  html { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 0 0 calc(1rem + var(--safe-bottom));
+    min-height: 100vh;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Nav header */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .nav-title { font-size: 17px; font-weight: 600; color: var(--text); }
+  .back-btn {
+    width: 32px; height: 32px;
+    border: none; background: var(--bg2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text);
+    font-size: 18px; line-height: 1;
+    flex-shrink: 0;
+  }
+  .back-btn:active { opacity: 0.6; }
+
+  /* Home */
+  .home-top {
+    padding: 2rem 1rem 1.5rem;
+  }
+  .home-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+  .home-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .deck-switch {
+    display: flex;
+    gap: 6px;
+    margin: 0 1rem 1.25rem;
+    background: var(--bg2);
+    padding: 4px;
+    border-radius: var(--radius);
+  }
+  .deck-btn {
+    flex: 1;
+    padding: 9px 10px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: calc(var(--radius) - 4px);
+    cursor: pointer;
+  }
+  .deck-btn.active {
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 0 1rem 1.5rem;
+  }
+  .stat {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+  }
+  .stat-n { font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
+  .stat-l { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .menu-list {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .menu-btn {
+    width: 100%;
+    padding: 15px 16px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+  }
+  .menu-btn:active { background: var(--bg2); }
+  .menu-btn.primary {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .menu-btn.primary:active { opacity: 0.85; }
+  .menu-icon { font-size: 20px; width: 24px; text-align: center; }
+  .menu-btn .arrow { margin-left: auto; color: var(--text2); font-size: 18px; }
+  .menu-btn.primary .arrow { color: var(--bg); opacity: 0.5; }
+
+  /* Quiz */
+  .quiz-header {
+    padding: 1rem 1rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .q-counter { font-size: 14px; color: var(--text2); font-weight: 500; }
+  .cat-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    background: var(--bg2);
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+  .progress-bar {
+    height: 3px;
+    background: var(--bg3);
+    margin: 0 1rem;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--text);
+    border-radius: 2px;
+    transition: width 0.35s ease;
+  }
+  .question-text {
+    padding: 1.25rem 1rem 1.5rem;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    letter-spacing: -0.3px;
+  }
+  .options {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt {
+    padding: 15px 16px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+  .opt:active:not(:disabled) { background: var(--bg2); }
+  .opt.correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 500; }
+  .opt.wrong   { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+  .opt.reveal  { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .opt:disabled { cursor: default; }
+  .num-area { padding: 0 1rem; }
+  .num-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .num-input {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 600;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    max-width: 180px;
+  }
+  .num-input::-webkit-outer-spin-button,
+  .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .num-input:focus { outline: none; border-color: var(--text); }
+  .num-unit { font-size: 16px; color: var(--text2); font-weight: 500; }
+  .num-prefix { font-size: 22px; font-weight: 600; color: var(--text); }
+  .range-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .range-label {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+  }
+  .range-dash {
+    font-size: 20px;
+    color: var(--text2);
+    padding-bottom: 12px;
+  }
+  .num-input.range-input { width: 100px; max-width: 100px; }
+  .num-input.range-input.active,
+  .num-input.multi-input.active { border-color: var(--text); box-shadow: 0 0 0 1.5px var(--text); }
+  .num-input.correct { border-color: var(--green); color: var(--green); }
+  .num-input.wrong { border-color: var(--red); color: var(--red); }
+  .multi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .multi-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 10px;
+  }
+  .multi-label {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.3;
+    flex: 1;
+  }
+  .multi-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .num-input.multi-input { width: 78px; max-width: 78px; padding: 10px 8px; font-size: 17px; }
+  .multi-input-wrap .num-prefix { font-size: 17px; }
+  .multi-input-wrap .range-dash { font-size: 16px; padding-bottom: 0; }
+  .multi-hint { flex-basis: 100%; text-align: right; font-size: 12px; color: var(--red); font-weight: 600; }
+  .multi-hint:empty { display: none; }
+  .cloze-text { font-size: 16px; line-height: 2.2; color: var(--text); margin-bottom: 12px; }
+  .cloze-head { font-weight: 600; }
+  .cloze-sub { padding-left: 1rem; }
+  .cloze-note { font-style: italic; color: var(--text2); }
+  .num-input.cloze-input.cloze-word { width: 92px; max-width: 92px; }
+  .num-input.cloze-input {
+    display: inline-block;
+    width: 64px; max-width: 64px;
+    padding: 2px 6px;
+    font-size: 16px;
+    border-radius: 6px;
+    vertical-align: baseline;
+  }
+  .num-input.cloze-input.active { border-color: var(--text); box-shadow: 0 0 0 1.5px var(--text); }
+  .cloze-hint { font-size: 13px; color: var(--red); font-weight: 600; margin-left: 4px; }
+  .cloze-hint:empty { display: none; }
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .kp-btn {
+    padding: 16px 0;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .kp-btn:active { background: var(--border2); }
+  .kp-minus { color: var(--red); font-size: 26px; }
+  .kp-back { font-size: 18px; color: var(--text2); }
+  .check-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .check-btn:active { opacity: 0.8; }
+  .check-btn:disabled { opacity: 0.4; cursor: default; }
+  .feedback {
+    margin: 14px 1rem 0;
+    padding: 13px 16px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.45;
+    display: none;
+  }
+  .feedback.ok { background: var(--green-bg); color: var(--green); }
+  .feedback.no { background: var(--red-bg);   color: var(--red); }
+  .next-btn {
+    margin: 14px 1rem 0;
+    width: calc(100% - 2rem);
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: none;
+  }
+  .next-btn:active { background: var(--bg2); }
+
+  /* Result */
+  .result-wrap {
+    padding: 2.5rem 1rem 1.5rem;
+  }
+  .result-label { font-size: 13px; color: var(--text2); font-weight: 500; margin-bottom: 6px; }
+  .result-score {
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .result-pct { font-size: 20px; color: var(--text2); margin-bottom: 0.5rem; }
+  .result-comment { font-size: 16px; color: var(--text2); margin-bottom: 2.5rem; }
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="home-label" id="home-label">Тест по ограничениям</div>
+    <div class="home-title" id="home-title">RRJ-95 Limits</div>
+  </div>
+  <div class="deck-switch">
+    <button class="deck-btn active" data-deck="rrj95" onclick="selectDeck('rrj95')">RRJ-95 Limits</button>
+    <button class="deck-btn" data-deck="ozp" onclick="selectDeck('ozp')">❄️ ОЗП</button>
+    <button class="deck-btn" data-deck="autoflight" onclick="selectDeck('autoflight')">AutoFlight</button>
+  </div>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-n" id="stat-total">0</div>
+      <div class="stat-l">вопросов</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="stat-best">—</div>
+      <div class="stat-l">лучший результат</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="stat-weak">0</div>
+      <div class="stat-l">слабых карточек</div>
+    </div>
+  </div>
+  <div class="menu-list">
+    <button class="menu-btn primary" onclick="startQuiz(10)">
+      <span class="menu-icon">▶</span> 10 случайных вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="startQuiz(20)">
+      <span class="menu-icon">▶</span> 20 вопросов
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="startQuiz(null)">
+      <span class="menu-icon">▶▶</span> Все вопросы
+      <span class="arrow">›</span>
+    </button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <span class="q-counter" id="q-counter">1 / 15</span>
+    <span class="cat-tag" id="q-cat"></span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width:0%"></div>
+  </div>
+  <p class="question-text" id="q-text"></p>
+  <div id="q-body"></div>
+  <div class="feedback" id="q-feedback"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQ()">Далее →</button>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <div class="result-wrap">
+    <div class="result-label">Результат теста</div>
+    <div class="result-score" id="res-score"></div>
+    <div class="result-pct" id="res-pct"></div>
+    <div class="result-comment" id="res-comment"></div>
+    <div class="result-btns">
+      <button class="menu-btn primary" onclick="restartLast()">
+        <span class="menu-icon">↺</span> Ещё раз
+        <span class="arrow">›</span>
+      </button>
+      <button class="menu-btn" onclick="showScreen('home')">
+        <span class="menu-icon">⌂</span> На главную
+        <span class="arrow">›</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const DEFAULT_QS = [
+  {id:17,category:"Маневрирование на земле",question:"Максимальная скорость ветра при рулении (N1≤35%)?",type:"number",answer:35,unit:"kt",tolerance:0},
+  {id:18,category:"Маневрирование на земле",question:"Максимальная скорость ветра при буксировке?",type:"number",answer:50,unit:"kt",tolerance:0},
+  {id:27,category:"Условия эксплуатации",question:"Максимальный уклон взлётно-посадочной полосы?",type:"choice",options:["±1%","±1.5%","±2%","±2.5%"],answer:2},
+  {id:28,category:"Условия эксплуатации",question:"Минимальная ширина нормальной взлётно-посадочной полосы?",type:"number",answer:42,unit:"м",tolerance:0},
+  {id:29,category:"Условия эксплуатации",question:"Минимальная ширина узкой взлётно-посадочной полосы?",type:"number",answer:30,unit:"м",tolerance:0},
+  {id:30,category:"Взлет и посадка",question:"Максимальная глубина влаги или воды на мокрой ВПП разрешённая для взлёта и посадки?",type:"number",answer:3,unit:"мм",tolerance:0},
+  {id:31,category:"Взлет и посадка",question:"Максимальная глубина сухого снега на ВПП разрешённая для взлёта и посадки?",type:"number",answer:60,unit:"мм",tolerance:0},
+  {id:32,category:"Взлет и посадка",question:"Максимальная глубина мокрого снега на ВПП разрешённая для взлёта и посадки?",type:"number",answer:15,unit:"мм",tolerance:0},
+  {id:33,category:"Взлет и посадка",question:"Максимальная глубина слякоти на ВПП разрешённая для взлёта и посадки?",type:"number",answer:13,unit:"мм",tolerance:0},
+  {id:34,category:"Взлет и посадка",question:"Максимальная глубина воды на ВПП разрешённая для посадки?",type:"choice",options:["10 мм","13 мм","15 мм","20 мм"],answer:2},
+  {id:35,category:"Ограничение по ветру",question:"Максимальная скорость ветра при эксплуатации входных (служебных) дверей и дверей БГО?",type:"number",answer:39,unit:"kt",tolerance:0},
+  {id:36,category:"Ограничение по ветру",question:"Максимальная встречная составляющая скорости ветра на взлете и посадке (включая порывы)?",type:"number",answer:50,unit:"kt",tolerance:0},
+  {id:41,category:"Ограничение по ветру",question:"Максимальная боковая составляющая скорости ветра на взлете и посадке для сухой ВПП (включая порывы)?",type:"number",answer:36,unit:"kt",tolerance:0},
+  {id:42,category:"Ограничения при взлете",question:"При каком минимальном коэффициенте сцепления ВПП запрещается взлет?",type:"choice",options:["μ < 0.2","μ < 0.3","μ < 0.4","μ < 0.5"],answer:1},
+  {id:43,category:"Ограничения при взлете",question:"Запрещается ли взлет с ВПП, покрытой водой на поверхности уплотненного снега?",type:"choice",options:["Разрешается","Запрещается","Разрешается только в конфигурации FLAP 1+F","Разрешается только ночью"],answer:1},
+  {id:44,category:"Ограничения при взлете",question:"Запрещается ли взлет с ВПП, покрытой сухим или мокрым снегом на поверхности льда?",type:"choice",options:["Разрешается","Запрещается","Разрешается только в конфигурации FLAP 2","Разрешается при коэффициенте сцепления > 0.3"],answer:1},
+  {id:48,category:"Ограничение по скорости",question:"Максимальная маневренная скорость VA в режиме DIRECT MODE?",type:"number",answer:236,unit:"kt",tolerance:0},
+  {id:53,category:"Ограничение по скорости",question:"Максимальная скорость в процессе выпуска шасси VLO EXT?",type:"number",answer:255,unit:"kt",tolerance:0},
+  {id:54,category:"Ограничение по скорости",question:"Максимальная скорость в процессе уборки шасси VLO RET?",type:"number",answer:215,unit:"kt",tolerance:0},
+  {id:55,category:"Ограничение по скорости",question:"Максимальная скорость с выпущенным шасси VLE?",type:"number",answer:255,unit:"kt",tolerance:0},
+  {id:56,category:"Ограничение по скорости",question:"Максимальная путевая скорость по условиям прочности шин колес основных опор шасси?",type:"number",answer:195,unit:"kt",tolerance:0},
+  {id:57,category:"Ограничение по скорости",question:"Максимальная скорость полета при использовании стеклоочистителей?",type:"number",answer:230,unit:"kt",tolerance:0},
+  {id:58,category:"Ограничение по скорости",question:"Максимальная скорость полета с открытой форточкой?",type:"number",answer:200,unit:"kt",tolerance:0},
+  {id:61,category:"Автопилот",question:"Минимальная высота использования автопилота при взлете?",type:"number",answer:100,unit:"ft AGL",tolerance:0},
+  {id:62,category:"Автопилот",question:"Минимальная высота использования автопилота при неточном заходе на посадку?",type:"choice",options:["100 ft AGL","MDA/MDH","500 ft AGL","200 ft AGL"],answer:1},
+  {id:63,category:"Автопилот",question:"Минимальная высота использования автопилота при заходе на посадку с визуальным маневрированием (circle-to-land)?",type:"choice",options:["MDA/MDH","MDA/MDH – 100 ft","MDA/MDH + 100 ft","500 ft AGL"],answer:1},
+  {id:65,category:"Автопилот",question:"Минимальная высота использования автопилота при уходе на второй круг в ручном режиме?",type:"number",answer:100,unit:"ft AGL",tolerance:0},
+  {id:66,category:"Автопилот",question:"Минимальная высота использования автопилота на других этапах полета (кроме указанных выше)?",type:"number",answer:500,unit:"ft AGL",tolerance:0},
+  {id:71,category:"Категория II/III",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ II БЕЗ автоматической посадки?",type:"choice",options:["APP1","APP2 или APP3 LAND","APP3 LAND","только APP3"],answer:1},
+  {id:72,category:"Категория II/III",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ II C автоматической посадкой?",type:"choice",options:["APP1 или APP2","APP2 или APP3 LAND","APP3 LAND","любая APP"],answer:2},
+  {id:76,category:"Категория I",question:"Какая индикация должна быть на FMA при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"choice",options:["только APP1","APP1 или APP2 или APP3 LAND","APP3 LAND","APP2 или APP3"],answer:1},
+  {id:77,category:"Категория I",question:"Максимальная боковая составляющая ветра при КАТЕГОРИИ I БЕЗ автоматической посадки?",type:"number",answer:36,unit:"kt",tolerance:0},
+  {id:90,category:"Топливные баки",question:"Общий объем всех топливных баков?",type:"number",answer:15805,unit:"л",tolerance:0},
+  {id:91,category:"Топливные баки",question:"Максимальный дисбаланс топлива между левым и правым крыльевыми баками в полете?",type:"number",answer:500,unit:"кг",tolerance:0},
+  {id:97,category:"Температура топлива",question:"При какой температуре топлива в баках на земле требуется использование противоводокристаллизационной жидкости?",type:"choice",options:["-35°C и менее","-40°C и менее","-47°C и менее","-50°C и менее"],answer:1},
+  {id:99,category:"Гидравлическая жидкость",question:"Минимальная температура гидрожидкости перед взлетом?",type:"number",answer:-20,unit:"°C",tolerance:0},
+  {id:105,category:"Система управления поворотом колес",question:"Максимальный угол поворота колес передней опоры шасси от педалей руля направления?",type:"number",answer:7,unit:"°",tolerance:0},
+  {id:106,category:"Навигация RNAV",question:"Максимальная продолжительность использования режима INERTIAL при выполнении полета по требованиям B-RNAV?",type:"choice",options:["1 ч 30 мин","2 ч 28 мин","3 ч 00 мин","30 мин"],answer:1},
+  {id:107,category:"Навигация RNAV",question:"Максимальная продолжительность использования режима INERTIAL при выполнении полета по требованиям RNAV 1 и P-RNAV?",type:"number",answer:30,unit:"мин",tolerance:0},
+  {id:110,category:"Кислородная система",question:"Время защиты кислородом при разгерметизации на время аварийного снижения?",type:"number",answer:15,unit:"мин",tolerance:0},
+  {id:111,category:"Кислородная система",question:"Время защиты кислородом при разгерметизации на эшелоне FL100?",type:"number",answer:175,unit:"мин",tolerance:0},
+  {id:112,category:"ВСУ (APU)",question:"Минимальный перерыв между запусками или попытками запуска ВСУ (электростартер)?",type:"number",answer:1,unit:"мин",tolerance:0},
+  {id:113,category:"ВСУ (APU)",question:"Не более скольких запусков или попыток запуска ВСУ разрешается в течение 60 минут?",type:"number",answer:3,unit:"",tolerance:0},
+  {id:122,category:"ВСУ (APU)",question:"Минимальная температура масла (тип II) перед запуском ВСУ на земле?",type:"number",answer:-40,unit:"°C",tolerance:0},
+  {id:123,category:"Силовая установка",question:"Максимальное время работы двигателя на режиме MAX?",type:"number",answer:5,unit:"мин",tolerance:0},
+  {id:125,category:"Силовая установка",question:"Максимальное время работы двигателя на режиме TO/GA при отказе двигателя?",type:"number",answer:10,unit:"мин",tolerance:0},
+  {id:128,category:"Силовая установка",question:"Максимальная продолжительность работы двигателя на режиме выше MCT (при отказе двигателя)?",type:"number",answer:10,unit:"мин",tolerance:0},
+  {id:133,category:"Силовая установка",question:"Минимальный уровень масла двигателя перед запуском на земле?",type:"number",answer:65,unit:"%",tolerance:0},
+  {id:139,category:"Силовая установка",question:"Запрещается выполнять более скольких последовательных запусков двигателя?",type:"number",answer:4,unit:"",tolerance:0},
+  {id:140,category:"Силовая установка",question:"Минимальный интервал между запусками (включениями стартера) двигателя?",type:"number",answer:10,unit:"с",tolerance:0},
+  {id:141,category:"Силовая установка",question:"Максимальное время непрерывной работы турбостартера?",type:"number",answer:2,unit:"мин",tolerance:0},
+  {id:142,category:"Силовая установка",question:"Максимальное время непрерывной работы турбостартера при температуре наружного воздуха ниже -15°C?",type:"number",answer:4,unit:"мин",tolerance:0},
+  {id:143,category:"Силовая установка",question:"Минимальное время охлаждения двигателя после 4-х последовательных запусков или 2-х прокруток?",type:"number",answer:5,unit:"мин",tolerance:0},
+  {id:144,category:"Силовая установка",question:"Запрещается включать турбостартер, если обороты N2 более?",type:"number",answer:36,unit:"%",tolerance:0},
+  {id:145,category:"Силовая установка",question:"Минимальное давление воздуха перед турбостартером для запуска двигателя (при открытом воздушном клапане турбостартера)?",type:"number",answer:33,unit:"Psi",tolerance:0},
+  {id:151,category:"Ограничения при взлете",question:"При пониженном уровне тяги (Flexible Takeoff) запрещается выполнять взлет в сочетании с чем?",type:"choice",options:["с посадкой на короткую ВПП","с взлетом с улучшенным набором высоты","с боковым ветром","с полной загрузкой"],answer:1},
+  {id:152,category:"Ограничения при взлете",question:"При пониженном уровне тяги (Flexible Takeoff) запрещается выполнять взлет при попутной составляющей скорости ветра более?",type:"number",answer:10,unit:"kt",tolerance:0},
+  {id:153,category:"Маневрирование на земле",question:"Максимально допустимый режим двигателей (N1) для страгивания ВС с места?",type:"number",answer:50,unit:"%",tolerance:0},
+  {id:159,category:"Маневрирование на земле",question:"При рулении по ВПП со скоростью более какой требуется использовать управление носовой ногой от педалей?",type:"number",answer:30,unit:"kts",tolerance:0},
+  {id:160,category:"Маневрирование на земле",question:"При эксплуатации на земле в условиях обледенения дольше какого времени требуется процедура сброса льда с лопаток двигателя?",type:"number",answer:30,unit:"мин",tolerance:0},
+  {id:161,category:"Маневрирование на земле",question:"До какого % N1 поочередно увеличивают обороты каждого двигателя для сброса льда с лопаток?",type:"number",answer:70,unit:"%",tolerance:0},
+  {id:162,category:"Маневрирование на земле",question:"На сколько секунд увеличивают обороты двигателя до 70% N1 при процедуре сброса льда?",type:"number",answer:20,unit:"с",tolerance:0},
+  {id:163,category:"Маневрирование на земле",question:"С каким интервалом (не реже) повторяют процедуру увеличения оборотов до 70% N1 при сбросе льда?",type:"number",answer:30,unit:"мин",tolerance:0},
+  {id:164,category:"Категория II/III",question:"На какой скорости встречного ветра и выше рекомендуется выполнять автоматическую посадку в механизации Flap 3?",type:"number",answer:18,unit:"kt",tolerance:0},
+  {id:165,category:"Система управления поворотом колес",question:"На какой скорости блокируется управление передней опорой от ручки N/W STRG и выше которой запрещается использование этой ручки?",type:"number",answer:43,unit:"kts",tolerance:0},
+  {id:176,category:"Посадка (контроль положения)",question:"При каком угле тангажа PNF подает доклад «PITCH PITCH» на посадке?",type:"number",answer:7.5,unit:"°",tolerance:0},
+  {id:177,category:"Посадка (контроль положения)",question:"При каком угле крена PNF подает доклад «BANK BANK» на посадке?",type:"number",answer:7,unit:"°",tolerance:0},
+  {id:178,category:"Посадка (контроль положения)",question:"При превышении какого угла крена происходит касание земли двигателем или законцовкой крыла?",type:"number",answer:20,unit:"°",tolerance:0},
+  {id:179,category:"Посадка (контроль положения)",question:"При превышении какого угла тангажа согласно SOP происходит касание земли хвостовой частью ВС (tail strike)?",type:"number",answer:13.5,unit:"°",tolerance:0},
+  {id:183,category:"Автопилот",question:"Высота включения режима TO TRK?",type:"number",answer:35,unit:"ft",tolerance:0},
+  {id:184,category:"Радиосвязное оборудование",question:"Через сколько секунд непрерывной работы VHF радиостанции в режиме «передача» происходит автоматическое отключение этого режима (защита от заклиненной кнопки PTT)?",type:"number",answer:35,unit:"с",tolerance:0},
+  {id:188,category:"Система электроснабжения",question:"До скольких минут ограничивается время полета при отказе двух двигателей (питание постоянного тока от аккумуляторных батарей)?",type:"number",answer:27,unit:"мин",tolerance:0},
+  {id:189,category:"Система электроснабжения",question:"Максимальное время выпуска ветродвигателя и подключения генератора RAT GEN?",type:"number",answer:8,unit:"сек",tolerance:0},
+  {id:190,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95LR при взлётной массе?",type:"range",answerMin:12,answerMax:32,unit:"%",tolerance:0},
+  {id:191,category:"Центровка и масса",question:"Какой диапазон допустимой центровки для RRJ-95B при взлётной массе?",type:"range",answerMin:12,answerMax:36,unit:"%",tolerance:0},
+  {id:192,category:"Условия эксплуатации",question:"Какой диапазон допустимой температуры наружного воздуха на эшелоне?",type:"range",answerMin:-70,answerMax:-32,unit:"°C",tolerance:0},
+  {id:193,category:"Условия эксплуатации",question:"Какой диапазон допустимой температуры наружного воздуха на земле?",type:"range",answerMin:-54,answerMax:45,unit:"°C",tolerance:0},
+  {id:194,category:"Условия эксплуатации",question:"Какой диапазон превышения аэродрома, допустимого для взлёта и посадки?",type:"range",answerMin:-1000,answerMax:5000,unit:"ft",tolerance:0},
+  {id:195,category:"Система кондиционирования",question:"Какой диапазон перепада давления в кабине (отрицательный / положительный)?",type:"range",answerMin:-1.4,answerMax:8.7,unit:"Psi",tolerance:0},
+  {id:196,category:"Гидравлическая жидкость",question:"Какой диапазон рабочего давления в гидросистеме?",type:"range",answerMin:1800,answerMax:3200,unit:"Psi",tolerance:0},
+  {id:198,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки JET A-1?",type:"range",answerMin:-47,answerMax:47,unit:"°C",tolerance:0},
+  {id:199,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки РТ?",type:"range",answerMin:-50,answerMax:47,unit:"°C",tolerance:0},
+  {id:200,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки ТС-1?",type:"range",answerMin:-50,answerMax:47,unit:"°C",tolerance:0},
+  {id:201,category:"Температура топлива",question:"Какой диапазон допустимой температуры топлива марки JET A?",type:"range",answerMin:-35,answerMax:47,unit:"°C",tolerance:0},
+  {id:203,category:"Маневрирование на земле",question:"Какой максимальный угол поворота колёс передней опоры при буксировке (в каждую сторону)?",type:"symmetric",answer:85,unit:"°",tolerance:0},
+  {id:204,category:"Маневрирование на земле",question:"На каком угле (в каждую сторону) срабатывают датчик и механические свидетели превышения предельного угла поворота колёс?",type:"symmetric",answer:90,unit:"°",tolerance:0},
+  {id:205,category:"Система управления поворотом колес",question:"Какой максимальный угол поворота колёс передней опоры шасси от ручки управления поворотом колес (в каждую сторону)?",type:"symmetric",answer:65,unit:"°",tolerance:0},
+  {id:206,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при убранных предкрылках и закрылках?",type:"range",answerMin:-1.0,answerMax:2.5,unit:"g",tolerance:0},
+  {id:207,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при убранных предкрылках и выпущенных закрылках?",type:"range",answerMin:0.0,answerMax:2.0,unit:"g",tolerance:0},
+  {id:208,category:"Перегрузки",question:"Какой диапазон допустимой эксплуатационной маневренной перегрузки при выпущенных предкрылках и закрылках?",type:"range",answerMin:0.0,answerMax:2.0,unit:"g",tolerance:0},
+  {id:209,category:"Категория I",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ I, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:30,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
+  {id:210,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, без автоматической посадки",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:16,unit:"kt"},{label:"Попутная составляющая",answer:15,unit:"kt"}],tolerance:0},
+  {id:211,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ II, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
+  {id:212,category:"Категория II/III",question:"Ограничения по ветру на посадке: КАТЕГОРИЯ III, с автоматической посадкой",type:"multi",fields:[{label:"Встречная составляющая",answer:30,unit:"kt"},{label:"Боковая составляющая",answer:20,unit:"kt"},{label:"Попутная составляющая",answer:10,unit:"kt"}],tolerance:0},
+  {id:215,category:"Категория I/II",question:"Минимальная высота использования автопилота на посадке",type:"multi",fields:[{label:"Категория I",answer:160,unit:"ft"},{label:"Категория II",answer:80,unit:"ft"}],tolerance:0},
+  {id:216,category:"Категория I/II/III",question:"Минимумы по категориям: высота принятия решения (DH) и дальность видимости на ВПП (RVR)",type:"multi",fields:[{label:"DH, Категория I",answer:200,unit:"ft"},{label:"DH, Категория II",answer:100,unit:"ft"},{label:"DH, Категория III",answer:50,unit:"ft"},{label:"RVR, Категория I",answer:550,unit:"м"},{label:"RVR, Категория II",answer:300,unit:"м"},{label:"RVR, Категория IIIa",answer:175,unit:"м"}],tolerance:0},
+  {id:217,category:"Ограничение по ветру",question:"Максимальная скорость ветра при выполнении захода на посадку с визуальным маневрированием (circle-to-land)?",type:"number",answer:25,unit:"kt",tolerance:0},
+  {id:218,category:"Стабилизированный заход",question:"Параметры стабилизированного захода на посадку",type:"multi",fields:[{label:"Скорость, отклонение от VAPP",kind:"range",answerMin:-5,answerMax:10,unit:"kt"},{label:"Тангаж",kind:"range",answerMin:-2.5,answerMax:10,unit:"°"},{label:"Крен",kind:"symmetric",answer:7,unit:"°"},{label:"Вертикальная скорость, не более",kind:"number",answer:1000,unit:"ft/min"}],tolerance:0},
+  {id:219,category:"Топливные баки",question:"Центральный топливный бак — объём и масса (при плотности 0.78 кг/л)",type:"multi",fields:[{label:"Объём",answer:5665,unit:"л"},{label:"Масса",answer:4419,unit:"кг"}],tolerance:0},
+  {id:220,category:"Топливные баки",question:"Один крыльевой топливный бак (левый или правый) — объём и масса (при плотности 0.78 кг/л)",type:"multi",fields:[{label:"Объём",answer:5070,unit:"л"},{label:"Масса",answer:3954,unit:"кг"}],tolerance:0},
+  {"id":221,"category":"Центровка и масса","question":"Массовые ограничения RRJ-95LR","type":"multi","fields":[{"label":"Рулёжная масса","answer":49650,"unit":"кг"},{"label":"Взлётная масса (тормоза отпущены)","answer":49450,"unit":"кг"},{"label":"Посадочная масса","answer":41000,"unit":"кг"},{"label":"Масса без топлива","answer":40000,"unit":"кг"},{"label":"Мин. полётная масса","answer":27400,"unit":"кг"}],"tolerance":0},
+  {"id":222,"category":"Центровка и масса","question":"Массовые ограничения RRJ-95B","type":"multi","fields":[{"label":"Рулёжная масса","answer":46055,"unit":"кг"},{"label":"Взлётная масса (тормоза отпущены)","answer":45880,"unit":"кг"}],"tolerance":0},
+  {"id":223,"category":"Ограничение по скорости","question":"Минимальные эволютивные скорости (V-speeds)","type":"multi","fields":[{"label":"VMCG","answer":111,"unit":"kt CAS"},{"label":"VMC","answer":116,"unit":"kt CAS"},{"label":"VMCL, Flap 2","answer":119,"unit":"kt CAS"},{"label":"VMCL, Flap 3 / FULL","answer":117,"unit":"kt CAS"}],"tolerance":0},
+  {"id":224,"category":"ВСУ (APU)","question":"ВСУ — обороты ротора","type":"multi","fields":[{"label":"Максимум","answer":106,"unit":"%"},{"label":"Максимум при авторотации","answer":4,"unit":"%"}],"tolerance":0},
+  {"id":225,"category":"ВСУ (APU)","question":"ВСУ — температура выходящих газов","type":"multi","fields":[{"label":"Максимум","answer":806,"unit":"°C"},{"label":"Максимум при запуске","answer":1038,"unit":"°C"}],"tolerance":0},
+  {"id":226,"category":"ВСУ (APU)","question":"ВСУ — эксплуатационные высоты","type":"multi","fields":[{"label":"Запуск ВСУ","answer":35500,"unit":"ft"},{"label":"Работа с включённым генератором","answer":40000,"unit":"ft"},{"label":"Отбор воздуха для запуска двигателя","answer":14000,"unit":"ft"},{"label":"Отбор воздуха для СКВ","answer":15000,"unit":"ft"}],"tolerance":0},
+  {"id":227,"category":"Силовая установка","question":"EGT двигателя по режимам","type":"multi","fields":[{"label":"Режим MAX","answer":972,"unit":"°C"},{"label":"Режим MCT","answer":928,"unit":"°C"},{"label":"При запуске","answer":830,"unit":"°C"}],"tolerance":0},
+  {"id":228,"category":"Силовая установка","question":"Температура масла двигателя","type":"multi","fields":[{"label":"Без ограничения по времени","answer":140,"unit":"°C"},{"label":"Не более 15 минут","answer":155,"unit":"°C"},{"label":"Мин. перед запуском на земле","answer":-40,"unit":"°C"},{"label":"Мин. перед взлётом","answer":10,"unit":"°C"}],"tolerance":0},
+  {"id":229,"category":"Силовая установка","question":"Давление масла двигателя","type":"multi","fields":[{"label":"Срабатывание предохр. клапана","answer":305,"unit":"Psi"},{"label":"Минимальное","answer":22,"unit":"Psi"},{"label":"Мин. при 90% нагрузки (примерно)","answer":45,"unit":"Psi"}],"tolerance":0},
+  {"id":230,"category":"Реверс тяги","question":"Реверс тяги — пределы скорости","type":"multi","fields":[{"label":"Запрет реверсирования, более","answer":170,"unit":"kt"},{"label":"REV IDLE, менее","answer":30,"unit":"kt"},{"label":"REV MAX, менее","answer":65,"unit":"kt"}],"tolerance":0},
+  {"id":231,"category":"Маневрирование на земле","question":"Скорость руления по манёвру","type":"multi","fields":[{"label":"Прямые участки, не по ВПП","answer":30,"unit":"kts"},{"label":"Прямые участки, по ВПП","answer":60,"unit":"kts"},{"label":"Плавные повороты","answer":20,"unit":"kts"},{"label":"Крутые развороты (90°+)","answer":10,"unit":"kts"},{"label":"Пониженное сцепление","answer":10,"unit":"kts"}],"tolerance":0},
+  {"id":232,"category":"Зона ожидания","question":"Скорости в зоне ожидания по высоте","type":"multi","fields":[{"label":"До 14000 ft (4250 м)","answer":230,"unit":"kt"},{"label":"14000–20000 ft (4250–6100 м)","answer":240,"unit":"kt"},{"label":"20000–34000 ft (6100–10350 м)","answer":265,"unit":"kt"},{"label":"Выше 34000 ft (10350 м)","answer":0.82,"unit":"M"}],"tolerance":0},
+  {"id":233,"category":"Габариты ВС","question":"Габариты воздушного судна","type":"multi","fields":[{"label":"Высота","answer":10.28,"unit":"м"},{"label":"Длина","answer":29.94,"unit":"м"},{"label":"Размах крыла","answer":27.8,"unit":"м"}],"tolerance":0},
+  {"id":234,"category":"Ограничения при взлете","question":"Осадки на ВПП для взлёта FLAP 1+F","type":"multi","fields":[{"label":"Слякоть","answer":3,"unit":"мм"},{"label":"Мокрый снег","answer":3,"unit":"мм"},{"label":"Сухой снег","answer":10,"unit":"мм"}],"tolerance":0},
+  {"id":235,"category":"Система электроснабжения","question":"Номинальная мощность генераторов","type":"multi","fields":[{"label":"L GEN / R GEN (основные)","answer":40,"unit":"KVA"},{"label":"RAT GEN (>125 kt)","answer":15,"unit":"KVA"},{"label":"ST INV","answer":1,"unit":"KVA"}],"tolerance":0},
+  {"id":236,"category":"Кислородная система","question":"Мин. давление кислорода перед вылетом по составу экипажа","type":"multi","fields":[{"label":"Экипаж 2 человека","answer":1200,"unit":"Psi"},{"label":"Экипаж 3 человека","answer":1700,"unit":"Psi"}],"tolerance":0},
+  {"id":237,"category":"Руление на спущенных шинах","question":"Руление на спущенных шинах","type":"multi","fields":[{"label":"1 шина спущена — скорость на развороте","answer":7,"unit":"kt"},{"label":"2 шины на одной опоре — скорость","answer":3,"unit":"kt"},{"label":"Угол отклонения колёс (2 шины на опоре)","answer":30,"unit":"°"}],"tolerance":0},
+  {"id":238,"category":"Ограничение по ветру","question":"Максимальная попутная составляющая ветра по этапам","type":"multi","fields":[{"label":"Взлёт, FLAP 1+F","answer":10,"unit":"kt"},{"label":"Взлёт, FLAP 2 / FLAP 3","answer":15,"unit":"kt"},{"label":"Посадка, FLAP 3","answer":10,"unit":"kt"}],"tolerance":0},
+  {"id":239,"category":"Силовая установка","question":"Максимально допустимые обороты роторов двигателя","type":"multi","fields":[{"label":"N1","answer":105,"unit":"%"},{"label":"N2","answer":110,"unit":"%"}],"tolerance":0},
+  {"id":240,"category":"Силовая установка","question":"Ветер при запуске двигателя","type":"multi","fields":[{"label":"Боковая составляющая","answer":35,"unit":"kt"},{"label":"Попутная составляющая","answer":10,"unit":"kt"}],"tolerance":0},
+  {id:241,category:"СДУ",question:"Сколько вычислителей MACE установлено на RRJ-95?",type:"number",answer:6,unit:"шт",tolerance:0},
+  {id:242,category:"СДУ",question:"Сколько блоков ACE установлено на RRJ-95?",type:"number",answer:14,unit:"шт",tolerance:0},
+  {id:243,category:"СДУ",question:"Защита Alpha Floor:",type:"cloze",text:"На FLOOR система FBWCS выдаёт командный сигнал на уборку интерцепторов, если они были выпущены, и на перемещение РУД в положение [[TO/GA]].\nПосле уменьшения угла атаки меньше FLOOR − [[0.5]] сигналы на уборку интерцепторов и автомат тяги отключаются, РУД остаются в достигнутом положении.\n_Ограничительная функция на FLOOR не работает, если радиовысота менее [[98]] ft, или скорость полёта более [[0.5]] M, или приборная скорость меньше [[65]] kt.",tolerance:0},
+  {id:244,category:"СДУ",question:"Ограничение крена (FBWCS)",type:"multi",fields:[{label:"Стабилизация крена, α до PROT",answer:35,unit:"°"},{label:"Макс. крен, α до PROT",kind:"range",answerMin:54,answerMax:61,unit:"°"},{label:"Стабилизация крена, α LIMIT",answer:27,unit:"°"},{label:"Макс. крен, α LIMIT",kind:"range",answerMin:45,answerMax:52,unit:"°"}],tolerance:0},
+  {id:245,category:"СДУ",question:"Ограничение тангажа (FBWCS)",type:"multi",fields:[{label:"Стабилизация тангажа (от / до)",kind:"range",answerMin:-10,answerMax:20,unit:"°"},{label:"Макс. тангаж при полном отклонении ручки (от / до)",kind:"range",answerMin:-20,answerMax:28,unit:"°"}],tolerance:0},
+  {id:246,category:"СДУ",question:"Ограничение отклонения руля направления",type:"multi",fields:[{label:"Полный ход, VIAS менее 162 kt",kind:"symmetric",answer:27,unit:"°"},{label:"Диапазон VIAS, где ход ограничивается автоматически",kind:"range",answerMin:162,answerMax:242,unit:"kt"},{label:"Ход при VIAS более 242 kt",kind:"symmetric",answer:8,unit:"°"}],tolerance:0},
+  {id:247,category:"СДУ",question:"Защита по углу атаки:",type:"cloze",text:"На угле атаки [[PROT]] начинает работать ограничитель предельных режимов по углу атаки.\nПри отклонении боковой ручки «на себя» СДУ автоматически ограничивает максимальный угол атаки значением [[LIMIT]], который может быть достигнут без дополнительной сигнализации.\nНа углах, близких к LIMIT, возможен кратковременный заброс угла атаки до срабатывания сигнализации предупреждения о сваливании ([[SW]]).",tolerance:0},
+  {id:248,category:"СДУ",question:"Приоритет боковой ручки (SS PRIOR):",type:"cloze",text:"В режиме [[NORMAL MODE]] пилот может блокировать ручку SS другого пилота нажатием и удержанием кнопки SS PRIOR/AP OFF, если:\n– кнопка удерживается менее [[40]] с — после её освобождения управление от другого пилота восстанавливается, индикация приоритета снимается;\n– кнопка удерживается более 40 с — ручка SS другого пилота блокируется, и после освобождения кнопки управление от неё автоматически не восстанавливается;\n– при одновременном нажатии обоими пилотами определяющим является [[последнее]] нажатие.",tolerance:0},
+  {id:249,category:"Механизация крыла",question:"Автоматический выпуск механизации крыла из положения flaps=0:",type:"cloze",text:"В полёте, в конфигурации 0, при уменьшении скорости менее [[185]] kt механизация крыла автоматически выпускается до конфигурации [[1]] ([[18]]°/[[3]]°).\nМеханизация крыла автоматически возвращается в конфигурацию 0 при увеличении скорости полёта более [[190]] kt.",tolerance:0},
+  {id:250,category:"Механизация крыла",question:"Запрет на изменение положения механизации крыла после взлёта:",type:"cloze",text:"При выполнении взлёта, на скорости [[80]] kt блокируется изменение положения закрылков и предкрылков в течение последующих [[30]] секунд или до высоты [[400]] ft, что наступит раньше.",tolerance:0}
+];
+
+const OZP_QS = [
+  {id:1,category:"ОЗП",question:"Какая минимальная температура наружного воздуха допускается для эксплуатации ВС RRJ-95B на земле?",type:"number",answer:-54,unit:"°C",tolerance:0},
+  {id:2,category:"ОЗП",question:"При какой температуре OAT (на земле) или TAT (в полете) официально возникают условия обледенения?",type:"number",answer:10,unit:"°C",tolerance:0},
+  {id:3,category:"ОЗП",question:"При какой температуре топлива в баках на земле использование ПВК-жидкости становится строго обязательным?",type:"number",answer:-40,unit:"°C",tolerance:0},
+  {id:4,category:"ОЗП",question:"Какая минимальная температура допускается для топлива марки JET A-1?",type:"number",answer:-47,unit:"°C",tolerance:0},
+  {id:5,category:"ОЗП",question:"При снижении температуры TAT в полете до какого значения необходимо выполнить процедуру FUEL LO TEMP для топлива JET A?",type:"number",answer:-33,unit:"°C",tolerance:0},
+  {id:6,category:"ОЗП",question:"Ниже какой температуры гидрожидкости технический персонал обязан выполнить подогрев гидробаков?",type:"number",answer:-30,unit:"°C",tolerance:0},
+  {id:7,category:"ОЗП",question:"До какой минимальной температуры необходимо подогреть гидробаки, если температура гидрожидкости была ниже –30°C?",type:"number",answer:-20,unit:"°C",tolerance:0},
+  {id:8,category:"ОЗП",question:"Какая минимальная температура масла допускается перед запуском двигателя на земле?",type:"number",answer:-40,unit:"°C",tolerance:0},
+  {id:9,category:"ОЗП",question:"Ниже какой температуры наружного воздуха (ТНВ) запрещается включать блоки авионики?",type:"number",answer:-15,unit:"°C",tolerance:0},
+  {id:10,category:"ОЗП",question:"При какой температуре наружного воздуха и ниже аккумуляторные батареи обязательно снимаются с борта при стоянке?",type:"number",answer:-30,unit:"°C",tolerance:0},
+  {id:11,category:"ОЗП",question:"Ниже какой температуры наружного воздуха необходимо снять гарнитуру экипажа для хранения в отапливаемом помещении?",type:"number",answer:-45,unit:"°C",tolerance:0},
+  {id:12,category:"ОЗП",question:"Теплым воздухом какой максимальной температуры разрешается удалять снег или лед с приемников давления и датчиков?",type:"number",answer:50,unit:"°C",tolerance:0},
+  {id:13,category:"ОЗП",question:"Какова минимальная скорость набегающего потока для устойчивой работы датчика обледенения?",type:"number",answer:30,unit:"kt",tolerance:0},
+  {id:14,category:"ОЗП",question:"Каково максимально допустимое время непрерывной работы турбостартера при температуре наружного воздуха ниже –15°C?",type:"number",answer:4,unit:"мин",tolerance:0},
+  {id:15,category:"ОЗП",question:"Сколько минут необходимо прогревать двигатель на режиме IDLE, если после стоянки при температуре ниже –30°C наблюдается течь топлива, прежде чем принять решение о его выключении?",type:"number",answer:5,unit:"мин",tolerance:0},
+  {id:16,category:"ОЗП",question:"Через какой максимальный интервал времени необходимо повторять процедуру увеличения режима работы двигателя до 70% N1 на 20 секунд при рулении в условиях обледенения?",type:"number",answer:30,unit:"мин",tolerance:0},
+  {id:17,category:"ОЗП",question:"На сколько часов максимум разрешена стоянка самолета с установленными аккумуляторными батареями при ТНВ от –15°C до –30°C?",type:"number",answer:6,unit:"ч",tolerance:0},
+  {id:18,category:"ОЗП",question:"Более скольких часов стоянки при ТНВ от –15°C до –54°C требуется для обязательного закрытия подачи кислорода от баллона?",type:"number",answer:3,unit:"ч",tolerance:0},
+  {id:19,category:"ОЗП",question:"Какая максимальная глубина мокрого снега или слякоти на ВПП запрещает взлет в конфигурации FLAP 1+F?",type:"number",answer:3,unit:"мм",tolerance:0},
+  {id:20,category:"ОЗП",question:"Какая максимальная глубина сухого снега на ВПП запрещает взлет в конфигурации FLAP 1+F?",type:"number",answer:10,unit:"мм",tolerance:0},
+  {id:21,category:"ОЗП",question:"Ниже какого значения коэффициента сцепления на ВПП посадку обязан выполнять только КВС?",type:"number",answer:0.4,unit:"",tolerance:0},
+  {id:22,category:"ОЗП",question:"Ниже какого значения коэффициента сцепления на ВПП вторым пилотам запрещено выполнение взлетов и посадок?",type:"number",answer:0.4,unit:"",tolerance:0},
+  {id:23,category:"ОЗП",question:"Какой процент от предельно допустимой боковой составляющей ветра разрешен для взлета второму пилоту под контролем КВС-инструктора в закрепленном составе?",type:"number",answer:80,unit:"%",tolerance:0},
+  {id:24,category:"ОЗП",question:"На сколько процентов располагаемая посадочная дистанция должна превышать потребную для выполнения посадки вторым пилотом?",type:"number",answer:15,unit:"%",tolerance:0},
+  {id:25,category:"ОЗП",question:"На сколько метров должна превышать фактическая видимость минимум захода для посадки вторым пилотом под контролем КВС (в незакрепленном составе)?",type:"number",answer:300,unit:"м",tolerance:0},
+  {id:26,category:"ОЗП",question:"Какова минимальная допустимая видимость на ВПП для взлета вторым пилотом под контролем КВС?",type:"number",answer:400,unit:"м",tolerance:0},
+  {id:27,category:"ОЗП",question:"Какова максимальная допустимая вертикальная скорость при стабилизированном заходе на посадку?",type:"number",answer:1000,unit:"ft/min",tolerance:0},
+  {id:28,category:"ОЗП",question:"На сколько градусов максимум не должны превышать угол упреждения и крен при компенсации сильного бокового ветра перед касанием?",type:"number",answer:5,unit:"°",tolerance:0},
+  {id:29,category:"ОЗП",question:"На сколько примерно метров увеличивается посадочная дистанция при пролете порога ВПП на высоте 100 ft вместо расчетной?",type:"number",answer:300,unit:"м",tolerance:0},
+  {id:30,category:"ОЗП",question:"Какой дополнительный коэффициент безопасности (Safety Factor) установлен в авиакомпании АЗИМУТ для расчета ALD в полете по рекомендации разработчика?",type:"number",answer:1.15,unit:"",tolerance:0},
+  {id:31,category:"ОЗП",question:"Какой коэффициент увеличения применяется к ALD для расчета RLD на сухую ВПП для основного аэродрома?",type:"number",answer:1.67,unit:"",tolerance:0}
+];
+
+const AF_QS = [
+  {id:1,category:"APPROACH LOST",question:"Сигнализация APPROACH LOST в зависимости от этапа захода включается:",type:"cloze",text:"• На любой высоте после включения режима LOC*:\n– при потере сигнала [[ILS]] (режимов LOC и/или GS) по любой причине.\n• Ниже [[200]] ft, если индицируется APP3 LAND или APP2 при:\n– отказе двух радиовысотомеров, или\n– рассогласовании радиовысотомеров более [[15]] ft, или\n– предельном отклонении от глиссады или курса ILS.\n• Ниже [[80]] ft, если индицируется APP3 LAND при:\n– отключении A/T на обоих РУД, или\n– отклонении от заданной скорости захода более чем на [[10]] kt.",tolerance:0},
+  {id:2,category:"Режим GA",question:"Режим GA (уход на 2-ой круг):",type:"cloze",text:"Режим GA обеспечивает переход из траектории снижения в набор высоты с выдерживанием скорости ухода на 2-ой круг и применением взлётной тяги, устанавливаемой вручную или автоматом тяги.\nРежим GA включается одновременно с горизонтальным режимом [[GA TRK]].\nСкорость ухода на 2-ой круг (заданная скорость в режиме GA) соответствует [[VAPP]] или текущей скорости в момент включения GA, что меньше, со следующими ограничениями:\n– не менее [[VLS]] и не более VLS+[[25]];\n– не менее VLS и не более VLS+[[15]] kt при одном работающем двигателе.\n_Примечание: если режим GA включён на скорости выше VLS+25 kt (VLS+15 kt при одном работающем двигателе), то индекс заданной скорости (независимо от способа управления скоростью — AUTO или FCP) перемещается к значению VLS+25 kt (VLS+15 kt при одном работающем двигателе).\n_При включении режима ALT* из режима GA и управлении скоростью AUTO индекс заданной скорости устанавливается на значении текущей скорости.",tolerance:0},
+  {id:3,category:"Пилотажный директор",question:"Отключение FD:",type:"cloze",text:"FD отключается:\n• любой из кнопок FD на FCP;\n• автоматически при достижении следующих условий:\n– крен [[45]]°;\n– тангаж более +[[28]]° или менее −[[18]]°;\n– при переходе системы управления самолётом в режим [[DIRECT MODE]];\n– при заходе на посадку и отключении AP ниже [[200]] ft, в том числе при автоматической посадке и обжатии любой из основных опор шасси.",tolerance:0},
+  {id:4,category:"Режим TO",question:"Режим «Взлёт» (TO):",type:"cloze",text:"На взлёте при включении режима TO одновременно включается FD.\nВо время разбега, при подъёме носовой стойки шасси до угла тангажа [[3]]°, командные планки FD не индицируются.\nНа высоте [[35]] ft RA включается режим [[TO TRK]] и индицируется директорная планка крена.\nСкорость начального набора высоты:\n– V2+[[10]], или\n– V2 или скорость, достигнутая на момент отказа двигателя, что больше, но не более V2+10.\n• Режим TO включается, когда V2 установлена и:\n– A/T в состоянии «Подготовка», РУД переведены вручную выше [[50]]% N1 и нажата кнопка TO/GA, или\n– РУД установлены вручную в положение TO/GA.\n• Режим TO отключается включением другого режима в вертикальной плоскости с высоты более [[400]] ft RA.",tolerance:0},
+  {id:5,category:"Автопилот",question:"Отключение AP:",type:"cloze",text:"AP отключается в следующих случаях:\n– лётный экипаж нажал на кнопку SS PRIOR/AP OFF на любой ручке SS, или\n– лётный экипаж нажал на кнопку AP на пульте FCP, или\n– лётный экипаж отклонил ручку SS или педали управления рулём направления выше порогового значения (на [[1.5]]° и [[20]] мм соответственно), или\n– при автоматической посадке любая из основных опор шасси обжата и режим [[GA]] не включён, или\n– система управления самолётом перешла в режим [[DIRECT MODE]], или\n– произошёл отказ функции AP, или\n– активирована функция защиты по скорости в СДУ, или\n– угол атаки превысил значение α prot, или\n– угол тангажа превысил значение [[25]]° (для отрицательных углов — меньше −[[15]]°) или угол крена превысил значение [[40]]°.",tolerance:0}
+];
+
+const DECKS = {
+  rrj95: { label: "RRJ-95 Limits", tagline: "Тест по ограничениям", qs: DEFAULT_QS, weakKey: "rrj95_weak" },
+  ozp:   { label: "ОЗП", tagline: "Тест по эксплуатации в зимний период", qs: OZP_QS, weakKey: "ozp_weak" },
+  autoflight: { label: "AutoFlight", tagline: "Тест по автоматическому управлению полётом", qs: AF_QS, weakKey: "autoflight_weak" }
+};
+let deckKey = "rrj95";
+let questions = [...DECKS[deckKey].qs];
+let queue = [];
+let current = 0;
+let score = 0;
+let bestByDeck = { rrj95: null, ozp: null, autoflight: null };
+let answered = false;
+let activeInputId = 'num-ans';
+
+// --- Слабые вопросы (id -> счётчик ошибок), хранятся в localStorage отдельно на каждую колоду ---
+let weakStats = {};
+function loadWeak() {
+  try { weakStats = JSON.parse(localStorage.getItem(DECKS[deckKey].weakKey) || '{}'); } catch(e) { weakStats = {}; }
+}
+function saveWeak() {
+  try { localStorage.setItem(DECKS[deckKey].weakKey, JSON.stringify(weakStats)); } catch(e) {}
+}
+loadWeak();
+function weakCount() {
+  return questions.filter(q => weakStats[q.id] > 0).length;
+}
+function updateWeakBadge() {
+  const el = document.getElementById('stat-weak');
+  if (el) el.textContent = weakCount();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  updateHomeStats();
+}
+
+function selectDeck(key) {
+  if (key === deckKey) return;
+  deckKey = key;
+  questions = [...DECKS[key].qs];
+  loadWeak();
+  document.querySelectorAll('.deck-btn').forEach(b => b.classList.toggle('active', b.dataset.deck === key));
+  document.getElementById('home-label').textContent = DECKS[key].tagline;
+  document.getElementById('home-title').textContent = DECKS[key].label;
+  updateHomeStats();
+}
+
+function updateHomeStats() {
+  document.getElementById('stat-total').textContent = questions.length;
+  const b = bestByDeck[deckKey];
+  document.getElementById('stat-best').textContent = b != null ? b + '%' : '—';
+  updateWeakBadge();
+}
+
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+let lastCount = 10;
+let missed = new Set();
+let requeued = false;
+
+function startQuiz(count) {
+  lastCount = count;
+  const n = count ? Math.min(count, questions.length) : questions.length;
+  const weak = shuffle(questions.filter(q => weakStats[q.id] > 0));
+  const rest = shuffle(questions.filter(q => !(weakStats[q.id] > 0)));
+  queue = shuffle([...weak, ...rest].slice(0, n));
+  current = 0; score = 0; answered = false; missed = new Set(); requeued = false;
+  showScreen('quiz');
+  renderQ();
+}
+
+// Неверный ответ не засчитывается: вопрос уходит на 3–7 позиций дальше, счётчик прогресса не двигается.
+// Отметка «слабый» снимается только при верном ответе с первой попытки в сессии.
+function recordAnswer(q, ok) {
+  if (!ok) {
+    weakStats[q.id] = (weakStats[q.id] || 0) + 1;
+    saveWeak();
+    missed.add(q.id);
+    queue.splice(current, 1);
+    const pos = Math.min(queue.length, current + 3 + Math.floor(Math.random() * 5));
+    queue.splice(pos, 0, q);
+    requeued = true;
+  } else if (!missed.has(q.id) && weakStats[q.id] > 0) {
+    weakStats[q.id]--;
+    if (weakStats[q.id] <= 0) delete weakStats[q.id];
+    saveWeak();
+  }
+}
+
+const KEYPAD_HTML = `<div class="keypad">
+        <button type="button" class="kp-btn" onclick="kpInput('1')">1</button>
+        <button type="button" class="kp-btn" onclick="kpInput('2')">2</button>
+        <button type="button" class="kp-btn" onclick="kpInput('3')">3</button>
+        <button type="button" class="kp-btn" onclick="kpInput('4')">4</button>
+        <button type="button" class="kp-btn" onclick="kpInput('5')">5</button>
+        <button type="button" class="kp-btn" onclick="kpInput('6')">6</button>
+        <button type="button" class="kp-btn" onclick="kpInput('7')">7</button>
+        <button type="button" class="kp-btn" onclick="kpInput('8')">8</button>
+        <button type="button" class="kp-btn" onclick="kpInput('9')">9</button>
+        <button type="button" class="kp-btn kp-minus" onclick="kpInput('-')">&minus;</button>
+        <button type="button" class="kp-btn" onclick="kpInput('0')">0</button>
+        <button type="button" class="kp-btn" onclick="kpInput('.')">.</button>
+        <button type="button" class="kp-btn kp-back" onclick="kpBackspace()">⌫</button>
+      </div>`;
+
+function renderQ() {
+  const q = queue[current];
+  answered = false;
+  document.getElementById('q-counter').textContent = (current + 1) + ' / ' + queue.length;
+  document.getElementById('q-cat').textContent = Array.isArray(q.category) ? q.category.join(', ') : q.category;
+  document.getElementById('progress').style.width = (current / queue.length * 100) + '%';
+  document.getElementById('q-text').textContent = q.question;
+  const fb = document.getElementById('q-feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback';
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'none';
+  const body = document.getElementById('q-body');
+  if (q.type === 'choice') {
+    body.innerHTML = '<div class="options">' +
+      q.options.map((o, i) => `<button class="opt" onclick="checkChoice(${i})">${o}</button>`).join('') +
+      '</div>';
+  } else if (q.type === 'range') {
+    activeInputId = 'num-ans-min';
+    body.innerHTML = `<div class="num-area">
+      <div class="range-row">
+        <div class="range-field">
+          <span class="range-label">от</span>
+          <input type="text" class="num-input range-input active" id="num-ans-min" onclick="focusField('num-ans-min')" inputmode="none" placeholder="0" readonly>
+        </div>
+        <span class="range-dash">–</span>
+        <div class="range-field">
+          <span class="range-label">до</span>
+          <input type="text" class="num-input range-input" id="num-ans-max" onclick="focusField('num-ans-max')" inputmode="none" placeholder="0" readonly>
+        </div>
+        <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkRange()">Проверить</button>
+    </div>`;
+  } else if (q.type === 'multi') {
+    activeInputId = q.fields[0].kind === 'range' ? 'multi-ans-0-min' : 'multi-ans-0';
+    body.innerHTML = `<div class="num-area">
+      <div class="multi-list">
+        ${q.fields.map((f, i) => {
+          const active = i === 0 ? ' active' : '';
+          let inputHtml;
+          if (f.kind === 'range') {
+            inputHtml = `<input type="text" class="num-input multi-input${active}" id="multi-ans-${i}-min" onclick="focusField('multi-ans-${i}-min')" inputmode="none" placeholder="0" readonly>
+            <span class="range-dash">–</span>
+            <input type="text" class="num-input multi-input" id="multi-ans-${i}-max" onclick="focusField('multi-ans-${i}-max')" inputmode="none" placeholder="0" readonly>`;
+          } else if (f.kind === 'symmetric') {
+            inputHtml = `<span class="num-prefix">±</span>
+            <input type="text" class="num-input multi-input${active}" id="multi-ans-${i}" onclick="focusField('multi-ans-${i}')" inputmode="none" placeholder="0" readonly>`;
+          } else {
+            inputHtml = `<input type="text" class="num-input multi-input${active}" id="multi-ans-${i}" onclick="focusField('multi-ans-${i}')" inputmode="none" placeholder="0" readonly>`;
+          }
+          return `
+        <div class="multi-row">
+          <span class="multi-label">${f.label}</span>
+          <div class="multi-input-wrap">
+            ${inputHtml}
+            <span class="num-unit">${f.unit || ''}</span>
+          </div>
+          <span class="multi-hint" id="multi-hint-${i}"></span>
+        </div>`;
+        }).join('')}
+      </div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkMulti()">Проверить</button>
+    </div>`;
+  } else if (q.type === 'cloze') {
+    const blanks = clozeBlanks(q);
+    activeInputId = null;
+    let bi = 0;
+    const lines = q.text.split('\n').map(line => {
+      const note = line.startsWith('_');
+      if (note) line = line.slice(1);
+      const cls = note ? 'cloze-note' : line.startsWith('•') ? 'cloze-head' : line.startsWith('–') ? 'cloze-sub' : '';
+      const html = line.split(/\[\[.+?\]\]/).map((part, k, arr) => {
+        let out = esc(part);
+        if (k < arr.length - 1) {
+          const i = bi++;
+          const numeric = blanks[i].numeric;
+          if (numeric && activeInputId === null) activeInputId = 'cloze-ans-' + i;
+          const active = numeric && activeInputId === 'cloze-ans-' + i ? ' active' : '';
+          out += numeric
+            ? `<input type="text" class="num-input cloze-input${active}" id="cloze-ans-${i}" onclick="focusField('cloze-ans-${i}')" inputmode="none" readonly><span class="cloze-hint" id="cloze-hint-${i}"></span>`
+            : `<input type="text" class="num-input cloze-input cloze-word" id="cloze-ans-${i}" onfocus="focusField('cloze-ans-${i}')" autocapitalize="characters" autocomplete="off" spellcheck="false"><span class="cloze-hint" id="cloze-hint-${i}"></span>`;
+        }
+        return out;
+      }).join('');
+      return `<div class="${cls}">${html}</div>`;
+    }).join('');
+    body.innerHTML = `<div class="num-area">
+      <div class="cloze-text">${lines}</div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkCloze()">Проверить</button>
+    </div>`;
+  } else if (q.type === 'symmetric') {
+    activeInputId = 'num-ans';
+    body.innerHTML = `<div class="num-area">
+      <div class="num-row">
+        <span class="num-prefix">±</span>
+        <input type="text" class="num-input" id="num-ans" inputmode="none" placeholder="0" readonly>
+        <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
+    </div>`;
+  } else {
+    activeInputId = 'num-ans';
+    body.innerHTML = `<div class="num-area">
+      <div class="num-row">
+        <input type="text" class="num-input" id="num-ans" inputmode="none" placeholder="0" readonly>
+        <span class="num-unit">${q.unit || ''}</span>
+      </div>
+      ${KEYPAD_HTML}
+      <button class="check-btn" id="check-btn" onclick="checkNumber()">Проверить</button>
+    </div>`;
+  }
+}
+
+function showFeedback(ok, text) {
+  const fb = document.getElementById('q-feedback');
+  fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+  fb.textContent = text;
+  fb.style.display = 'block';
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'block';
+  nb.textContent = !requeued && current + 1 >= queue.length ? 'Завершить' : 'Далее →';
+}
+
+function checkChoice(i) {
+  if (answered) return;
+  answered = true;
+  const q = queue[current];
+  const btns = document.querySelectorAll('.opt');
+  btns.forEach(b => b.disabled = true);
+  const ok = (i === q.answer);
+  recordAnswer(q, ok);
+  if (ok) {
+    btns[i].classList.add('correct');
+    if (!missed.has(q.id)) score++;
+    showFeedback(true, '✓ Верно');
+  } else {
+    btns[i].classList.add('wrong');
+    btns[q.answer].classList.add('reveal');
+    showFeedback(false, '✗ Неверно. Правильный ответ: ' + q.options[q.answer]);
+  }
+}
+
+function focusField(id) {
+  activeInputId = id;
+  document.querySelectorAll('.range-input, .multi-input, .cloze-input').forEach(el => el.classList.toggle('active', el.id === id));
+}
+
+function kpInput(ch) {
+  const inp = document.getElementById(activeInputId);
+  if (!inp || inp.disabled) return;
+  if (ch === '-') {
+    inp.value = inp.value.startsWith('-') ? inp.value.slice(1) : '-' + inp.value;
+  } else if (ch === '.') {
+    if (!inp.value.includes('.')) inp.value += (inp.value === '' || inp.value === '-') ? '0.' : '.';
+  } else {
+    inp.value += ch;
+  }
+}
+
+function kpBackspace() {
+  const inp = document.getElementById(activeInputId);
+  if (!inp || inp.disabled) return;
+  inp.value = inp.value.slice(0, -1);
+}
+
+function esc(v) {
+  return String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function normWord(v) { return v.replace(/\s+/g, '').toUpperCase().replace(/Ё/g, 'Е'); }
+
+function clozeBlanks(q) {
+  return [...q.text.matchAll(/\[\[(.+?)\]\]/g)].map(m => ({ answer: m[1], numeric: !isNaN(parseFloat(m[1])) && isFinite(m[1]) }));
+}
+
+function checkCloze() {
+  if (answered) return;
+  const q = queue[current];
+  const blanks = clozeBlanks(q);
+  const inputs = blanks.map((b, i) => document.getElementById('cloze-ans-' + i));
+  if (inputs.some((inp, i) => !inp || (blanks[i].numeric ? isBlank(inp.value) : !inp.value.trim()))) return;
+  answered = true;
+  const tol = q.tolerance || 0;
+  let allOk = true;
+  blanks.forEach((b, i) => {
+    const inp = inputs[i];
+    const ok = b.numeric
+      ? Math.abs(parseFloat(inp.value.replace(',', '.')) - parseFloat(b.answer)) <= tol
+      : normWord(inp.value) === normWord(b.answer);
+    inp.disabled = true;
+    inp.classList.remove('active');
+    inp.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) {
+      allOk = false;
+      document.getElementById('cloze-hint-' + i).textContent = '→ ' + b.answer;
+    }
+  });
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  recordAnswer(q, allOk);
+  if (allOk) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Все значения верны'); }
+  else { showFeedback(false, '✗ Есть ошибки — неверные поля красным, верный ответ рядом'); }
+}
+
+function isBlank(v) { return isNaN(parseFloat(v.replace(',', '.'))); }
+
+function checkNumber() {
+  if (answered) return;
+  const inp = document.getElementById('num-ans');
+  if (!inp || isBlank(inp.value)) return;
+  answered = true;
+  const q = queue[current];
+  const val = parseFloat(inp.value.replace(',', '.'));
+  const tol = q.tolerance || 0;
+  const ok = Math.abs(val - q.answer) <= tol;
+  inp.disabled = true;
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  recordAnswer(q, ok);
+  const prefix = q.type === 'symmetric' ? '±' : '';
+  if (ok) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Верно: ' + prefix + q.answer + ' ' + (q.unit || '')); }
+  else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + prefix + q.answer + ' ' + (q.unit || '')); }
+}
+
+function checkRange() {
+  if (answered) return;
+  const inpMin = document.getElementById('num-ans-min');
+  const inpMax = document.getElementById('num-ans-max');
+  if (!inpMin || !inpMax || isBlank(inpMin.value) || isBlank(inpMax.value)) return;
+  answered = true;
+  const q = queue[current];
+  const valMin = parseFloat(inpMin.value.replace(',', '.'));
+  const valMax = parseFloat(inpMax.value.replace(',', '.'));
+  const tol = q.tolerance || 0;
+  const ok = Math.abs(valMin - q.answerMin) <= tol && Math.abs(valMax - q.answerMax) <= tol;
+  inpMin.disabled = true;
+  inpMax.disabled = true;
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  recordAnswer(q, ok);
+  const correctText = q.answerMin + '–' + q.answerMax + ' ' + (q.unit || '');
+  if (ok) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Верно: ' + correctText); }
+  else { showFeedback(false, '✗ Неверно. Правильный ответ: ' + correctText); }
+}
+
+function checkMulti() {
+  if (answered) return;
+  const q = queue[current];
+  const fieldInputs = q.fields.map((f, i) => f.kind === 'range'
+    ? [document.getElementById('multi-ans-' + i + '-min'), document.getElementById('multi-ans-' + i + '-max')]
+    : [document.getElementById('multi-ans-' + i)]);
+  if (fieldInputs.some(arr => arr.some(inp => !inp || isBlank(inp.value)))) return;
+  answered = true;
+  const tol = q.tolerance || 0;
+  let allOk = true;
+  q.fields.forEach((f, i) => {
+    const inputs = fieldInputs[i];
+    let ok, correctText;
+    if (f.kind === 'range') {
+      const valMin = parseFloat(inputs[0].value.replace(',', '.'));
+      const valMax = parseFloat(inputs[1].value.replace(',', '.'));
+      ok = Math.abs(valMin - f.answerMin) <= tol && Math.abs(valMax - f.answerMax) <= tol;
+      correctText = f.answerMin + '–' + f.answerMax;
+    } else {
+      const val = parseFloat(inputs[0].value.replace(',', '.'));
+      ok = Math.abs(val - f.answer) <= tol;
+      correctText = (f.kind === 'symmetric' ? '±' : '') + f.answer;
+    }
+    inputs.forEach(inp => { inp.disabled = true; inp.classList.remove('active'); inp.classList.add(ok ? 'correct' : 'wrong'); });
+    if (!ok) {
+      allOk = false;
+      const hint = document.getElementById('multi-hint-' + i);
+      if (hint) hint.textContent = '→ ' + correctText;
+    }
+  });
+  const cb = document.getElementById('check-btn');
+  if (cb) cb.disabled = true;
+  recordAnswer(q, allOk);
+  if (allOk) { if (!missed.has(q.id)) score++; showFeedback(true, '✓ Все значения верны'); }
+  else { showFeedback(false, '✗ Есть ошибки — неверные поля красным, верный ответ рядом'); }
+}
+
+function nextQ() {
+  if (requeued) requeued = false; else current++;
+  if (current >= queue.length) { showResult(); return; }
+  renderQ();
+  window.scrollTo(0, 0);
+}
+
+function restartLast() {
+  startQuiz(lastCount);
+}
+
+function showResult() {
+  const pct = Math.round(score / queue.length * 100);
+  if (bestByDeck[deckKey] === null || pct > bestByDeck[deckKey]) bestByDeck[deckKey] = pct;
+  document.getElementById('res-score').textContent = score + ' / ' + queue.length;
+  document.getElementById('res-pct').textContent = pct + '%';
+  let txt =
+    pct >= 90 ? 'Отлично! Ограничения знаешь.' :
+    pct >= 70 ? 'Хорошо, есть над чем работать.' :
+    pct >= 50 ? 'Нужно повторить материал.' : 'Серьёзно повторить РЛЭ.';
+  const n = weakCount();
+  txt += n > 0
+    ? ' На повторении осталось карточек: ' + n + '.'
+    : ' Все карточки закрыты — слабых тем не осталось!';
+  document.getElementById('res-comment').textContent = txt;
+  showScreen('result');
+}
+
+updateHomeStats();
+</script>
+</body>
+</html>
