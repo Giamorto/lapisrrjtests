@@ -3,153 +3,189 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RRJ-95 Limitations</title>
+<title>RRJ-95 Limits</title>
 <style>
 :root{
-  --bg:#f4f5f7; --surface:#ffffff; --surface-2:#eef0f3; --line:#d9dde3;
-  --text:#16191d; --muted:#5d6670; --accent:#1f5fbf; --accent-soft:#e3ecfa;
-  --ok:#1d7a46; --ok-soft:#e1f3e8; --bad:#b3261e; --bad-soft:#fbe5e3;
-  --warn:#8a5a00; --warn-soft:#fbefd6;
-  --radius:12px; --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+  --bg:#ffffff; --soft:#f4f4f2; --line:#d6d6d3; --text:#1a1a1a; --muted:#6b6b68;
+  --primary:#1a1a1a; --on-primary:#ffffff;
+  --ok:#1d7a46; --ok-soft:#e3f3e9; --bad:#b3261e; --bad-soft:#fbe6e4; --warn:#8a5a00; --warn-soft:#fbf0d9;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#111418; --surface:#1a1e24; --surface-2:#232830; --line:#30363f;
-    --text:#e8eaed; --muted:#9aa3ad; --accent:#7fb0ff; --accent-soft:#1e2c44;
-    --ok:#5cc98a; --ok-soft:#173326; --bad:#ff8a80; --bad-soft:#3a1d1b;
-    --warn:#f0c060; --warn-soft:#3a2f17;
-    --shadow:0 1px 2px rgba(0,0,0,.4);
+    --bg:#141414; --soft:#202020; --line:#363636; --text:#ececea; --muted:#9a9a96;
+    --primary:#ececea; --on-primary:#141414;
+    --ok:#5cc98a; --ok-soft:#173326; --bad:#ff8a80; --bad-soft:#3a1d1b; --warn:#f0c060; --warn-soft:#3a2f17;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#111418; --surface:#1a1e24; --surface-2:#232830; --line:#30363f;
-  --text:#e8eaed; --muted:#9aa3ad; --accent:#7fb0ff; --accent-soft:#1e2c44;
-  --ok:#5cc98a; --ok-soft:#173326; --bad:#ff8a80; --bad-soft:#3a1d1b;
-  --warn:#f0c060; --warn-soft:#3a2f17;
-  --shadow:0 1px 2px rgba(0,0,0,.4);
+  --bg:#141414; --soft:#202020; --line:#363636; --text:#ececea; --muted:#9a9a96;
+  --primary:#ececea; --on-primary:#141414;
+  --ok:#5cc98a; --ok-soft:#173326; --bad:#ff8a80; --bad-soft:#3a1d1b; --warn:#f0c060; --warn-soft:#3a2f17;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 button,input,select{font:inherit;color:inherit}
-.wrap{max-width:860px;margin:0 auto;padding:12px 16px 80px}
-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-header h1{font-size:18px;margin:0;font-weight:650;letter-spacing:.2px}
-header h1 small{color:var(--muted);font-weight:500;font-size:13px;margin-left:6px}
-.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:10px;margin-left:auto}
-.tabs button{border:0;background:transparent;padding:7px 12px;border-radius:7px;cursor:pointer;color:var(--muted);font-weight:550}
-.tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
-.filters{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.lbl{color:var(--muted);font-size:13px;min-width:62px}
-select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;max-width:100%}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;cursor:pointer;font-size:13px}
-.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 14px;cursor:pointer;font-weight:550}
-.btn:hover{border-color:var(--accent)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-:root[data-theme="dark"] .btn.primary{color:#0b1220}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0b1220}}
-.btn.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
-.btn.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
-.btn.small{padding:4px 9px;font-size:12px;border-radius:7px}
-.muted{color:var(--muted)}
-.sec{display:inline-block;font-size:12px;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:2px 7px;font-weight:600}
-/* flashcards */
-.progress{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin:4px 0 12px}
-.progress i{display:block;height:100%;background:var(--accent);transition:width .2s}
-.card{perspective:1200px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
-.card-in{position:relative;min-height:260px;transition:transform .35s;transform-style:preserve-3d}
+#app{max-width:440px;margin:0 auto;padding:20px 16px 40px}
+.screen{display:none}
+.screen.active{display:block}
+
+/* home */
+.home-label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.home-title{font-size:26px;font-weight:700;margin:2px 0 16px}
+.seg{display:flex;background:var(--soft);border-radius:10px;padding:4px;gap:4px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:transparent;border-radius:7px;padding:8px 4px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.scope{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.stat{background:var(--soft);border-radius:10px;padding:12px}
+.stat b{display:block;font-size:22px}
+.stat span{font-size:12.5px;color:var(--muted)}
+.menu{display:flex;flex-direction:column;gap:10px}
+.menu button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:15px 16px;cursor:pointer}
+.menu button.primary{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.menu button i{font-style:normal;width:22px;text-align:center}
+.menu button em{font-style:normal;margin-left:auto;color:var(--muted)}
+.menu button.primary em{color:inherit;opacity:.6}
+.menu .sep{height:6px}
+
+/* quiz */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.x{border:0;background:var(--soft);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:18px;line-height:1;color:var(--muted)}
+.count{font-weight:600;color:var(--muted);font-size:14px}
+.tag{margin-left:auto;font-size:12px;color:var(--muted);background:var(--soft);border-radius:99px;padding:3px 10px;max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:3px;background:var(--soft);border-radius:3px;margin-bottom:18px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--primary);transition:width .2s}
+.qtext{font-size:19px;font-weight:650;margin:0 0 16px}
+.qsub{font-size:13px;color:var(--muted);margin:-10px 0 14px}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:13px 16px;margin-bottom:10px;cursor:pointer}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px}
+.field input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:12px 14px;font-size:17px}
+.field input:focus{outline:2px solid var(--primary);outline-offset:-1px}
+.field.ok input{border-color:var(--ok);background:var(--ok-soft)}
+.field.bad input{border-color:var(--bad);background:var(--bad-soft)}
+.field.self input{border-color:var(--warn);background:var(--warn-soft)}
+.field .res{font-size:13px;margin-top:3px}
+.field.ok .res{color:var(--ok)} .field.bad .res{color:var(--bad)} .field.self .res{color:var(--warn)}
+.grow{padding:10px 0;border-bottom:1px dashed var(--line)}
+.grow .gl{font-size:15px;margin-bottom:6px}
+.gh{font-size:13px;color:var(--muted);font-weight:600;margin:16px 0 2px}
+.fb{border-radius:10px;padding:12px 14px;margin:6px 0 12px;font-size:15px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.self{background:var(--warn-soft);color:var(--warn)}
+.fb .ans{color:var(--text);font-weight:600}
+.fb small{display:block;color:var(--muted);margin-top:4px;font-size:12.5px}
+.fb .lnk{border:0;background:none;color:inherit;text-decoration:underline;padding:0;cursor:pointer;font-size:13px;margin-left:6px}
+.btn{display:block;width:100%;border:0;border-radius:10px;padding:14px;font-weight:650;cursor:pointer;background:var(--primary);color:var(--on-primary);margin-top:6px}
+.btn.ghost{background:var(--soft);color:var(--text)}
+.row2{display:flex;gap:10px}
+.row2 .btn{flex:1}
+.kp{display:none;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.kp.on{display:grid}
+.kp button{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:14px 0;font-size:20px;font-weight:600;cursor:pointer}
+.kp button.act{background:var(--primary);color:var(--on-primary);border-color:var(--primary);font-size:16px}
+.unv{color:var(--warn)}
+
+/* cards */
+.card{perspective:1200px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;margin-bottom:14px}
+.card-in{position:relative;min-height:280px;transition:transform .35s;transform-style:preserve-3d}
 .card.flip .card-in{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:12px}
-.face.back{transform:rotateY(180deg)}
-.face .grp{color:var(--muted);font-size:13px}
-.face .q{font-size:20px;font-weight:600;margin:auto 0;text-align:center}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--line);border-radius:14px;background:var(--bg);padding:18px;display:flex;flex-direction:column}
+.face.back{transform:rotateY(180deg);background:var(--soft)}
+.face .q{margin:auto 0;text-align:center;font-size:19px;font-weight:650}
 .face .a{margin:auto 0;text-align:center;font-size:24px;font-weight:700}
-.face .a .v{display:flex;justify-content:center;gap:10px;align-items:baseline;font-size:21px;margin:6px 0}
-.face .a .v span{font-size:13px;color:var(--muted);font-weight:600;min-width:90px;text-align:right}
-.face .note{font-size:13px;color:var(--warn);text-align:center}
-.face .hint{font-size:12px;color:var(--muted);text-align:center}
-.cardbar{display:flex;gap:10px;margin-top:14px}
-.cardbar .btn{flex:1;padding:12px}
-.counts{display:flex;gap:14px;font-size:13px;color:var(--muted);margin-top:10px;justify-content:center}
-.done{text-align:center;padding:30px 10px}
-.done h2{margin:0 0 6px}
-/* fill-in */
-.fill h2{font-size:18px;margin:0 0 4px}
-.fill h3{font-size:14px;margin:18px 0 6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);padding-bottom:4px}
-.fi{display:grid;grid-template-columns:1fr minmax(150px,240px);gap:8px 12px;align-items:start;padding:8px 0;border-bottom:1px dashed var(--line)}
-.fi:last-child{border-bottom:0}
-.fi .l{padding-top:7px}
-.fi .ins{display:flex;flex-direction:column;gap:6px}
-.inp{display:flex;flex-direction:column;gap:3px}
-.inp label{font-size:11px;color:var(--muted);font-weight:600}
-.inp input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 9px}
-.inp input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
-.inp.ok input{border-color:var(--ok);background:var(--ok-soft)}
-.inp.bad input{border-color:var(--bad);background:var(--bad-soft)}
-.inp.self input{border-color:var(--warn);background:var(--warn-soft)}
-.inp .res{font-size:12.5px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.inp.ok .res{color:var(--ok)}
-.inp.bad .res{color:var(--bad)}
-.inp.self .res{color:var(--warn)}
-.fi .nt{grid-column:1/-1;font-size:12.5px;color:var(--warn);margin-top:-2px}
-.score{position:sticky;bottom:10px;margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow)}
-.score b{font-size:17px}
-@media (max-width:560px){
-  .fi{grid-template-columns:1fr}
-  .fi .l{padding-top:0}
-  .tabs{margin-left:0;width:100%}
-  .tabs button{flex:1}
-  .face .q{font-size:18px}
-}
+.face .a .v{font-size:19px;margin:4px 0}
+.face .a .v span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.face .s{font-size:12px;color:var(--muted);text-align:center}
+.face .n{font-size:13px;color:var(--warn);text-align:center;margin-bottom:6px}
+
+/* result */
+.res-wrap{text-align:center;padding-top:40px}
+.res-score{font-size:56px;font-weight:700;margin:6px 0}
+.res-pct{color:var(--muted);margin-bottom:6px}
+.res-comment{margin-bottom:28px}
+
 /* reference */
-.ref h2{font-size:16px;margin:22px 0 6px}
-.ref h2:first-child{margin-top:0}
-.ref h3{font-size:14px;margin:12px 0 4px;color:var(--muted)}
-table{width:100%;border-collapse:collapse;font-size:14px}
-td{border-bottom:1px solid var(--line);padding:6px 6px;vertical-align:top}
-td:first-child{width:58%}
-td b{white-space:nowrap}
-td .vv{display:block}
-td .vv small{color:var(--muted);font-weight:600;margin-right:4px}
-td .n{display:block;font-size:12px;color:var(--warn)}
-.src{font-size:12px;color:var(--muted)}
-.unv{color:var(--warn);font-weight:600}
+.ref h2{font-size:17px;margin:22px 0 4px}
+.ref h3{font-size:13px;color:var(--muted);margin:14px 0 4px;font-weight:600}
+.ref table{width:100%;border-collapse:collapse;font-size:14px}
+.ref td{border-bottom:1px solid var(--line);padding:6px 4px;vertical-align:top}
+.ref td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+.ref td small{display:block;font-weight:400;color:var(--warn);white-space:normal}
+.ref td .vv{display:block}
+.ref td .vv span{color:var(--muted);font-weight:400;font-size:12px;margin-right:4px}
 kbd{font:11px ui-monospace,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>RRJ-95 · Ограничения <small>FCOM 1.02 R72</small></h1>
-    <nav class="tabs" id="tabs">
-      <button data-tab="cards">Карточки</button>
-      <button data-tab="fill">Подстановка</button>
-      <button data-tab="ref">Шпаргалка</button>
-    </nav>
-  </header>
+<div id="app">
 
-  <div class="panel filters" id="filters">
-    <div class="row" id="srcRow"><span class="lbl">Источник</span></div>
-    <div class="row"><span class="lbl">Раздел</span><select id="secSel"></select></div>
-    <div class="row" id="tagRow"><span class="lbl">Тема</span></div>
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-label">Тест по ограничениям</div>
+  <div class="home-title">RRJ-95 Limits</div>
+  <div class="seg" id="srcSeg"></div>
+  <select class="scope" id="scope"></select>
+  <div class="stats">
+    <div class="stat"><b id="stTotal">0</b><span>вопросов</span></div>
+    <div class="stat"><b id="stBest">—</b><span>лучший результат</span></div>
+    <div class="stat"><b id="stWeak">0</b><span>слабых карточек</span></div>
   </div>
-
-  <main id="view"></main>
+  <div class="menu" id="menu"></div>
 </div>
 
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="top">
+    <button class="x" onclick="go('home')" title="На главную">×</button>
+    <span class="count" id="qCount"></span>
+    <span class="tag" id="qTag"></span>
+  </div>
+  <div class="bar"><i id="qBar"></i></div>
+  <div id="qBody"></div>
+</div>
+
+<!-- CARDS -->
+<div id="cards" class="screen">
+  <div class="top">
+    <button class="x" onclick="go('home')" title="На главную">×</button>
+    <span class="count" id="cCount"></span>
+    <span class="tag" id="cTag"></span>
+  </div>
+  <div class="bar"><i id="cBar"></i></div>
+  <div id="cBody"></div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <div class="res-wrap">
+    <div class="home-label">Результат</div>
+    <div class="res-score" id="rScore"></div>
+    <div class="res-pct" id="rPct"></div>
+    <div class="res-comment" id="rComment"></div>
+    <div class="menu" id="rMenu"></div>
+  </div>
+</div>
+
+<!-- REFERENCE -->
+<div id="ref" class="screen">
+  <div class="top">
+    <button class="x" onclick="go('home')" title="На главную">×</button>
+    <span class="count">Шпаргалка</span>
+    <span class="tag" id="refTag"></span>
+  </div>
+  <div class="ref" id="refBody"></div>
+</div>
+
+</div>
 <script>
 /* ============================================================
-   ДАННЫЕ
-   Группа: {id, sec, title, tags, items}
-   Пункт: [вопрос, ответ, опции?]
-     ответ — строка или V(b, lr) / объект {метка: ответ} для вариантов
-     опции: {k:[ключевые слова]} — проверка по словам
-            {self:true}          — самопроверка
-            {n:"примечание"}
-   Проверка по умолчанию — по числам в ответе.
+   ДАННЫЕ (см. limitations.md и источники в ref/s)
    ============================================================ */
 const V = (b, lr) => ({ 'RRJ-95B': b, 'RRJ-95LR': lr });
 const GEAR = (a, b) => ({ 'RRJ-95B / 95LR': a, '95105, 95179': b });
@@ -774,19 +810,18 @@ const store = {
   set(k, v){ try{ localStorage.setItem('rrj95:'+k, JSON.stringify(v)); }catch(e){} }
 };
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.random()*(i+1)|0; [a[i],a[j]] = [a[j],a[i]]; } return a; };
+const touch = window.matchMedia('(pointer: coarse)').matches;
 
-// разворачиваем пункты в плоский список
 const ITEMS = [];
 GROUPS.forEach(g => g.items.forEach((it, i) => {
   const [q, a, o = {}] = it;
-  ITEMS.push({ id: g.id + ':' + i, g, q, a, o, raw: it });
+  ITEMS.push({ id: g.id + ':' + i, g, q, a, o });
 }));
 
 /* --- проверка ответа --- */
 function nums(s){
-  s = String(s).replace(/,/g, '.').replace(/[−–—]/g, m => m);
-  const out = [];
-  const re = /(\d{1,3}(?:[  ]\d{3})+|\d+)(?:\.(\d+))?/g;
+  s = String(s).replace(/,/g, '.');
+  const out = [], re = /(\d{1,3}(?:[  ]\d{3})+|\d+)(?:\.(\d+))?/g;
   let m;
   while ((m = re.exec(s))){
     let v = parseFloat(m[1].replace(/[  ]/g, '') + (m[2] ? '.' + m[2] : ''));
@@ -797,7 +832,6 @@ function nums(s){
   return out;
 }
 const norm = s => String(s).toLowerCase().replace(/ё/g,'е').replace(/[\s.,;:()'"«»]/g,'');
-
 function check(expected, input, o){
   input = String(input || '').trim();
   if (!input) return 'bad';
@@ -807,282 +841,363 @@ function check(expected, input, o){
   if (!e.length) return norm(input) === norm(expected) ? 'ok' : 'self';
   const g = nums(input);
   if (g.length !== e.length) return 'bad';
-  // знак минус обязателен для отрицательных значений; лишний «–» перед положительным
-  // числом прощаем (это обычно тире диапазона: «1800 - 3200»)
+  // минус обязателен для отрицательных; лишний «–» перед положительным прощаем (тире диапазона)
   return e.every((v, i) => Math.abs(v - g[i]) < 1e-9 || (v > 0 && Math.abs(v + g[i]) < 1e-9)) ? 'ok' : 'bad';
+}
+const numeric = (a, o) => !o.k && !o.self && nums(a).length > 0;
+const secLabel = g => g.src === 'fcom' ? 'FCOM ' + g.sec.replace(/^02/, '1.02') : g.sec;
+const srcOf = (g, o) => o.s || g.ref || secLabel(g);
+const ansText = a => typeof a === 'object' ? Object.entries(a).map(([k, v]) => `${k}: ${v}`).join(' · ') : a;
+
+/* ============================================================
+   ФИЛЬТР: источник + тема/раздел
+   ============================================================ */
+const SRC = { fcom:'FCOM 1.02', ext:'SOP и РПП', all:'Все' };
+const state = { src: store.get('src', 'fcom'), scope: store.get('scope', 'all') };
+const inSrc = g => state.src === 'all' || g.src === state.src;
+function inScope(g, raw){
+  const [kind, val] = state.scope.split(':');
+  if (kind === 'sec') return g.sec === val;
+  if (kind === 'tag') return g.tags.includes(val) || ((raw[2] || {}).t || []).includes(val);
+  return true;
+}
+const itemsOf = g => g.items.filter(r => inScope(g, r));
+const scopeGroups = () => GROUPS.filter(g => inSrc(g) && itemsOf(g).length);
+const scopeItems = () => ITEMS.filter(it => inSrc(it.g) && inScope(it.g, [it.q, it.a, it.o]));
+const scopeName = () => {
+  const [kind, val] = state.scope.split(':');
+  if (kind === 'tag') return TAGS[val];
+  if (kind === 'sec') return val + ' ' + SECTIONS[val];
+  return 'Все темы';
+};
+const scopeKey = () => state.src + '|' + state.scope;
+
+/* слабые карточки — как в старой версии: ошибка +1, верный ответ −1 */
+let weak = store.get('weak', {});
+const weakItems = () => scopeItems().filter(it => weak[it.id] > 0);
+function record(it, ok){
+  if (!ok) weak[it.id] = (weak[it.id] || 0) + 1;
+  else if (weak[it.id] > 0 && !session.missed.has(it.id)){ weak[it.id]--; if (weak[it.id] <= 0) delete weak[it.id]; }
+  if (!ok) session.missed.add(it.id);
+  store.set('weak', weak);
 }
 
 /* ============================================================
-   СОСТОЯНИЕ И ФИЛЬТРЫ
+   НАВИГАЦИЯ И ГЛАВНЫЙ ЭКРАН
    ============================================================ */
-const state = {
-  tab: store.get('tab', 'cards'),
-  sec: store.get('sec', 'all'),
-  tag: store.get('tag', null),
-  src: store.get('src', 'fcom'),
-};
-const SRC = { fcom:'FCOM 1.02', ext:'SOP, РПП, системы', all:'Все' };
-const inSrc = g => state.src === 'all' || g.src === state.src;
-// источник пункта для подписи; ⚠ — значение не найдено в документах
-const srcOf = (g, o) => (o.s || g.ref || (g.src === 'fcom' ? 'FCOM ' + g.sec.replace(/^02/, '1.02') : ''));
-const srcHTML = (g, o) => { const s = srcOf(g, o); return (s ? `<span class="src">${esc(s)}</span>` : '') + (o.u ? ' <span class="unv" title="В документах не найдено — проверьте">⚠ не подтверждено</span>' : ''); };
-// пункт попадает в тему, если тег стоит на группе или на самом пункте (опция t)
-const inTag = (g, it) => !state.tag || g.tags.includes(state.tag) || ((it[2] || {}).t || []).includes(state.tag);
-const itemsOf = g => g.items.filter(it => inTag(g, it));
-function scopeGroups(){
-  return GROUPS.filter(g => inSrc(g) && (state.sec === 'all' || g.sec === state.sec) && itemsOf(g).length);
-}
-function scopeItems(){
-  return ITEMS.filter(it => inSrc(it.g) && (state.sec === 'all' || it.g.sec === state.sec) && inTag(it.g, it.raw));
+function go(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  window.scrollTo(0, 0);
+  if (id === 'home') renderHome();
 }
 
-function renderFilters(){
-  const srow = $('#srcRow');
-  srow.querySelectorAll('.chip').forEach(c => c.remove());
-  Object.entries(SRC).forEach(([k, v]) => {
-    const b = document.createElement('button');
-    b.className = 'chip' + (state.src === k ? ' on' : '');
-    b.textContent = v;
-    b.onclick = () => { state.src = k; store.set('src', k); renderFilters(); rerender(); };
-    srow.appendChild(b);
+function renderHome(){
+  $('#srcSeg').innerHTML = Object.entries(SRC).map(([k, v]) =>
+    `<button class="${state.src === k ? 'on' : ''}" onclick="setSrc('${k}')">${v}</button>`).join('');
+
+  const groups = GROUPS.filter(inSrc);
+  const tags = Object.keys(TAGS).filter(t => groups.some(g => g.tags.includes(t) || g.items.some(r => ((r[2] || {}).t || []).includes(t))));
+  const secs = [...new Set(groups.map(g => g.sec))];
+  if (!(state.scope === 'all' || tags.includes(state.scope.slice(4)) || secs.includes(state.scope.slice(4)))) state.scope = 'all';
+  $('#scope').innerHTML = '<option value="all">Все темы</option>' +
+    '<optgroup label="Темы">' + tags.map(t => `<option value="tag:${t}">${TAGS[t]}</option>`).join('') + '</optgroup>' +
+    '<optgroup label="Разделы">' + secs.map(s => `<option value="sec:${s}">${s} ${esc(SECTIONS[s])}</option>`).join('') + '</optgroup>';
+  $('#scope').value = state.scope;
+  $('#scope').onchange = e => { state.scope = e.target.value; store.set('scope', state.scope); renderHome(); };
+
+  const items = scopeItems(), nWeak = weakItems().length, best = store.get('best', {})[scopeKey()];
+  $('#stTotal').textContent = items.length;
+  $('#stBest').textContent = best != null ? best + '%' : '—';
+  $('#stWeak').textContent = nWeak;
+
+  const fillLabel = state.scope === 'all' ? 'Вписать по группам' : 'Вписать всё: ' + scopeName();
+  $('#menu').innerHTML = `
+    <button class="primary" onclick="startQuiz(10)"><i>▶</i> 10 случайных вопросов <em>›</em></button>
+    <button onclick="startQuiz(20)"><i>▶</i> 20 вопросов <em>›</em></button>
+    <button onclick="startQuiz(null)"><i>▶▶</i> Все вопросы <em>›</em></button>
+    ${nWeak ? `<button onclick="startWeak()"><i>↺</i> Слабые карточки (${nWeak}) <em>›</em></button>` : ''}
+    <div class="sep"></div>
+    <button onclick="startCards()"><i>▢</i> Карточки <em>›</em></button>
+    <button onclick="startFill()"><i>✎</i> ${esc(fillLabel)} <em>›</em></button>
+    <button onclick="showRef()"><i>☰</i> Шпаргалка <em>›</em></button>`;
+}
+function setSrc(k){ state.src = k; store.set('src', k); renderHome(); }
+
+/* ============================================================
+   ТЕСТ: по одному заданию на экран
+   задание: {kind:'item'|'choice', it}  или  {kind:'group', title, parts:[{g, rows}]}
+   ============================================================ */
+let session = { tasks: [], i: 0, ok: 0, total: 0, missed: new Set(), last: null };
+
+function unitOf(a){ return typeof a === 'string' ? a.replace(/[−–-]?\d[\d\s.,]*/g, '#').replace(/\s+/g, ' ').trim() : null; }
+function choicesFor(it){
+  if (typeof it.a !== 'string' || nums(it.a).length !== 1 || it.o.k || it.o.self) return null;
+  const u = unitOf(it.a), v = nums(it.a)[0];
+  const pool = shuffle(ITEMS.filter(x => typeof x.a === 'string' && unitOf(x.a) === u && nums(x.a).length === 1 && nums(x.a)[0] !== v));
+  const same = pool.filter(x => x.g.sec === it.g.sec), opts = [];
+  for (const x of [...same, ...pool]) if (!opts.some(y => nums(y)[0] === nums(x.a)[0])) { opts.push(x.a); if (opts.length === 3) break; }
+  return opts.length === 3 ? shuffle([it.a, ...opts]) : null;
+}
+
+function begin(tasks){
+  session = { tasks, i: 0, ok: 0, total: 0, missed: new Set(), last: tasks };
+  if (!tasks.length){ alert('Нет вопросов для выбранного фильтра'); return; }
+  go('quiz'); renderTask();
+}
+function itemTasks(items){
+  return items.map(it => { const c = Math.random() < 0.35 ? choicesFor(it) : null; return c ? { kind:'choice', it, opts:c } : { kind:'item', it }; });
+}
+function startQuiz(n){
+  const items = scopeItems(), w = shuffle(items.filter(it => weak[it.id] > 0)), rest = shuffle(items.filter(it => !(weak[it.id] > 0)));
+  const pick = n ? shuffle([...w, ...rest].slice(0, n)) : shuffle(items);
+  begin(itemTasks(pick));
+}
+function startWeak(){ begin(itemTasks(shuffle(weakItems()))); }
+function startFill(){
+  const groups = scopeGroups();
+  const tasks = state.scope === 'all'
+    ? shuffle(groups).map(g => ({ kind:'group', title: g.title, parts:[{ g, rows: itemsOf(g) }] }))
+    : [{ kind:'group', title: 'Впишите всё: ' + scopeName(), parts: groups.map(g => ({ g, rows: itemsOf(g) })) }];
+  begin(tasks);
+}
+
+function fieldsHTML(a, o, id){
+  const vars = typeof a === 'object' ? Object.entries(a) : [[null, a]];
+  return vars.map(([lab, ans], j) => {
+    const num = numeric(ans, o);
+    return `<div class="field" data-id="${id}" data-j="${j}">${lab ? `<label>${esc(lab)}</label>` : ''}
+      <input autocomplete="off" spellcheck="false" ${num && touch ? 'inputmode="none"' : ''} data-num="${num ? 1 : 0}"><div class="res"></div></div>`;
+  }).join('');
+}
+
+function renderTask(){
+  const t = session.tasks[session.i], n = session.tasks.length;
+  $('#qCount').textContent = `${session.i + 1} / ${n}`;
+  $('#qBar').style.width = (session.i / n * 100) + '%';
+  let html = '';
+  if (t.kind === 'group'){
+    $('#qTag').textContent = t.parts.length > 1 ? scopeName() : t.parts[0].g.sec;
+    html += `<p class="qtext">${esc(t.title)}</p>`;
+    t.parts.forEach((p, pi) => {
+      if (t.parts.length > 1) html += `<div class="gh">${esc(p.g.title)}</div>`;
+      p.rows.forEach((r, ri) => {
+        html += `<div class="grow"><div class="gl">${esc(r[0])}</div>${fieldsHTML(r[1], r[2] || {}, pi + '.' + ri)}</div>`;
+      });
+    });
+    html += `<div class="fb" id="fb"></div><div id="act"><button class="btn" onclick="checkTask()">Проверить</button></div>`;
+  } else {
+    const it = t.it;
+    $('#qTag').textContent = it.g.sec + ' · ' + it.g.title;
+    html += `<p class="qtext">${esc(it.q)}</p><p class="qsub">${esc(it.g.title)}</p>`;
+    if (t.kind === 'choice') html += t.opts.map((o, i) => `<button class="opt" onclick="pickChoice(${i})">${esc(o)}</button>`).join('');
+    else html += fieldsHTML(it.a, it.o, 'x');
+    html += `<div class="fb" id="fb"></div><div id="act">${t.kind === 'choice' ? '' : '<button class="btn" onclick="checkTask()">Проверить</button>'}</div>`;
+  }
+  html += `<div class="kp" id="kp">${['1','2','3','⌫','4','5','6','−','7','8','9','/','.','0','→','✓'].map(k =>
+    `<button type="button" class="${k === '✓' ? 'act' : ''}" onmousedown="event.preventDefault()" onclick="kp('${k}')">${k}</button>`).join('')}</div>`;
+  $('#qBody').innerHTML = html;
+  const inputs = [...document.querySelectorAll('#qBody input')];
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('focus', () => { kpTarget = inp; $('#kp').classList.toggle('on', touch && inp.dataset.num === '1'); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); if (inputs[i + 1] && !checked) inputs[i + 1].focus(); else enter(); } });
   });
-  const secs = [...new Set(GROUPS.filter(inSrc).map(g => g.sec))];
-  if (state.sec !== 'all' && !secs.includes(state.sec)){ state.sec = 'all'; store.set('sec', 'all'); }
-  const sel = $('#secSel');
-  sel.innerHTML = '<option value="all">Все разделы</option>' +
-    secs.map(k => `<option value="${k}">${k} ${esc(SECTIONS[k])}</option>`).join('');
-  sel.value = state.sec;
-  sel.onchange = () => { state.sec = sel.value; store.set('sec', state.sec); rerender(); };
-  const row = $('#tagRow');
-  row.querySelectorAll('.chip').forEach(c => c.remove());
-  const mk = (key, label) => {
-    const b = document.createElement('button');
-    b.className = 'chip' + (state.tag === key ? ' on' : '');
-    b.textContent = label;
-    b.onclick = () => { state.tag = state.tag === key ? null : key; store.set('tag', state.tag); renderFilters(); rerender(); };
-    row.appendChild(b);
-  };
-  Object.entries(TAGS).forEach(([k, v]) => mk(k, v));
+  checked = false; kpTarget = inputs[0] || null;
+  if (inputs[0]) inputs[0].focus({ preventScroll: true });
 }
 
-function renderTabs(){
-  document.querySelectorAll('#tabs button').forEach(b => {
-    b.classList.toggle('on', b.dataset.tab === state.tab);
-    b.onclick = () => { state.tab = b.dataset.tab; store.set('tab', state.tab); renderTabs(); rerender(); };
-  });
+/* экранная клавиатура (на телефоне, для числовых ответов — есть минус) */
+let kpTarget = null, checked = false;
+function kp(k){
+  if (k === '✓'){ enter(); return; }
+  if (!kpTarget) return;
+  if (k === '→'){ const ins = [...document.querySelectorAll('#qBody input')]; const nx = ins[ins.indexOf(kpTarget) + 1]; if (nx) nx.focus(); return; }
+  if (k === '⌫') kpTarget.value = kpTarget.value.slice(0, -1);
+  else kpTarget.value += (k === '−' ? '-' : k === '/' ? ' / ' : k);
+}
+function enter(){ if (checked === 'self') return; if (!checked) checkTask(); else next(); }
+
+function showFb(cls, html){ const fb = $('#fb'); fb.className = 'fb show ' + cls; fb.innerHTML = html; }
+function nextBtn(){ $('#act').innerHTML = `<button class="btn" onclick="next()">${session.i + 1 < session.tasks.length ? 'Далее →' : 'Результат →'}</button>`; $('#kp').classList.remove('on'); }
+const meta = (g, o) => `${o.n ? `<small>${esc(o.n)}</small>` : ''}<small>Источник: ${esc(srcOf(g, o))}${o.u ? ' · <span class="unv">⚠ не подтверждено</span>' : ''}</small>`;
+
+function pickChoice(i){
+  if (checked) return;
+  const t = session.tasks[session.i], ok = t.opts[i] === t.it.a;
+  document.querySelectorAll('.opt').forEach((b, j) => { if (t.opts[j] === t.it.a) b.classList.add('ok'); else if (j === i) b.classList.add('bad'); });
+  checked = true; session.total++; if (ok) session.ok++; record(t.it, ok);
+  showFb(ok ? 'ok' : 'bad', (ok ? 'Верно' : 'Неверно') + meta(t.it.g, t.it.o));
+  nextBtn();
 }
 
-function rerender(){
-  if (state.tab === 'cards') Cards.start();
-  else if (state.tab === 'fill') Fill.start();
-  else Ref.render();
+function checkTask(){
+  if (checked) return;
+  const t = session.tasks[session.i];
+  checked = true;
+  if (t.kind === 'group'){
+    let ok = 0, total = 0;
+    const rowsOk = [];
+    t.parts.forEach((p, pi) => p.rows.forEach((r, ri) => {
+      const [, a, o = {}] = r, vars = typeof a === 'object' ? Object.values(a) : [a];
+      let rowOk = true;
+      vars.forEach((ans, j) => {
+        const box = document.querySelector(`.field[data-id="${pi}.${ri}"][data-j="${j}"]`);
+        const res = check(ans, box.querySelector('input').value, o);
+        markField(box, res, ans, () => updateGroupScore());
+        if (res !== 'ok') rowOk = false;
+      });
+      if (o.n) box_note(pi, ri, o.n);
+      rowsOk.push({ g: p.g, i: p.g.items.indexOf(r) });
+    }));
+    t.rowsOk = rowsOk;
+    updateGroupScore();
+    nextBtn();
+    return;
+  }
+  const it = t.it, vars = typeof it.a === 'object' ? Object.values(it.a) : [it.a];
+  const res = vars.map((ans, j) => { const box = document.querySelector(`.field[data-j="${j}"]`); const r = check(ans, box.querySelector('input').value, it.o); markField(box, r, ans, null); return r; });
+  if (res.includes('self')){
+    showFb('self', `Сверьте ответ: <span class="ans">${esc(ansText(it.a))}</span>
+      <button class="lnk" onclick="selfMark(true)">верно</button><button class="lnk" onclick="selfMark(false)">неверно</button>${meta(it.g, it.o)}`);
+    checked = 'self'; $('#act').innerHTML = ''; $('#kp').classList.remove('on');
+    return;
+  }
+  const ok = res.every(r => r === 'ok');
+  finishItem(ok);
+}
+function finishItem(ok){
+  const it = session.tasks[session.i].it;
+  session.total++; if (ok) session.ok++; record(it, ok);
+  showFb(ok ? 'ok' : 'bad', (ok ? 'Верно' : `Правильно: <span class="ans">${esc(ansText(it.a))}</span>
+    <button class="lnk" onclick="override()">засчитать</button>`) + meta(it.g, it.o));
+  nextBtn();
+}
+function selfMark(ok){ finishItem(ok); }
+function override(){
+  const it = session.tasks[session.i].it;
+  session.ok++; session.missed.delete(it.id);
+  if (weak[it.id] > 0){ weak[it.id]--; if (weak[it.id] <= 0) delete weak[it.id]; store.set('weak', weak); }
+  showFb('ok', 'Засчитано' + meta(it.g, it.o));
+}
+function markField(box, res, ans, onChange){
+  box.classList.remove('ok', 'bad', 'self'); box.classList.add(res); box.dataset.res = res;
+  const r = box.querySelector('.res');
+  if (res === 'ok') r.textContent = '✓ ' + ans;
+  else {
+    r.innerHTML = (res === 'bad' ? '✗ ' : 'Сверьте: ') + esc(ans) + (onChange ? ` <button class="lnk" style="color:inherit">${res === 'bad' ? 'засчитать' : 'верно'}</button>` : '');
+    const b = r.querySelector('button');
+    if (b) b.onclick = () => { box.classList.remove('bad', 'self'); box.classList.add('ok'); box.dataset.res = 'ok'; r.textContent = '✓ ' + ans; onChange(); };
+  }
+}
+function box_note(pi, ri, n){
+  const row = document.querySelector(`.field[data-id="${pi}.${ri}"]`).parentElement;
+  if (!row.querySelector('.gn')) row.insertAdjacentHTML('beforeend', `<div class="gn" style="font-size:13px;color:var(--warn)">${esc(n)}</div>`);
+}
+function updateGroupScore(){
+  const boxes = [...document.querySelectorAll('#qBody .field')];
+  const ok = boxes.filter(b => b.dataset.res === 'ok').length;
+  showFb(ok === boxes.length ? 'ok' : 'bad', `${ok} из ${boxes.length} верно`);
+}
+function next(){
+  const t = session.tasks[session.i];
+  if (t.kind === 'group'){
+    // каждый пункт группы учитывается как отдельный ответ (и в слабых карточках)
+    t.parts.forEach((p, pi) => p.rows.forEach((r, ri) => {
+      const boxes = [...document.querySelectorAll(`.field[data-id="${pi}.${ri}"]`)];
+      const ok = boxes.every(b => b.dataset.res === 'ok');
+      const it = ITEMS.find(x => x.g === p.g && x.q === r[0]);
+      session.total++; if (ok) session.ok++; if (it) record(it, ok);
+    }));
+  }
+  session.i++;
+  if (session.i < session.tasks.length) renderTask(); else showResult();
 }
 
-function answerHTML(a, cls = 'v'){
-  if (typeof a !== 'object') return esc(a);
-  return Object.entries(a).map(([k, v]) => `<div class="${cls}"><span>${esc(k)}</span>${esc(v)}</div>`).join('');
+function showResult(){
+  const pct = session.total ? Math.round(session.ok / session.total * 100) : 0;
+  const bests = store.get('best', {}), k = scopeKey();
+  if (bests[k] == null || pct > bests[k]){ bests[k] = pct; store.set('best', bests); }
+  $('#rScore').textContent = `${session.ok} / ${session.total}`;
+  $('#rPct').textContent = pct + '%';
+  $('#rComment').textContent = pct >= 90 ? 'Отлично!' : pct >= 70 ? 'Хорошо, но есть что повторить.' : 'Стоит повторить — ошибки ушли в слабые карточки.';
+  const missed = ITEMS.filter(it => session.missed.has(it.id));
+  $('#rMenu').innerHTML = `
+    <button class="primary" onclick="begin(session.last.map(t => t))"><i>↺</i> Ещё раз <em>›</em></button>
+    ${missed.length ? `<button onclick='begin(itemTasks(shuffle(ITEMS.filter(it => ${JSON.stringify([...session.missed])}.includes(it.id)))))'><i>✗</i> Повторить ошибки (${missed.length}) <em>›</em></button>` : ''}
+    <button onclick="go('home')"><i>⌂</i> На главную <em>›</em></button>`;
+  go('result');
 }
 
 /* ============================================================
    КАРТОЧКИ
    ============================================================ */
-const Cards = {
-  start(){
-    const known = store.get('known', {});
-    let items = scopeItems();
-    this.onlyNew = store.get('onlyNew', false);
-    if (this.onlyNew) items = items.filter(it => !known[it.id]);
-    this.queue = shuffle(items);
-    this.total = this.queue.length;
-    this.ok = 0; this.miss = 0; this.missed = [];
-    this.render();
-  },
-  render(){
-    const v = $('#view');
-    const known = store.get('known', {});
-    const scope = scopeItems();
-    const learned = scope.filter(it => known[it.id]).length;
-    const top = `<div class="row" style="justify-content:space-between;margin-bottom:6px">
-      <span class="muted" style="font-size:13px">Выучено ${learned} из ${scope.length}</span>
-      <span class="row">
-        <button class="chip ${this.onlyNew ? 'on' : ''}" id="onlyNew">Только невыученные</button>
-        <button class="chip" id="resetKnown">Сбросить</button>
-      </span></div>`;
-    if (!this.queue.length){
-      v.innerHTML = top + `<div class="panel done">
-        <h2>${this.total ? 'Колода пройдена' : 'Карточек нет'}</h2>
-        <p class="muted">${this.total ? `Знал: ${this.ok} · Не знал: ${this.miss}` : 'Измените фильтр раздела или темы.'}</p>
-        <div class="row" style="justify-content:center">
-          ${this.missed.length ? '<button class="btn primary" id="again">Повторить невыученные</button>' : ''}
-          <button class="btn" id="restart">Начать заново</button>
-        </div></div>`;
-      $('#again') && ($('#again').onclick = () => { this.queue = shuffle(this.missed); this.total = this.queue.length; this.ok = this.miss = 0; this.missed = []; this.render(); });
-      $('#restart').onclick = () => this.start();
-      this.bindTop();
-      return;
-    }
-    const it = this.queue[0];
-    const done = this.total - this.queue.length;
-    v.innerHTML = top + `
-      <div class="progress"><i style="width:${done / this.total * 100}%"></i></div>
-      <div class="card" id="card"><div class="card-in">
-        <div class="face front">
-          <div><span class="sec">${it.g.sec}</span> <span class="grp">${esc(it.g.title)}</span></div>
-          <div class="q">${esc(it.q)}</div>
-          <div class="hint">${srcHTML(it.g, it.o)}</div>
-          <div class="hint">Нажмите или <kbd>Пробел</kbd>, чтобы перевернуть</div>
-        </div>
-        <div class="face back">
-          <div><span class="sec">${it.g.sec}</span> <span class="grp">${esc(it.q)}</span></div>
-          <div class="a">${answerHTML(it.a)}</div>
-          ${it.o.n ? `<div class="note">${esc(it.o.n)}</div>` : ''}
-          <div class="hint">${srcHTML(it.g, it.o)}</div>
-        </div>
-      </div></div>
-      <div class="cardbar">
-        <button class="btn bad" id="no">Не знаю <kbd>1</kbd></button>
-        <button class="btn ok" id="yes">Знаю <kbd>2</kbd></button>
-      </div>
-      <div class="counts"><span>Осталось: ${this.queue.length}</span><span>Знал: ${this.ok}</span><span>Не знал: ${this.miss}</span></div>`;
-    $('#card').onclick = () => $('#card').classList.toggle('flip');
-    $('#yes').onclick = () => this.mark(true);
-    $('#no').onclick = () => this.mark(false);
-    this.bindTop();
-  },
-  bindTop(){
-    $('#onlyNew').onclick = () => { store.set('onlyNew', !this.onlyNew); this.start(); };
-    $('#resetKnown').onclick = () => { if (confirm('Сбросить отметки «выучено»?')){ store.set('known', {}); this.start(); } };
-  },
-  mark(knew){
-    const it = this.queue.shift();
-    const known = store.get('known', {});
-    if (knew){ this.ok++; known[it.id] = 1; }
-    else {
-      this.miss++; delete known[it.id];
-      if (!this.missed.includes(it)) this.missed.push(it);
-      // вернуть карточку в колоду через несколько позиций
-      this.queue.splice(Math.min(this.queue.length, 4 + (Math.random() * 3 | 0)), 0, it);
-      this.total++;
-    }
-    store.set('known', known);
-    this.render();
-  },
-  key(e){
-    if (!$('#card')) return;
-    if (e.code === 'Space'){ e.preventDefault(); $('#card').classList.toggle('flip'); }
-    else if (e.key === '1') this.mark(false);
-    else if (e.key === '2') this.mark(true);
+let deck = { q: [], total: 0, ok: 0, miss: 0 };
+function startCards(){
+  const items = shuffle(scopeItems());
+  if (!items.length){ alert('Нет карточек для выбранного фильтра'); return; }
+  deck = { q: items, total: items.length, ok: 0, miss: 0 };
+  session.missed = new Set();
+  go('cards'); renderCard();
+}
+function renderCard(){
+  $('#cTag').textContent = scopeName();
+  if (!deck.q.length){
+    $('#cCount').textContent = 'Готово';
+    $('#cBar').style.width = '100%';
+    $('#cBody').innerHTML = `<div class="res-wrap" style="padding-top:20px"><div class="res-score" style="font-size:40px">${deck.ok} / ${deck.ok + deck.miss}</div>
+      <div class="res-pct">знал / всего ответов</div><div class="menu" style="margin-top:24px">
+      <button class="primary" onclick="startCards()"><i>↺</i> Ещё раз <em>›</em></button>
+      <button onclick="go('home')"><i>⌂</i> На главную <em>›</em></button></div></div>`;
+    return;
   }
-};
-
-/* ============================================================
-   ПОДСТАНОВКА
-   ============================================================ */
-const Fill = {
-  start(){
-    const groups = scopeGroups();
-    const v = $('#view');
-    if (!groups.length){ v.innerHTML = '<div class="panel done"><h2>Нет вопросов</h2><p class="muted">Измените фильтр.</p></div>'; return; }
-    const opts = [];
-    if (state.tag) opts.push(`<option value="__tag">Все: ${esc(TAGS[state.tag])}${state.sec !== 'all' ? ' · ' + state.sec : ''} (${scopeItems().length})</option>`);
-    else if (state.sec !== 'all') opts.push(`<option value="__tag">Весь раздел ${state.sec} (${scopeItems().length})</option>`);
-    groups.forEach(g => opts.push(`<option value="${g.id}">${g.sec} · ${esc(g.title)} (${itemsOf(g).length})</option>`));
-    if (!this.choice || !(this.choice === '__tag' ? (state.tag || state.sec !== 'all') : groups.some(g => g.id === this.choice)))
-      this.choice = (state.tag || state.sec !== 'all') ? '__tag' : groups[0].id;
-    v.innerHTML = `<div class="panel fill">
-      <div class="row" style="margin-bottom:6px">
-        <select id="grpSel" style="flex:1;min-width:0">${opts.join('')}</select>
-        <button class="btn" id="rnd" title="Случайная группа">Случайная</button>
-      </div>
-      <div id="form"></div></div>`;
-    $('#grpSel').value = this.choice;
-    $('#grpSel').onchange = e => { this.choice = e.target.value; this.renderForm(); };
-    $('#rnd').onclick = () => { const g = groups[Math.random() * groups.length | 0]; this.choice = g.id; $('#grpSel').value = g.id; this.renderForm(); };
-    this.renderForm();
-  },
-  renderForm(){
-    const groups = this.choice === '__tag' ? scopeGroups() : GROUPS.filter(g => g.id === this.choice);
-    const multi = groups.length > 1;
-    const title = multi ? ($('#grpSel').selectedOptions[0].textContent.replace(/\s*\(\d+\)$/, '')) : groups[0].title;
-    this.fields = [];
-    let html = `<h2>${esc(title)}</h2><p class="muted" style="margin:0 0 6px;font-size:13px">Впишите значения. Единицы можно не писать. <kbd>Enter</kbd> — следующее поле.</p>`;
-    groups.forEach(g => {
-      if (multi) html += `<h3>${g.sec} · ${esc(g.title)}</h3>`;
-      if (g.ref || g.src === 'fcom') html += `<div class="src" style="margin:${multi ? '-2px 0 4px' : '0 0 6px'}">Источник: ${esc(g.ref || 'FCOM ' + g.sec.replace(/^02/, '1.02'))}</div>`;
-      itemsOf(g).forEach(it => {
-        const [q, a, o = {}] = it;
-        const vars = typeof a === 'object' ? Object.entries(a) : [[null, a]];
-        html += `<div class="fi"><div class="l">${esc(q)}${o.s || o.u ? '<br>' + srcHTML({}, o) : ''}</div><div class="ins">`;
-        vars.forEach(([lab, ans]) => {
-          const fid = 'f' + this.fields.length;
-          this.fields.push({ fid, ans, o });
-          html += `<div class="inp" id="${fid}">${lab ? `<label>${esc(lab)}</label>` : ''}<input autocomplete="off" spellcheck="false" inputmode="text"><div class="res"></div></div>`;
-        });
-        html += `</div>${o.n ? `<div class="nt" hidden>${esc(o.n)}</div>` : ''}</div>`;
-      });
-    });
-    html += `<div class="score" id="score"><button class="btn primary" id="chk">Проверить</button><button class="btn" id="clr">Очистить</button><span id="sc"></span></div>`;
-    $('#form').innerHTML = html;
-    const inputs = [...document.querySelectorAll('#form input')];
-    inputs.forEach((inp, i) => inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter'){ e.preventDefault(); if (inputs[i + 1]) inputs[i + 1].focus(); else this.check(); }
-    }));
-    $('#chk').onclick = () => this.check();
-    $('#clr').onclick = () => this.renderForm();
-    if (window.matchMedia('(pointer:fine)').matches && inputs[0]) inputs[0].focus();
-  },
-  check(){
-    this.fields.forEach(f => {
-      const box = document.getElementById(f.fid);
-      const val = box.querySelector('input').value;
-      f.res = check(f.ans, val, f.o);
-      box.className = 'inp ' + f.res;
-      const r = box.querySelector('.res');
-      if (f.res === 'ok') r.innerHTML = `✓ ${esc(f.ans)}`;
-      else if (f.res === 'bad') r.innerHTML = `✗ ${esc(f.ans)} <button class="btn small" data-a="ok">засчитать</button>`;
-      else r.innerHTML = `Сверьте: ${esc(f.ans)} <button class="btn small" data-a="ok">верно</button><button class="btn small" data-a="bad">неверно</button>`;
-      r.querySelectorAll('button').forEach(b => b.onclick = () => {
-        f.res = b.dataset.a; box.className = 'inp ' + f.res;
-        r.innerHTML = (f.res === 'ok' ? '✓ ' : '✗ ') + esc(f.ans);
-        this.score();
-      });
-    });
-    document.querySelectorAll('#form .nt').forEach(n => n.hidden = false);
-    this.score();
-  },
-  score(){
-    const ok = this.fields.filter(f => f.res === 'ok').length;
-    const pending = this.fields.filter(f => f.res === 'self').length;
-    $('#sc').innerHTML = `<b>${ok} / ${this.fields.length}</b>` + (pending ? ` <span class="muted">· сверить: ${pending}</span>` : '');
-  }
-};
+  const it = deck.q[0], done = deck.total - deck.q.length;
+  $('#cCount').textContent = `${done + 1} / ${deck.total}`;
+  $('#cBar').style.width = (done / deck.total * 100) + '%';
+  const ans = typeof it.a === 'object'
+    ? Object.entries(it.a).map(([k, v]) => `<div class="v"><span>${esc(k)}</span>${esc(v)}</div>`).join('') : esc(it.a);
+  $('#cBody').innerHTML = `
+    <div class="card" id="card" onclick="this.classList.toggle('flip')"><div class="card-in">
+      <div class="face"><div class="s">${esc(it.g.title)}</div><div class="q">${esc(it.q)}</div><div class="s">нажмите, чтобы перевернуть</div></div>
+      <div class="face back"><div class="s">${esc(it.q)}</div><div class="a">${ans}</div>
+        ${it.o.n ? `<div class="n">${esc(it.o.n)}</div>` : ''}<div class="s">${esc(srcOf(it.g, it.o))}${it.o.u ? ' · <span class="unv">⚠ не подтверждено</span>' : ''}</div></div>
+    </div></div>
+    <div class="row2"><button class="btn ghost" onclick="mark(false)">Не знаю</button><button class="btn" onclick="mark(true)">Знаю</button></div>`;
+}
+function mark(ok){
+  const it = deck.q.shift();
+  record(it, ok);
+  if (ok) deck.ok++;
+  else { deck.miss++; deck.q.splice(Math.min(deck.q.length, 4 + (Math.random() * 3 | 0)), 0, it); deck.total++; }
+  renderCard();
+}
 
 /* ============================================================
    ШПАРГАЛКА
    ============================================================ */
-const Ref = {
-  render(){
-    const groups = scopeGroups();
-    let html = '<div class="panel ref">';
-    let lastSec = null;
-    groups.forEach(g => {
-      if (g.sec !== lastSec){ html += `<h2>${g.sec} ${esc(SECTIONS[g.sec])}</h2>`; lastSec = g.sec; }
-      html += `<h3>${esc(g.title)} <span class="src">· ${esc(g.ref || 'FCOM ' + g.sec.replace(/^02/, '1.02'))}</span></h3><table>`;
-      itemsOf(g).forEach(([q, a, o = {}]) => {
-        const ans = typeof a === 'object'
-          ? Object.entries(a).map(([k, v]) => `<span class="vv"><small>${esc(k)}</small><b>${esc(v)}</b></span>`).join('')
-          : `<b>${esc(a)}</b>`;
-        html += `<tr><td>${esc(q)}${o.s || o.u ? '<br>' + srcHTML({}, o) : ''}</td><td>${ans}${o.n ? `<span class="n">${esc(o.n)}</span>` : ''}</td></tr>`;
-      });
-      html += '</table>';
+function showRef(){
+  $('#refTag').textContent = SRC[state.src] + ' · ' + scopeName();
+  let html = '', last = null;
+  scopeGroups().forEach(g => {
+    if (g.sec !== last){ html += `<h2>${g.sec} ${esc(SECTIONS[g.sec])}</h2>`; last = g.sec; }
+    html += `<h3>${esc(g.title)} · ${esc(g.ref || secLabel(g))}</h3><table>`;
+    itemsOf(g).forEach(([q, a, o = {}]) => {
+      const v = typeof a === 'object' ? Object.entries(a).map(([k, x]) => `<span class="vv"><span>${esc(k)}</span>${esc(x)}</span>`).join('') : esc(a);
+      html += `<tr><td>${esc(q)}${o.u ? ' <span class="unv">⚠</span>' : ''}</td><td>${v}${o.n ? `<small>${esc(o.n)}</small>` : ''}</td></tr>`;
     });
-    if (!groups.length) html += '<p class="muted">Нет данных для выбранного фильтра.</p>';
-    $('#view').innerHTML = html + '</div>';
-  }
-};
+    html += '</table>';
+  });
+  $('#refBody').innerHTML = html || '<p>Нет данных.</p>';
+  go('ref');
+}
 
-document.addEventListener('keydown', e => { if (state.tab === 'cards' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') Cards.key(e); });
-renderTabs(); renderFilters(); rerender();
+/* клавиши: карточки — пробел/1/2; тест — Enter */
+document.addEventListener('keydown', e => {
+  if (!$('#cards').classList.contains('active') || !$('#card')) return;
+  if (e.code === 'Space'){ e.preventDefault(); $('#card').classList.toggle('flip'); }
+  else if (e.key === '1') mark(false);
+  else if (e.key === '2') mark(true);
+});
+
+renderHome();
 </script>
 </body>
 </html>
