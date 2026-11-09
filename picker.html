@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Отбор вопросов</title>
+<style>
+:root{
+  --bg:#ffffff; --bg2:#f4f4f2; --line:#d6d6d3; --text:#1a1a1a; --muted:#6b6b68;
+  --primary:#1a1a1a; --on-primary:#ffffff; --star:#b07800; --sel:#eef4ec; --sel-line:#1d7a46;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141414; --bg2:#202020; --line:#363636; --text:#ececea; --muted:#9a9a96;
+    --primary:#ececea; --on-primary:#141414; --star:#f0c060; --sel:#16261b; --sel-line:#5cc98a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141414; --bg2:#202020; --line:#363636; --text:#ececea; --muted:#9a9a96;
+  --primary:#ececea; --on-primary:#141414; --star:#f0c060; --sel:#16261b; --sel-line:#5cc98a;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+#app{max-width:640px;margin:0 auto;padding:20px 16px 110px}
+.label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:24px;margin:2px 0 6px}
+.lead{color:var(--muted);font-size:14px;margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chip.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.search{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.grp{margin-top:22px}
+.gh{display:flex;align-items:baseline;gap:8px;border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:8px}
+.gh b{font-size:16px}
+.gh span{font-size:12px;color:var(--muted)}
+.gh .deck{font-size:11px;font-weight:700;border-radius:5px;padding:1px 6px;background:var(--bg2);color:var(--muted)}
+.gh button{margin-left:auto;border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer;white-space:nowrap}
+.q{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.q.on{background:var(--sel);border-color:var(--sel-line)}
+.q input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--sel-line)}
+.q .t{font-weight:600}
+.q .a{font-size:14px;margin-top:3px}
+.q .s{font-size:12px;color:var(--muted);margin-top:2px}
+.star{color:var(--star);font-size:12px;font-weight:700;margin-left:4px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.bar .in{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.bar .n{font-weight:700}
+.bar .n small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.btn{border:0;border-radius:10px;padding:12px 16px;font-weight:650;cursor:pointer;background:var(--primary);color:var(--on-primary)}
+.btn.ghost{background:var(--bg2);color:var(--text)}
+.bar .btn:first-of-type{margin-left:auto}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:5}
+.modal.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:640px;border-radius:14px 14px 0 0;padding:16px;max-height:88vh;display:flex;flex-direction:column;gap:10px}
+.sheet textarea{width:100%;flex:1;min-height:300px;border:1px solid var(--line);border-radius:10px;padding:10px;font:12px/1.4 ui-monospace,Consolas,monospace;background:var(--bg2);color:var(--text);resize:none}
+.sheet .row{display:flex;gap:10px}
+.sheet .row .btn{flex:1}
+.empty{color:var(--muted);text-align:center;padding:30px 0}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="label">RRJ-95 Limits</div>
+  <h1>Отбор новых вопросов</h1>
+  <p class="lead">Отметьте вопросы, которые стоит добавить в тест, и нажмите «Экспорт». Все ответы числовые. ★ — рекомендую в первую очередь.</p>
+  <div class="chips" id="chips"></div>
+  <input class="search" id="search" placeholder="Поиск по вопросу или источнику">
+  <div id="list"></div>
+</div>
+
+<div class="bar"><div class="in">
+  <div class="n" id="count"></div>
+  <button class="btn ghost" onclick="clearSel()">Сбросить</button>
+  <button class="btn" onclick="openExport()">Экспорт</button>
+</div></div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeExport()">
+  <div class="sheet">
+    <b>Выбранные вопросы в формате теста</b>
+    <span style="font-size:13px;color:var(--muted)">Скопируйте и пришлите — я добавлю их в приложение (FCOM — в DEFAULT_QS, SOP — ещё и в SOP_IDS).</span>
+    <textarea id="out" readonly></textarea>
+    <div class="row">
+      <button class="btn" onclick="copyOut()" id="copyBtn">Скопировать</button>
+      <button class="btn ghost" onclick="downloadOut()">Скачать .txt</button>
+      <button class="btn ghost" onclick="closeExport()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   КАНДИДАТЫ. Только числовые ответы.
+   N — одно число; R — диапазон; S — ± значение;
+   M — несколько полей: [подпись, число | [мин, макс] | {s: число}, единица]
+   последний аргумент 1 — рекомендовано (★)
+   ============================================================ */
+const N = (q, a, u, star) => ({ type:'number', q, a, u, star });
+const R = (q, min, max, u, star) => ({ type:'range', q, min, max, u, star });
+const S = (q, a, u, star) => ({ type:'symmetric', q, a, u, star });
+const M = (q, fields, star) => ({ type:'multi', q, fields, star });
+
+const GROUPS = [
+/* ---------------- FCOM ---------------- */
+{ id:'nrw', deck:'fcom', src:'FCOM 1.06.30', title:'Узкая ВПП (менее 42 м)', items:[
+  M('Узкая ВПП: макс. боковая составляющая ветра на взлёте и посадке (включая порывы)', [['μ 0.42 и более', 17, 'kt'], ['μ 0.41–0.40', 15, 'kt'], ['μ 0.39–0.37', 12, 'kt']], 1),
+  M('Узкая ВПП: VMCG (FLAP 1+F / 2 / 3)', [['RRJ-95B', 111, 'kt'], ['RRJ-95LR', 115, 'kt']], 1),
+]},
+{ id:'steep', deck:'fcom', src:'FCOM 1.06.40', title:'Глиссада более 3.5° и до 4°', items:[
+  N('Глиссада 3.5°–4°: максимальная барометрическая высота аэродрома', 1500, 'ft', 1),
+  N('Глиссада 3.5°–4°: выравнивание начинать на высоте не ниже', 40, 'ft', 1),
+]},
+{ id:'rvsm', deck:'fcom', src:'FCOM 1.06.10', title:'RVSM', items:[
+  M('RVSM: допустимые расхождения высоты', [
+    ['На земле: от превышения аэродрома и между PFD, не более', 75, 'ft'],
+    ['Отклонение от эшелона в режиме ALT, не более', 65, 'ft'],
+    ['Проскакивание нового эшелона, не более', 150, 'ft'],
+    ['Расхождение двух PFD в полёте, не более', 200, 'ft']], 1),
+]},
+{ id:'abn', deck:'fcom', src:'FCOM 1.08', title:'Аварийные и особые процедуры', items:[
+  N('Высота разгона после отказа на взлёте, не менее', 1000, 'ft', 1),
+  N('Автопосадка Cat II/III с одним двигателем: встречная составляющая ветра, не более', 26, 'kt', 1),
+  M('Разгерметизация', [['Действия, если CAB ALT более', 10000, 'ft'], ['CAB PRESS EXCESS CAB ALT гаснет при CAB ALT менее', 9842, 'ft']], 1),
+  M('DIRECT MODE / FLAP ICE: максимальная скорость', [['IAS', 280, 'kt'], ['Число M', 0.8, 'M']], 1),
+  N('FLAP ICE на M более 0.72: рост расхода топлива', 6, '%'),
+  M('Отказ ручки FLAPS: ΔVREF и коэффициент ALD', [
+    ['Ручка в «0»: ΔVREF', 28, 'kt'], ['Ручка в «0»: ALD ×', 1.95, ''],
+    ['Ручка в «1»: ΔVREF', 11, 'kt'], ['Ручка в «1»: ALD ×', 1.77, ''],
+    ['Ручка в «2»: ΔVREF', 8, 'kt'], ['Ручка в «2»: ALD ×', 1.7, '']], 1),
+  S('Отказ элерона или интерцепторов: максимальный крен', 35, '°', 1),
+  N('Отказ механизации: держать скорость на … ниже VFE NEXT', 5, 'kt'),
+  N('Табло FIRE не погасло через … — разрядить второй огнетушитель', 30, 'с', 1),
+  M('Остаток топлива', [['FUEL QTY MIN: общий остаток', 800, 'кг'], ['Особые действия: в крыльевом баке менее', 400, 'кг']], 1),
+  N('FUEL L(R) ENG LO PR: максимальная высота полёта', 20000, 'ft', 1),
+  N('Один генератор: ELEC1 и ELEC3/2A одновременно не более', 30, 'с'),
+  N('HYD OVERHEAT: ждать после закрытия SOV', 15, 'мин'),
+  N('Отказ ПОС: особые действия при обледенении дольше', 10, 'мин'),
+  M('Запуск двигателя в полёте от авторотации', [['Не гарантирован выше', 20000, 'ft'], ['… при N2 менее', 16, '%'], ['Надёжен на скорости более', 280, 'kt']], 1),
+  M('Запуск в полёте со стартером', [['N1 работающего двигателя, не менее', 40, '%'], ['Прекратить, если N1 упали ниже', 30, '%']]),
+  N('После запуска в полёте: N2 на малом газе не менее', 62.5, '%'),
+  N('Запуск в полёте: нет роста EGT в течение', 20, 'с'),
+  N('L/G WOW FAULT: выключить двигатели не позднее', 3, 'мин', 1),
+  N('Кислород экипажа: особые действия при давлении в баллоне менее', 690, 'psi'),
+  M('W/S AHEAD заблокировано', [['На скорости более', 100, 'kt'], ['До высоты', 50, 'ft']]),
+  N('T/O TIME LIMIT / MAX TIME LIMIT: предупреждение за … до лимита', 30, 'с'),
+]},
+{ id:'perf', deck:'fcom', src:'FCOM 1.03', title:'Лётные характеристики', items:[
+  M('V2', [['Достигается до высоты', 35, 'ft'], ['Мин. градиент набора на 2-м участке', 2.4, '%']], 1),
+  N('VMC / VMCL: крен при отказе критического двигателя, не более', 5, '°', 1),
+  N('Режим MAX: прирост тяги относительно TO/GA', 10, '%', 1),
+  M('Градиент ухода на второй круг с одним двигателем, не менее', [['Ручной заход', 2.1, '%'], ['Автоматический заход', 2.5, '%']], 1),
+  N('ALD отсчитывается от пролёта порога на высоте', 50, 'ft', 1),
+  N('FLAP 3: скорость конечного этапа не менее VREF +', 8, 'kt', 1),
+  N('Автопосадка Cat II/III: ΔVREF', 5, 'kt', 1),
+  N('VAPP выше VREF+ΔVF: рост посадочной дистанции на каждый 1 kt', 0.9, '%'),
+  M('Топливо на полёт в зоне ожидания', [['Время', 30, 'мин'], ['Высота над запасным', 1500, 'ft']]),
+  M('Заход IFR (расчёт топлива)', [['Топливо', 136, 'кг'], ['Время', 6, 'мин']]),
+  N('Расход APU на земле с отбором на СКВ', 127, 'кг/ч'),
+  N('Максимальная высота: возможность набора на MCL с вертикальной скоростью', 100, 'ft/min'),
+  M('Минимальная скорость крейсерского полёта обеспечивает', [['Крен', 40, '°'], ['Или запас до бафтинга', 0.3, 'g']]),
+  N('Короткие рейсы: время крейсерского полёта не менее', 15, 'мин'),
+]},
+{ id:'air', deck:'fcom', src:'FCOM 2.21', title:'Кондиционирование и наддув', items:[
+  N('Продувочная вентиляция и RAM AIR запрещены выше', 10000, 'ft', 1),
+  M('Наддув на 40 000 ft', [['CAB ALT, не более', 8000, 'ft'], ['ΔP, не более', 8.4, 'psi']], 1),
+  N('Разгерметизированная кабина выше FL140: CAB ALT не более', 13800, 'ft'),
+  N('Режим DITCHING заблокирован выше', 15000, 'ft'),
+  N('Отказ обоих вентиляторов левого борта: посадка в течение', 60, 'мин'),
+  N('Остаточный перепад после посадки (автоматическая разгерметизация)', 0.16, 'psi'),
+]},
+{ id:'afcs', deck:'fcom', src:'FCOM 2.22', title:'AFCS', items:[
+  N('Ниже какой высоты повторное включение AP/FD/A/T до посадки заблокировано', 200, 'ft', 1),
+  N('Заход по ILS: органы управления FCP блокируются ниже', 400, 'ft', 1),
+  M('Максимальная заданная скорость в САУ', [['IAS', 303, 'kt'], ['Число M', 0.8, 'M']], 1),
+  N('Задатчик ALT: максимальная высота', 42650, 'ft'),
+  N('VNAV APP включается за … до FAF', 2, 'NM', 1),
+  M('Режим FLARE', [['Подготовка на', 400, 'ft RA'], ['RETARD на', 17, 'ft RA']], 1),
+  N('Предустановленные VS/FPA сохраняются', 5, 'мин'),
+  N('ALT*: изменение давления, меняющее высоту более … — выход из ALT*', 250, 'ft'),
+]},
+{ id:'misc', deck:'fcom', src:'FCOM 2.23–2.26', title:'Регистраторы, дверь, электро, пожар', items:[
+  M('Регистраторы CVR/FDR', [['Автовключение при скорости более', 50, 'kt'], ['Автоотключение после полёта через', 5, 'мин'], ['Ручное включение REC — удерживать', 5, 'с']]),
+  M('Аварийный доступ в кабину', [['Задержка открытия', 30, 'с'], ['Замок открыт', 10, 'с'], ['BLKD блокирует доступ на', 10, 'мин']], 1),
+  M('RAT', [['Автовыпуск при скорости более', 50, 'kt'], ['RAT GEN отключается на скорости менее', 116, 'kt']], 1),
+  M('Переменный ток', [['Напряжение', 115, 'V'], ['Частота', 400, 'Hz']]),
+  N('APU FIRE с наземного пульта: разряд огнетушителя через', 10, 'с'),
+  N('Огнетушитель второй очереди БГО: концентрация в течение', 60, 'мин'),
+]},
+{ id:'fctl', deck:'fcom', src:'FCOM 2.27', title:'Управление самолётом', items:[
+  R('Руль высоты: диапазон отклонения', -27, 22, '°', 1),
+  R('Элероны: диапазон отклонения', -27, 15, '°', 1),
+  N('Интерцепторы для управления по крену: максимальный угол', 19.5, '°'),
+  M('Стабилизатор', [['Автобалансировка: диапазон', [-12, 2], '°'], ['Фиксируется ниже', 50, 'ft']], 1),
+  N('Автоуборка механизации при превышении VFE на', 3, 'kt', 1),
+  N('Тормозные щитки убираются автоматически на скорости менее', 40, 'kt', 1),
+  N('Автовыпуск интерцепторов на стоянке при боковом ветре более', 40, 'kt'),
+  N('LDG SPLRS NOT ARM / LDG FLAPS NOT LAND срабатывают ниже', 800, 'ft RA', 1),
+]},
+{ id:'sys', deck:'fcom', src:'FCOM 2.28–2.30', title:'Топливо, гидро, ПОС', items:[
+  N('Подача топлива самотёком обеспечивается с высоты не более', 20000, 'ft', 1),
+  N('Насос гидросистемы отключается при температуре в баке более', 135, '°C'),
+  N('HYD PTU FAULT: давление на выходе менее', 1800, 'psi'),
+  N('ПОС воздухозаборников запрещено при OAT выше', 10, '°C', 1),
+  N('ПОС крыла на земле в положении ON отключается через', 2, 'мин', 1),
+  M('Блокировка ПОС крыла до посадки', [['Полёт выше', 17000, 'ft'], ['В обледенении не менее', 5, 'мин']], 1),
+  M('Гидрофобизирующая жидкость RAIN RPLNT', [['Скорость, не более', 160, 'kt'], ['Эффект сохраняется', 45, 'мин']]),
+  N('Стеклоочистители, быстрый режим', 120, 'циклов/мин'),
+]},
+{ id:'gear', deck:'fcom', src:'FCOM 2.32–2.33', title:'Шасси, тормоза, освещение', items:[
+  N('L/G GEAR SPEED PROT: превышение VLO на', 5, 'kt', 1),
+  N('GEAR NOT UPLOCKED / NOT DOWNLOCKED / DOOR NOT CLOSED — через', 28, 'с', 1),
+  N('Антиюз работает на скорости более', 10, 'kt', 1),
+  M('Автоторможение: замедление, не менее', [['RTO', 5, 'м/с²'], ['MAX', 3, 'м/с²'], ['MED', 2.4, 'м/с²'], ['LOW', 1.8, 'м/с²']], 1),
+  M('BRAKE HOT', [['В полёте', 300, '°C'], ['На земле', 440, '°C']], 1),
+  N('L/G NW STEER HI ANGLE: поворот колёс более', 90, '°'),
+  N('GEAR NOT DOWN — ниже', 800, 'ft'),
+  M('Аварийное освещение', [['В полёте', 30, 'мин'], ['После аварийной посадки, не менее', 10, 'мин'], ['Всего, не более', 40, 'мин']]),
+]},
+{ id:'nav', deck:'fcom', src:'FCOM 2.34', title:'Навигация, TCAS, PWS', items:[
+  N('TCAS не выдаёт RA на набор выше', 18000, 'ft', 1),
+  M('TCAS не выдаёт RA на снижение ниже', [['На взлёте', 1100, 'ft AGL'], ['На заходе', 900, 'ft AGL']], 1),
+  N('TCAS не выдаёт «increase descent» ниже', 1450, 'ft AGL'),
+  M('TCAS: речевые сообщения подавлены ниже', [['При снижении', 400, 'ft'], ['В наборе', 600, 'ft']]),
+  M('Время реакции на RA', [['Корректирующий RA', 5, 'с'], ['Усиливающий / реверсивный RA', 2.5, 'с']], 1),
+  N('PWS: сдвиг ветра прогнозируется ниже', 1500, 'ft AGL', 1),
+  N('ILS: автонастройка MMR на удалении', 30, 'NM'),
+  M('Сигнализация рассогласований', [['NAV AOA DISAGREE, более', 2.5, '°'], ['NAV ALT DISAGREE / CHECK ALT, более', 200, 'ft'], ['CHECK ATT / CHECK HDG, более', 3, '°'], ['CHECK CAS, более', 10, 'kt']], 1),
+  M('ND: автоматический масштаб', [['TCAS / TAWS', 10, 'NM'], ['PWS', 5, 'NM']]),
+]},
+{ id:'oxy', deck:'fcom', src:'FCOM 2.35', title:'Кислород', items:[
+  N('Пассажирские маски выпадают при CAB ALT', 14000, 'ft', 1),
+  N('Химический генератор кислорода', 15, 'мин', 1),
+  M('Дымозащитный капюшон PBE', [['Время защиты, не менее', 15, 'мин'], ['CAB ALT, не более', 8000, 'ft']], 1),
+  N('Маска экипажа подаёт 100 % O₂ при CAB ALT более', 26250, 'ft'),
+]},
+{ id:'eng', deck:'fcom', src:'FCOM 2.49, 2.70', title:'APU и двигатель', items:[
+  N('APU: питание стартера отключается на оборотах', 50, '%'),
+  M('APR', [['Прирост тяги', 10, '%'], ['Работает ниже', 15000, 'ft']], 1),
+  M('Автопереход TO/GA → MCT', [['Выше', 15000, 'ft'], ['Или при M более', 0.34, 'M']], 1),
+  M('Закрытие клапана SAV при N2', [['На земле', 51, '%'], ['В полёте', 55, '%']], 1),
+  N('Превышение времени запуска двигателя', 5, 'мин'),
+  N('Перекладка створок реверса, не более', 3.5, 'с'),
+  N('Питание DECU от PMA при N2 выше', 38, '%'),
+]},
+{ id:'fms', deck:'fcom', src:'FCOM 3.xx', title:'FMS', items:[
+  M('Inbound leg зоны ожидания', [['На 14 000 ft и ниже', 1, 'мин'], ['Выше 14 000 ft', 1.5, 'мин']], 1),
+  M('RNP по умолчанию', [['Маршрут', 2, 'NM'], ['Район аэродрома', 1, 'NM'], ['Заход', 0.3, 'NM']], 1),
+  N('FMS переходит в APPROACH за … до FAF', 2, 'NM', 1),
+  M('Район аэродрома для FMS', [['Ближе', 30, 'NM'], ['Ниже', 15000, 'ft']]),
+  M('Максимальные значения для ввода в FMS', [['ZFW', 40000, 'кг'], ['Топливо', 13500, 'кг']]),
+  N('Стандартный разворот: автоматическое ограничение скорости', 180, 'kt'),
+  N('EARLY DES доступен в пределах … от T/D', 50, 'NM'),
+  N('S/C и S/D активировать не ближе чем за', 3, 'NM'),
+  N('E/D без FAF в базе — от торца ВПП', 10, 'NM'),
+  S('RTA выдерживается с точностью', 30, 'с'),
+  M('Прерывание питания FMS без потери плана', [['В полёте, менее', 7, 'с'], ['На земле, менее', 90, 'с']]),
+  N('Максимальная высота FMS ограничена запасом по перегрузке', 1.3, 'g'),
+  N('CHECK TAKEOFF SPEEDS: расхождение скоростей от', 1, 'kt'),
+]},
+
+/* ---------------- SOP ---------------- */
+{ id:'sop104', deck:'sop', src:'FCOM 1.04–1.07', title:'Нормальные процедуры FCOM', items:[
+  M('Подготовка кабины: аккумуляторы', [['Для запуска APU от батарей, не менее', 24, 'V'], ['Если меньше — подзарядка', [10, 20], 'мин']], 1),
+  N('APU запустить после включения батарей не позднее чем через', 10, 'мин'),
+  M('Время выставки IRS', [['На широте до 70°', [5, 10], 'мин'], ['На широте выше 70°', 17, 'мин']], 1),
+  N('Кнопку RCL для вызова удалённых сообщений удерживать не менее', 3, 'с'),
+  N('TEST RAT: надпись PASSED светится', 10, 'с'),
+  N('Течь топлива или дымление при запуске: держать IDLE', 5, 'мин', 1),
+  N('Давление воздуха от APU / перед SAV для запуска, не менее', 36, 'psi', 1),
+  N('Кнопку T.O CONF удерживать не менее', 0.5, 'с'),
+  N('Выше какой скорости прекращать взлёт только по серьёзным причинам', 100, 'kt', 1),
+  M('Взлёт в FLAP 1+F с большой массой', [['Сообщение F/CTL FLAP/SLAT AUTOPROT', 208, 'kt'], ['Автоуборка в FLAP 1', 213, 'kt']], 1),
+  N('Взлёт с массой менее … — текущая скорость больше F', 32000, 'кг'),
+  M('Подготовка к снижению', [['Начать примерно за', 80, 'NM'], ['Требуется примерно', 10, 'мин']]),
+  N('VNAV включить на удалении от T/D не более', 50, 'NM'),
+  M('Стандартный градиент снижения', [['Высота', 3000, 'ft'], ['На расстояние', 10, 'NM']]),
+  N('FD не использовать для управления ниже', 200, 'ft', 1),
+  M('Механизация не выпустилась (без FAULT)', [['Повторных попыток, не более', 3, ''], ['Интервал между попытками, не менее', 10, 'с']], 1),
+  N('Захват глиссады сверху: захватить до высоты', 1000, 'ft AGL'),
+  M('Визуальный заход', [['Стабилизирован к высоте', 500, 'ft AGL'], ['FLAPS 1 не позднее чем за … до траверза ВПП', 5, 'NM']], 1),
+  N('Речевое RETARD при ручной посадке', 17, 'ft RA', 1),
+  N('Выравнивание: увеличить тангаж примерно на', 2, '°'),
+  M('Уход на второй круг', [['Тангаж с одним неработающим двигателем', 12, '°'], ['LNAV/HDG выбирать не ниже', 400, 'ft AGL']], 1),
+  N('Выключение двигателей не ранее чем через … на режиме не более 50 % N1', 3, 'мин', 1),
+  R('BRAKE CHECK SYSTEM: повторно включить PARK BRAKE через', 5, 10, 'с'),
+  N('Холодная прокрутка', 30, 'с'),
+  M('Холодная прокрутка: N2', [['Целевое', 24, '%'], ['Не менее (max motoring)', 18, '%']]),
+  N('Разница топлива в крыльевых баках после заправки, не более', 100, 'кг'),
+  S('Изменения в последний момент (LMC) без нового расчёта, до', 100, 'кг'),
+]},
+{ id:'tech', deck:'sop', src:'FCOM 1.09', title:'Техника пилотирования', items:[
+  N('Высота пролёта порога по VASI/PAPI, примерно', 50, 'ft', 1),
+  N('Начало выравнивания при стабилизированном заходе, примерно', 30, 'ft'),
+  N('«Козёл»: продолжать посадку, если высота отделения менее', 5, 'ft', 1),
+  M('Выбор торможения по длине ВПП', [['Короче … — педальное торможение', 2000, 'м'], ['Длиннее … — автоторможение LOW', 3000, 'м']], 1),
+  R('Запасное торможение: вытягивать рукоятку', 1, 2, 'с'),
+  M('Перегонка с неубранным шасси', [['Максимальная взлётная масса', 39500, 'кг'], ['Число M', 0.45, 'M']], 1),
+  M('Охлаждение тормозов', [['Если с охлаждения прошло менее', 90, 'мин'], ['Выпустить шасси раньше, примерно за', 7, 'мин']]),
+  M('Лёд в зоне ожидания', [['Полёт в обледенении более', 45, 'мин'], ['Толщина льда до', 76, 'мм']]),
+  N('Крен, при котором самолёт не может перейти в набор (2.5 g)', 67, '°'),
+  N('INERTIAL в районе аэродрома, не более', 30, 'мин'),
+  M('Разворот на спущенных шинах', [['Скорость разворота', [3, 7], 'kt'], ['Асимметрия тяги, не более', 50, '% N1']]),
+  N('Особая процедура AoA: быстрый рост VAOA PROT более', 30, 'kt'),
+]},
+{ id:'rppb1', deck:'sop', src:'РПП-B гл. 1, 3.1.6', title:'Ограничения авиакомпании', items:[
+  M('Аэродром (РПП)', [['Макс. высота аэродрома', 5000, 'ft'], ['Мин. ширина РД', 15, 'м']], 1),
+  N('Мин. измеренный коэффициент сцепления', 0.17, '', 1),
+  N('Мин. RVR для взлёта', 150, 'м'),
+  M('Боковой ветер по измеренному коэффициенту сцепления (RWYCC)', [
+    ['0.62 и более (код 6)', 36, 'kt'], ['0.40–0.61 (код 5)', 36, 'kt'], ['0.39–0.36 (код 4)', 33, 'kt'],
+    ['0.35–0.30 (код 3)', 30, 'kt'], ['0.29–0.26 (код 2)', 25, 'kt'], ['0.25–0.17 (код 1)', 20, 'kt'], ['0.17', 15, 'kt']], 1),
+  M('Взлётная тяга ставится на путевой 30 kt, если', [['Боковой более', 20, 'kt'], ['Попутный более', 5, 'kt']]),
+  N('Взлёт без остановки запрещён при боковой или попутной составляющей более', 20, 'kt', 1),
+  M('Сильная турбулентность: превышение для расшифровки', [['VMO на', 20, 'kt'], ['MMO на', 0.02, 'M']]),
+]},
+{ id:'rppb2', deck:'sop', src:'РПП-B гл. 2', title:'SOP авиакомпании', items:[
+  M('Фары RWY TURN OFF на рулении', [['Не более', 10, 'мин'], ['Повторно — после перерыва', 10, 'мин']], 1),
+  M('Руление в LVO', [['Прямые участки', 10, 'kt'], ['Развороты', 5, 'kt']], 1),
+  M('Прогрев после запуска', [['Режим не более', 50, '% N1'], ['Время', 5, 'мин'], ['Сократить до 3 мин, если после выключения прошло не более', 150, 'мин']], 1),
+  N('Холодная прокрутка перед запуском, если после выключения прошло менее', 15, 'мин', 1),
+  N('Угол атаки на скорости 80 kt, не более', 2, '°'),
+  N('«POSITIVE CLIMB»: RA не менее', 10, 'ft'),
+  M('Высота стабилизации захода', [['IMC', 1000, 'ft AAL'], ['VMC', 500, 'ft AAL'], ['CIRCLING', 400, 'ft AAL']], 1),
+  M('VMC по РПП', [['ВНГО не ниже', 450, 'м'], ['Видимость не ниже', 5000, 'м']]),
+  N('Кратковременно допустимая V/S при глиссаде круче 3°', 1200, 'ft/min'),
+  N('Отказ, влияющий на минимум, до высоты … — продолжать по более высокому минимуму', 1000, 'ft AGL'),
+  N('Площадка на MDA/MDH: LVL OFF на высоте MDA/MDH +', 50, 'ft'),
+  M('Рубежи в полёте', [['TRANSITION за … до высоты перехода', 500, 'ft'], ['MORA/MOCA докладывать, если выше', 10000, 'ft'], ['Расхождение ALT на PFD — AIRDATA на CAPT3, более', 65, 'ft']]),
+  N('TCAS: ВС ближе 6 NM и ±1200 ft — ограничить V/S до', 1000, 'ft/min'),
+  M('Без GPS: точность местоположения', [['LNAV не использовать при ANP от', 1, 'NM'], ['Надёжно при ошибке не более', 3, 'NM']]),
+  N('Захват глиссады сверху: V/S не более', 1500, 'ft/min'),
+  N('LOC/GS захватываются не быстрее чем через', 3, 'с'),
+]},
+{ id:'cold', deck:'sop', src:'РПП-B 3.1.3–3.1.4, ИС 73/26', title:'Низкие температуры и ОЗП 2026–27', items:[
+  M('Сброс льда на ОЗП 2026–27 (ИС 73/26)', [['Нужен при рулении в обледенении дольше', 5, 'мин'], ['Повторять не реже чем через', 5, 'мин']], 1),
+  M('Вибрация на исполнительном старте (ИС 73/26)', [['На 70 % N1 должна быть менее', 0.3, ''], ['Повторить процедуру до … раз', 3, '']], 1),
+  N('Предупредить диспетчера о задержке взлёта более', 1, 'мин'),
+  M('Вибрация двигателя', [['Сброс льда нужен при вибрации более', 0.4, ''], ['Во время сброса допустимо до', 1, '']]),
+  N('Иней на нижней поверхности крыла, не более', 3, 'мм', 1),
+  M('Гидрожидкость от −20 до −30 °C', [['Перекладка рулей через', 5, 'мин'], ['Количество перекладок', [10, 15], '']]),
+  M('Противообледенительная обработка', [['AIR R выключить после AIR L через', 5, 'с'], ['AIR L+R включить после ПОО через', 60, 'с']]),
+  M('Руление в условиях низких температур', [['Прямые участки, не более', 20, 'kt'], ['Развороты, не более', 10, 'kt']], 1),
+  M('Final Reserve Fuel RRJ-95', [['Не менее', 800, 'кг'], ['Время', 30, 'мин'], ['Высота над аэродромом', 1500, 'ft']], 1),
+]},
+];
+
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
+// Уже добавлены в тест (id 251–310) — в списке не показываются
+const ADDED = new Set(["APR", "DIRECT MODE / FLAP ICE: максимальная скорость", "FD не использовать для управления ниже", "FLAP ICE на M более 0.72: рост расхода топлива", "Final Reserve Fuel RRJ-95", "Inbound leg зоны ожидания", "L/G GEAR SPEED PROT: превышение VLO на", "LOC/GS захватываются не быстрее чем через", "PWS: сдвиг ветра прогнозируется ниже", "RVSM: допустимые расхождения высоты", "TCAS не выдаёт RA на набор выше", "TCAS не выдаёт RA на снижение ниже", "TCAS не выдаёт «increase descent» ниже", "TCAS: ВС ближе 6 NM и ±1200 ft — ограничить V/S до", "TCAS: речевые сообщения подавлены ниже", "V2", "W/S AHEAD заблокировано", "Автопереход TO/GA → MCT", "Автопосадка Cat II/III с одним двигателем: встречная составляющая ветра, не более", "Автоуборка механизации при превышении VFE на", "Антиюз работает на скорости более", "Аэродром (РПП)", "Блокировка ПОС крыла до посадки", "Взлёт без остановки запрещён при боковой или попутной составляющей более", "Взлётная тяга ставится на путевой 30 kt, если", "Вибрация двигателя", "Вибрация на исполнительном старте (ИС 73/26)", "Визуальный заход", "Время реакции на RA", "Выключение двигателей не ранее чем через … на режиме не более 50 % N1", "Высота разгона после отказа на взлёте, не менее", "Высота стабилизации захода", "Гидрожидкость от −20 до −30 °C", "Глиссада 3.5°–4°: максимальная барометрическая высота аэродрома", "Запрет на изменение положения механизации крыла после взлёта:", "Заход по ILS: органы управления FCP блокируются ниже", "Иней на нижней поверхности крыла, не более", "Кратковременно допустимая V/S при глиссаде круче 3°", "Мин. RVR для взлёта", "Мин. измеренный коэффициент сцепления", "Отказ, влияющий на минимум, до высоты … — продолжать по более высокому минимуму", "ПОС воздухозаборников запрещено при OAT выше", "Пассажирские маски выпадают при CAB ALT", "Площадка на MDA/MDH: LVL OFF на высоте MDA/MDH +", "Подача топлива самотёком обеспечивается с высоты не более", "Предупредить диспетчера о задержке взлёта более", "Предустановленные VS/FPA сохраняются", "Прогрев после запуска", "Противообледенительная обработка", "Режим FLARE", "Режим MAX: прирост тяги относительно TO/GA", "Рубежи в полёте", "Руление в LVO", "Руление в условиях низких температур", "Руль высоты: диапазон отклонения", "Сброс льда на ОЗП 2026–27 (ИС 73/26)", "Тормозные щитки убираются автоматически на скорости менее", "Уход на второй круг", "Фары RWY TURN OFF на рулении", "Холодная прокрутка перед запуском, если после выключения прошло менее", "Элероны: диапазон отклонения"]);
+GROUPS.forEach(g => { g.items = g.items.filter(it => !ADDED.has(it.q)); });
+const ALL = [];
+GROUPS.forEach(g => g.items.forEach((it, i) => { it.key = g.id + ':' + it.q; it.g = g; ALL.push(it); }));
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('picker:' + k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('picker:' + k, JSON.stringify(v)); }catch(e){} }
+};
+let sel = new Set(store.get('sel2', []).filter(k => ALL.some(it => it.key === k)));
+let filter = 'all', query = '';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = n => String(n).replace('-', '−');
+const unit = u => u ? ' ' + u : '';
+
+function preview(it){
+  const val = (a, u) => Array.isArray(a) ? `${fmt(a[0])}…${fmt(a[1])}${unit(u)}` : `${fmt(a)}${unit(u)}`;
+  if (it.type === 'number') return val(it.a, it.u);
+  if (it.type === 'range') return `от ${fmt(it.min)} до ${fmt(it.max)}${unit(it.u)}`;
+  if (it.type === 'symmetric') return `±${it.a}${unit(it.u)}`;
+  return it.fields.map(([l, a, u]) => `${esc(l)}: <b>${val(a, u)}</b>`).join(' · ');
+}
+
+const FILTERS = { all:'Все', fcom:'FCOM', sop:'SOP', star:'★ Рекомендованные', sel:'Выбранные' };
+function visible(it){
+  if (filter === 'fcom' || filter === 'sop') { if (it.g.deck !== filter) return false; }
+  if (filter === 'star' && !it.star) return false;
+  if (filter === 'sel' && !sel.has(it.key)) return false;
+  if (query){ const s = (it.q + ' ' + it.g.title + ' ' + it.g.src + ' ' + (it.fields || []).map(f => f[0]).join(' ')).toLowerCase(); if (!s.includes(query)) return false; }
+  return true;
+}
+
+function render(){
+  document.getElementById('chips').innerHTML = Object.entries(FILTERS).map(([k, v]) =>
+    `<button class="chip ${filter === k ? 'on' : ''}" onclick="setFilter('${k}')">${v}</button>`).join('');
+  let html = '';
+  GROUPS.forEach(g => {
+    const its = g.items.filter(visible);
+    if (!its.length) return;
+    const allOn = its.every(it => sel.has(it.key));
+    html += `<div class="grp"><div class="gh"><b>${esc(g.title)}</b><span class="deck">${g.deck.toUpperCase()}</span><span>${esc(g.src)}</span>
+      <button onclick="toggleGroup('${g.id}')">${allOn ? 'снять все' : 'выбрать все'}</button></div>`;
+    its.forEach(it => {
+      const on = sel.has(it.key);
+      html += `<label class="q ${on ? 'on' : ''}"><input type="checkbox" ${on ? 'checked' : ''} onchange="toggle('${it.key}')">
+        <div><div class="t">${esc(it.q)}${it.star ? '<span class="star">★</span>' : ''}</div>
+        <div class="a">${it.type === 'multi' ? preview(it) : '<b>' + preview(it) + '</b>'}</div></div></label>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('list').innerHTML = html || '<div class="empty">Ничего не найдено</div>';
+  const nF = ALL.filter(it => sel.has(it.key) && it.g.deck === 'fcom').length, nS = sel.size - nF;
+  document.getElementById('count').innerHTML = `Выбрано ${sel.size} из ${ALL.length}<small>FCOM ${nF} · SOP ${nS}</small>`;
+}
+function setFilter(k){ filter = k; render(); }
+function toggle(key){ sel.has(key) ? sel.delete(key) : sel.add(key); store.set('sel2', [...sel]); render(); }
+function toggleGroup(id){
+  const its = GROUPS.find(g => g.id === id).items.filter(visible), allOn = its.every(it => sel.has(it.key));
+  its.forEach(it => allOn ? sel.delete(it.key) : sel.add(it.key));
+  store.set('sel2', [...sel]); render();
+}
+function clearSel(){ if (sel.size && confirm('Снять все отметки?')){ sel.clear(); store.set('sel2', []); render(); } }
+document.getElementById('search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); render(); });
+
+/* ============================================================
+   ЭКСПОРТ в формат вопросов старого приложения (DEFAULT_QS)
+   ============================================================ */
+const FIRST_ID = 311; // в DEFAULT_QS последний id — 310
+const js = s => JSON.stringify(s);
+function toQuestion(it, id){
+  const head = `{id:${id},category:${js(it.g.title)},question:${js(it.q)},`;
+  if (it.type === 'number') return head + `type:"number",answer:${it.a},unit:${js(it.u)},tolerance:0}`;
+  if (it.type === 'range') return head + `type:"range",answerMin:${it.min},answerMax:${it.max},unit:${js(it.u)},tolerance:0}`;
+  if (it.type === 'symmetric') return head + `type:"symmetric",answer:${it.a},unit:${js(it.u)},tolerance:0}`;
+  const f = it.fields.map(([l, a, u]) => Array.isArray(a)
+    ? `{label:${js(l)},kind:"range",answerMin:${a[0]},answerMax:${a[1]},unit:${js(u)}}`
+    : `{label:${js(l)},answer:${a},unit:${js(u)}}`).join(',');
+  return head + `type:"multi",fields:[${f}],tolerance:0}`;
+}
+function exportText(){
+  const chosen = ALL.filter(it => sel.has(it.key));
+  if (!chosen.length) return '';
+  let id = FIRST_ID; const lines = [], sopIds = [];
+  chosen.forEach(it => { lines.push(`  ${toQuestion(it, id)}, // ${it.g.src}`); if (it.g.deck === 'sop') sopIds.push(id); id++; });
+  return `// Новые вопросы для DEFAULT_QS (${chosen.length} шт.)\n` + lines.join('\n') +
+    `\n\n// Добавить в SOP_IDS (колода SOP): ${sopIds.length ? sopIds.join(', ') : '—'}\n`;
+}
+function openExport(){
+  const t = exportText();
+  if (!t){ alert('Сначала отметьте вопросы'); return; }
+  document.getElementById('out').value = t;
+  document.getElementById('modal').classList.add('on');
+}
+function closeExport(){ document.getElementById('modal').classList.remove('on'); }
+function copyOut(){
+  const ta = document.getElementById('out'), b = document.getElementById('copyBtn');
+  const done = () => { b.textContent = 'Скопировано'; setTimeout(() => b.textContent = 'Скопировать', 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, () => { ta.select(); document.execCommand('copy'); done(); });
+  else { ta.select(); document.execCommand('copy'); done(); }
+}
+function downloadOut(){
+  const blob = new Blob([document.getElementById('out').value], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'new_questions.txt'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+render();
+</script>
+</body>
+</html>
