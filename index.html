@@ -6,6 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-title" content="RRJ-95">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
 <title>RRJ-95 Limits</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -182,6 +186,40 @@
     border-radius: 100px;
   }
   .q-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .q-right .cat-tag { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hide-btn {
+    flex: none; height: 26px; padding: 0 10px; border-radius: 13px;
+    border: 1px solid var(--border2); background: transparent; color: var(--text2);
+    font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .extra-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 1rem 0; }
+  .extra-btn {
+    width: 100%; padding: 12px 16px; border-radius: var(--radius); border: 0.5px solid var(--border);
+    background: var(--bg2); color: var(--text); font-size: 15px; text-align: left; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .extra-btn .arrow { margin-left: auto; color: var(--text2); }
+  .home-note { margin: 12px 1rem 0; font-size: 13px; line-height: 1.45; color: var(--text2); }
+  .home-note a { color: var(--text); }
+  .back-btn { border: 0; background: none; color: var(--text); font-size: 16px; font-weight: 600; cursor: pointer; padding: 4px 0; white-space: nowrap; }
+  .manage { padding: 0 1rem 2rem; }
+  .manage h2 { font-size: 18px; margin: 18px 0 6px; }
+  .manage p { font-size: 14px; line-height: 1.5; color: var(--text2); margin-bottom: 10px; }
+  .manage .warn { color: var(--red); }
+  .hid-group { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text2); margin: 14px 0 6px; }
+  .hid-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .hid-row span { flex: 1; font-size: 14px; line-height: 1.4; }
+  .small-btn {
+    flex: none; padding: 7px 12px; border-radius: 8px; border: 0.5px solid var(--border2);
+    background: var(--bg); color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .small-btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .manage textarea {
+    width: 100%; min-height: 90px; border-radius: 10px; border: 0.5px solid var(--border2);
+    background: var(--bg2); color: var(--text); padding: 10px; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace;
+    -webkit-user-select: text; user-select: text;
+  }
   .src-btn {
     flex: none; width: 26px; height: 26px; border-radius: 50%;
     border: 1.5px solid var(--text2); background: transparent; color: var(--text2);
@@ -456,13 +494,34 @@
       <span class="arrow">›</span>
     </button>
   </div>
+  <div class="extra-list" id="extra-list"></div>
+  <div class="home-note" id="home-note"></div>
+</div>
+
+<!-- УПРАВЛЕНИЕ: скрытые вопросы и резервная копия -->
+<div id="manage" class="screen">
+  <div class="quiz-header"><button class="back-btn" onclick="showScreen('home')">‹ Назад</button></div>
+  <div class="manage">
+    <h2>Скрытые вопросы</h2>
+    <p>Скрытые вопросы не попадают в тест. Скрыть вопрос — кнопка «Скрыть» в шапке вопроса.</p>
+    <div id="hidden-list"></div>
+    <h2>Сохранение данных</h2>
+    <p id="storage-status"></p>
+    <h2>Резервная копия</h2>
+    <p>Скрытые вопросы, слабые карточки и лучшие результаты. Скопируйте код и вставьте его в другом браузере, на другом устройстве или в приложении на экране «Домой».</p>
+    <div class="btn-row">
+      <button class="small-btn primary" onclick="copyBackup()" id="copy-backup">Скопировать код</button>
+      <button class="small-btn" onclick="importBackup()">Загрузить из кода</button>
+    </div>
+    <textarea id="backup-code" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Сюда вставьте код резервной копии"></textarea>
+  </div>
 </div>
 
 <!-- QUIZ -->
 <div id="quiz" class="screen">
   <div class="quiz-header">
     <span class="q-counter" id="q-counter">1 / 15</span>
-    <span class="q-right"><span class="cat-tag" id="q-cat"></span><button class="src-btn" id="src-btn" onclick="toggleSource()" title="Откуда этот вопрос" aria-label="Откуда этот вопрос">?</button></span>
+    <span class="q-right"><span class="cat-tag" id="q-cat"></span><button class="hide-btn" onclick="hideCurrent()" title="Скрыть вопрос навсегда">Скрыть</button><button class="src-btn" id="src-btn" onclick="toggleSource()" title="Откуда этот вопрос" aria-label="Откуда этот вопрос">?</button></span>
   </div>
   <div class="src-box" id="src-box"></div>
   <div class="progress-bar">
@@ -686,7 +745,26 @@ const DEFAULT_QS = [
   {id:307,category:"Низкие температуры и ОЗП 2026–27",question:"Гидрожидкость от −20 до −30 °C",type:"multi",fields:[{label:"Перекладка рулей через",answer:5,unit:"мин"},{label:"Количество перекладок",kind:"range",answerMin:10,answerMax:15,unit:""}],tolerance:0}, // РПП-B 3.1.3–3.1.4, ИС 73/26
   {id:308,category:"Низкие температуры и ОЗП 2026–27",question:"Противообледенительная обработка",type:"multi",fields:[{label:"AIR R выключить после AIR L через",answer:5,unit:"с"},{label:"AIR L+R включить после ПОО через",answer:60,unit:"с"}],tolerance:0}, // РПП-B 3.1.3–3.1.4, ИС 73/26
   {id:309,category:"Низкие температуры и ОЗП 2026–27",question:"Руление в условиях низких температур",type:"multi",fields:[{label:"Прямые участки, не более",answer:20,unit:"kt"},{label:"Развороты, не более",answer:10,unit:"kt"}],tolerance:0}, // РПП-B 3.1.3–3.1.4, ИС 73/26
-  {id:310,category:"Низкие температуры и ОЗП 2026–27",question:"Final Reserve Fuel RRJ-95",type:"multi",fields:[{label:"Не менее",answer:800,unit:"кг"},{label:"Время",answer:30,unit:"мин"},{label:"Высота над аэродромом",answer:1500,unit:"ft"}],tolerance:0} // РПП-B 3.1.3–3.1.4, ИС 73/26
+  {id:310,category:"Низкие температуры и ОЗП 2026–27",question:"Final Reserve Fuel RRJ-95",type:"multi",fields:[{label:"Не менее",answer:800,unit:"кг"},{label:"Время",answer:30,unit:"мин"},{label:"Высота над аэродромом",answer:1500,unit:"ft"}],tolerance:0}, // РПП-B 3.1.3–3.1.4, ИС 73/26
+  {id:311,category:"Регистраторы, дверь, электро, пожар",question:"Регистраторы CVR/FDR",type:"multi",fields:[{label:"Автовключение при скорости более",answer:50,unit:"kt"},{label:"Автоотключение после полёта через",answer:5,unit:"мин"},{label:"Ручное включение REC — удерживать",answer:5,unit:"с"}],tolerance:0}, // FCOM 2.23–2.26
+  {id:312,category:"Регистраторы, дверь, электро, пожар",question:"Переменный ток",type:"multi",fields:[{label:"Напряжение",answer:115,unit:"V"},{label:"Частота",answer:400,unit:"Hz"}],tolerance:0}, // FCOM 2.23–2.26
+  {id:313,category:"Управление самолётом",question:"Интерцепторы для управления по крену: максимальный угол",type:"number",answer:19.5,unit:"°",tolerance:0}, // FCOM 2.27
+  {id:314,category:"Управление самолётом",question:"Автовыпуск интерцепторов на стоянке при боковом ветре более",type:"number",answer:40,unit:"kt",tolerance:0}, // FCOM 2.27
+  {id:315,category:"Топливо, гидро, ПОС",question:"ПОС крыла на земле в положении ON отключается через",type:"number",answer:2,unit:"мин",tolerance:0}, // FCOM 2.28–2.30
+  {id:316,category:"Шасси, тормоза, освещение",question:"GEAR NOT DOWN — ниже",type:"number",answer:800,unit:"ft",tolerance:0}, // FCOM 2.32–2.33
+  {id:317,category:"APU и двигатель",question:"Превышение времени запуска двигателя",type:"number",answer:5,unit:"мин",tolerance:0}, // FCOM 2.49, 2.70
+  {id:318,category:"Нормальные процедуры FCOM",question:"Подготовка кабины: аккумуляторы",type:"multi",fields:[{label:"Для запуска APU от батарей, не менее",answer:24,unit:"V"},{label:"Если меньше — подзарядка",kind:"range",answerMin:10,answerMax:20,unit:"мин"}],tolerance:0}, // FCOM 1.04–1.07
+  {id:319,category:"Нормальные процедуры FCOM",question:"Кнопку RCL для вызова удалённых сообщений удерживать не менее",type:"number",answer:3,unit:"с",tolerance:0}, // FCOM 1.04–1.07
+  {id:320,category:"Нормальные процедуры FCOM",question:"Течь топлива или дымление при запуске: держать IDLE",type:"number",answer:5,unit:"мин",tolerance:0}, // FCOM 1.04–1.07
+  {id:321,category:"Нормальные процедуры FCOM",question:"Давление воздуха от APU / перед SAV для запуска, не менее",type:"number",answer:36,unit:"psi",tolerance:0}, // FCOM 1.04–1.07
+  {id:322,category:"Нормальные процедуры FCOM",question:"Кнопку T.O CONF удерживать не менее",type:"number",answer:0.5,unit:"с",tolerance:0}, // FCOM 1.04–1.07
+  {id:323,category:"Нормальные процедуры FCOM",question:"Механизация не выпустилась (без FAULT)",type:"multi",fields:[{label:"Повторных попыток, не более",answer:3,unit:""},{label:"Интервал между попытками, не менее",answer:10,unit:"с"}],tolerance:0}, // FCOM 1.04–1.07
+  {id:324,category:"Нормальные процедуры FCOM",question:"Речевое RETARD при ручной посадке",type:"number",answer:17,unit:"ft RA",tolerance:0}, // FCOM 1.04–1.07
+  {id:325,category:"Нормальные процедуры FCOM",question:"Разница топлива в крыльевых баках после заправки, не более",type:"number",answer:100,unit:"кг",tolerance:0}, // FCOM 1.04–1.07
+  {id:326,category:"Техника пилотирования",question:"Охлаждение тормозов",type:"multi",fields:[{label:"Если с охлаждения прошло менее",answer:90,unit:"мин"},{label:"Выпустить шасси раньше, примерно за",answer:7,unit:"мин"}],tolerance:0}, // FCOM 1.09
+  {id:327,category:"Техника пилотирования",question:"Лёд в зоне ожидания",type:"multi",fields:[{label:"Полёт в обледенении более",answer:45,unit:"мин"},{label:"Толщина льда до",answer:76,unit:"мм"}],tolerance:0}, // FCOM 1.09
+  {id:328,category:"Техника пилотирования",question:"Разворот на спущенных шинах",type:"multi",fields:[{label:"Скорость разворота",kind:"range",answerMin:3,answerMax:7,unit:"kt"},{label:"Асимметрия тяги, не более",answer:50,unit:"% N1"}],tolerance:0}, // FCOM 1.09
+  {id:329,category:"Ограничения авиакомпании",question:"Сильная турбулентность: превышение для расшифровки",type:"multi",fields:[{label:"VMO на",answer:20,unit:"kt"},{label:"MMO на",answer:0.02,unit:"M"}],tolerance:0} // РПП-B гл. 1, 3.1.6
 ];
 
 const OZP_QS = [
@@ -734,7 +812,8 @@ const AF_QS = [
 // Вопросы из SOP / РПП (процедуры), остальные из DEFAULT_QS — FCOM.
 // Обе колоды хранят «слабые» в прежнем ключе rrj95_weak (id внутри DEFAULT_QS уникальны).
 const SOP_IDS = new Set([153, 159, 160, 161, 162, 163, 176, 177, 178, 179, 216, 217, 218, 231, 232,
-  282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310]);
+  282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310,
+  318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329]);
 const FCOM_QS = DEFAULT_QS.filter(q => !SOP_IDS.has(q.id));
 const SOP_QS = DEFAULT_QS.filter(q => SOP_IDS.has(q.id));
 
@@ -928,7 +1007,26 @@ const SRC_LIMITS = {
   307: "РПП-B 3.1.4 «Эксплуатация в условиях низких температур»",
   308: "РПП-B 3.1.3 «Процедура наземной противообледенительной обработки»",
   309: "РПП-B 3.1.4 «Эксплуатация в условиях низких температур»",
-  310: "ИС 73/26 «Рекомендации ОЗП 2026–2027», стр. 24"
+  310: "ИС 73/26 «Рекомендации ОЗП 2026–2027», стр. 24",
+  311: "FCOM 2.23.23 «Система регистрации речевой информации» и 2.31.80 «Система регистрации параметрической информации»",
+  312: "FCOM 2.24.10 «Система электроснабжения»",
+  313: "FCOM 2.27.20 «Система управления самолётом. Эксплуатация»",
+  314: "FCOM 2.27.20 «Система управления самолётом. Эксплуатация»",
+  315: "FCOM 2.30.20 «ПОС крыла»",
+  316: "FCOM 2.32.20 «Выпуск и уборка шасси»",
+  317: "FCOM 2.70.75 «Система зажигания и запуска двигателя», стр. 5",
+  318: "FCOM 1.04.30 «Предварительная подготовка кабины экипажа»",
+  319: "FCOM 1.04.30 «Предварительная подготовка кабины экипажа»",
+  320: "FCOM 1.04.45 «Запуск двигателей»",
+  321: "FCOM 1.04.45 «Запуск двигателей»",
+  322: "FCOM 1.04.52 «Руление»",
+  323: "FCOM 1.04.72 «Заход на посадку по ILS»",
+  324: "FCOM 1.04.80 «Посадка»",
+  325: "FCOM 1.07.30 «Заправка топливом»",
+  326: "FCOM 1.09.14 «Техника выполнения посадки» (перегрев тормозов)",
+  327: "FCOM 1.09.16 «Полёт в условиях обледенения»",
+  328: "FCOM 1.09.22 «Особые процедуры на земле» (спущенные шины)",
+  329: "РПП-B 3.1.6 «Попадание в зону сильной турбулентности»"
 };
 const SRC_OZP = {
   1: "ИС 73/26 «Рекомендации ОЗП 2026–2027», стр. 3; FCOM 1.02.15",
@@ -1161,7 +1259,26 @@ const EXC_LIMITS = {
   307: "Если температура гидрожидкости в диапазоне от ниже -20°С до -30°С … ПЕРЕКЛЮЧАТЕЛИ ELEC 1,3,2A … ON; CHRONO … START. Через 5 мин: перекладку рулевых поверхностей … PERFORM. Выполните 10-15 перекладок руля высоты, элеронов, руля направления, и циклов выпуска/уборки SPEED BRAKE в положение FULL.",
   308: "AIR L … OFF. Не менее чем через 5 секунд: AIR R … OFF … / Через 60 секунд после окончания противообледенительной обработки: … AIR L+R … ON",
   309: "Выдерживайте скорость не более 20 kts на прямолинейных участках и не более 10 kts при выполнении разворотов.",
-  310: "FINAL RESERVE FUEL — запас топлива … для полёта в течение 30 мин со скоростью полёта в зоне ожидания на высоте 450 м (1500 фут) над превышением аэродрома … Для ВС RRJ-95 минимальное количество конечного резервного топлива Final reserve не должно быть менее 800 кг."
+  310: "FINAL RESERVE FUEL — запас топлива … для полёта в течение 30 мин со скоростью полёта в зоне ожидания на высоте 450 м (1500 фут) над превышением аэродрома … Для ВС RRJ-95 минимальное количество конечного резервного топлива Final reserve не должно быть менее 800 кг.",
+  311: "Автоматическое включение CVRS происходит при запуске любого двигателя и дублируется при скорости более 50 kt. Ручное включение CVRS выполняется до запуска двигателей однократным нажатием кнопки REC ON/OFF (GND CTRL) … с удержанием ее в течение 5 секунд. После окончания полета при отсутствии сигналов автоматического включения (запуск двигателей и скорость более 50 kt) по истечении 5 минут происходит автоматическое отключение системы CVRS.",
+  312: "Генераторы … обеспечивают систему электроснабжения самолета переменным трехфазным током с напряжением 115/200V и частотой 400 Hz. Номинальная мощность каждого генератора 40 KVA.",
+  313: "Максимальный угол отклонения интерцепторов для управления по крену – 19,5°.",
+  314: "Примечание: Допускается автоматический выпуск интерцепторов в режиме воздушных тормозов при боковом ветре более 40 kt (включая порывы) на рулении или на стоянке с включенными ADS, при этом, если РУД не установлен в положение IDLE, допускается индикация сообщения TO SPOILERS EXTENDED.",
+  315: "На земле противообледенительная система крыла автоматически отключается через 2 минуты, если переключатель режима работы WING установлен в положение ON.",
+  316: "… убедиться в том, что все опоры шасси находятся на замках выпущенного положения следует по отсутствию: текстового сообщения L/G GEAR NOT DOWNLOCKED; текстового сообщения LDG GEAR NOT DOWN (на высоте менее 800 ft); речевого сообщения GEAR NOT DOWN (на высоте менее 800 ft).",
+  317: "ПРЕРЫВАНИЕ АВТОМАТИЧЕСКОГО ЗАПУСКА НА ЗЕМЛЕ. Если системе FADEC не удаётся устранить отклонения на запуске, то запуск автоматически прерывается по следующим причинам: превышение предельной температуры запуска (830˚С); превышение времени запуска (5 мин); помпаж на запуске; …",
+  318: "Если напряжение не менее 24 V: … выполните процедуру APU FIRE и запустите APU в течение не более 10 минут после включения аккумуляторных батарей. / Если напряжение менее 24 V: требуется подзарядка аккумуляторных батарей в течение 10 - 20 минут.",
+  319: "Нажмите и удерживайте (не менее 3 секунд) кнопку RCL для вызова и просмотра всех текстовых сообщений, которые ранее были удалены кнопкой CLEAR или отменены кнопкой ALERT CANCEL.",
+  320: "Если во время запуска технический персонал сообщает о течи топлива из дренажной системы или дымлении из сопла, сохраняйте режим IDLE в течение 5 минут. Если течь топлива или дымление продолжаются более 5 минут, требуется техническое обслуживание перед выполнением полета.",
+  321: "Убедитесь в том, что линия отбора воздуха индицируется зеленым цветом и давление воздуха в линии отбора воздуха от APU не менее 36 psi. / Разрешается запуск левого двигателя после закрытия клапана START правого двигателя и восстановления давления воздуха перед клапаном воздушного турбостартера (SAV) не менее 36 psi.",
+  322: "Нажмите кнопку T.O CONF (продолжительность нажатия не менее 0.5 секунд) и контролируйте появление сообщения на EWD “TO CONF NORMAL” зеленого цвета.",
+  323: "Если механизация крыла не выпустилась и отсутствует сообщение F/CTL SLATS(FLAPS) FAULT, установите ручку FLAPS в исходное положение и через 10 секунд повторите выпуск механизации крыла. Допускается три попытки повторного выпуска механизации крыла с интервалом между попытками не менее 10 секунд.",
+  324: "При выполнении посадки вручную речевое сообщение “RETARD“ срабатывает на высоте 17 ft RA, чтобы напомнить экипажу о необходимости перемещения РУД в положение IDLE.",
+  325: "Убедитесь, что разница между количеством топлива в левом и правом крыльевых баках не более 100 кг.",
+  326: "Для предотвращения возможного перегрева тормозов, в случае если время после охлаждения тормозов, учитывающее время полета и последующее пребывание на земле составляет менее 90 минут, рекомендуется предусмотреть возможность раннего выпуска шасси, примерно за 7 минут до посадки.",
+  327: "Максимальная толщина льда, которая может быть достигнута при полете в условиях обледенения в зоне ожидания более 45 минут, составляет 76 мм.",
+  328: "Выполняйте развороты плавно на рекомендуемой скорости 3-7 kt, не допускайте развороты на неподвижной основной опоре шасси. Для предотвращения значительного увеличения угловой скорости разворота … используйте асимметричную тягу не более 50% N1 одного из двигателей.",
+  329: "Повышенная турбулентность характеризуется выходом за пределы следующих допустимых параметров: … максимально допустимая скорость (VMO) превысила … +20 kt (CAS); максимально допустимое число Маха (MMO) превысило … +0.02 M. При подозрении выхода параметров … за пределы допустимых значений сообщите в ЦУП о необходимости расшифровки параметров полёта."
 };
 const EXC_OZP = {
   1: "Условия эксплуатации ВС RRJ-95 (RRJ-95B, RRJ-95B-100, RRJ-95LR-100): минимальная температура воздуха –54°C.",
@@ -1210,22 +1327,51 @@ const DECKS = {
   ozp:   { label: "ОЗП", tagline: "Тест по эксплуатации в зимний период", qs: OZP_QS, weakKey: "ozp_weak", src: SRC_OZP, exc: EXC_OZP },
   autoflight: { label: "AutoFlight", tagline: "Тест по автоматическому управлению полётом", qs: AF_QS, weakKey: "autoflight_weak", src: SRC_AF, exc: EXC_AF }
 };
+// ===== Хранилище =====
+// localStorage с проверкой: если браузер не даёт сохранять (приватный режим), данные живут только в памяти.
+const store = (() => {
+  let ok = false; const mem = {};
+  try { localStorage.setItem('__rrj_t', '1'); localStorage.removeItem('__rrj_t'); ok = true; } catch (e) {}
+  return {
+    ok,
+    get(k, d) { try { const v = ok ? localStorage.getItem(k) : mem[k]; return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { const s = JSON.stringify(v); mem[k] = s; if (ok) { try { localStorage.setItem(k, s); } catch (e) {} } }
+  };
+})();
+// Просим браузер не удалять данные сайта при нехватке места / по таймеру (Safari 17+, Chrome)
+let persistState = 'unknown';
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persisted()
+    .then(p => p ? true : navigator.storage.persist())
+    .then(p => { persistState = p ? 'granted' : 'denied'; })
+    .catch(() => {});
+}
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const IS_STANDALONE = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+
+// Скрытые вопросы: ключ «набор:id» (у FCOM и SOP общий набор id)
+const POOL = { fcom: 'main', sop: 'main', ozp: 'ozp', autoflight: 'af' };
+let hidden = new Set(store.get('rrj95_hidden', []));
+const hkey = (deck, q) => POOL[deck] + ':' + q.id;
+function saveHidden() { store.set('rrj95_hidden', [...hidden]); }
+function deckQs(key) { return DECKS[key].qs.filter(q => !hidden.has(hkey(key, q))); }
+
 let deckKey = "fcom";
-let questions = [...DECKS[deckKey].qs];
+let questions = deckQs(deckKey);
 let queue = [];
 let current = 0;
 let score = 0;
-let bestByDeck = { fcom: null, sop: null, ozp: null, autoflight: null };
+let bestByDeck = Object.assign({ fcom: null, sop: null, ozp: null, autoflight: null }, store.get('rrj95_best', {}));
 let answered = false;
 let activeInputId = 'num-ans';
 
 // --- Слабые вопросы (id -> счётчик ошибок), хранятся в localStorage отдельно на каждую колоду ---
 let weakStats = {};
 function loadWeak() {
-  try { weakStats = JSON.parse(localStorage.getItem(DECKS[deckKey].weakKey) || '{}'); } catch(e) { weakStats = {}; }
+  weakStats = store.get(DECKS[deckKey].weakKey, {}) || {};
 }
 function saveWeak() {
-  try { localStorage.setItem(DECKS[deckKey].weakKey, JSON.stringify(weakStats)); } catch(e) {}
+  store.set(DECKS[deckKey].weakKey, weakStats);
 }
 loadWeak();
 function weakCount() {
@@ -1246,7 +1392,7 @@ function showScreen(id) {
 function selectDeck(key) {
   if (key === deckKey) return;
   deckKey = key;
-  questions = [...DECKS[key].qs];
+  questions = deckQs(key);
   loadWeak();
   document.querySelectorAll('.deck-btn').forEach(b => b.classList.toggle('active', b.dataset.deck === key));
   document.getElementById('home-label').textContent = DECKS[key].tagline;
@@ -1256,6 +1402,7 @@ function selectDeck(key) {
 
 function updateHomeStats() {
   document.getElementById('stat-total').textContent = questions.length;
+  renderHomeExtras();
   const b = bestByDeck[deckKey];
   document.getElementById('stat-best').textContent = b != null ? b + '%' : '—';
   updateWeakBadge();
@@ -1280,7 +1427,9 @@ function startQuiz(count) {
 
 // Неверный ответ не засчитывается: вопрос уходит на 3–7 позиций дальше, счётчик прогресса не двигается.
 // Отметка «слабый» снимается только при верном ответе с первой попытки в сессии.
+let shownQ = null, lastCounted = false;
 function recordAnswer(q, ok) {
+  lastCounted = ok && !missed.has(q.id);
   if (!ok) {
     weakStats[q.id] = (weakStats[q.id] || 0) + 1;
     saveWeak();
@@ -1325,6 +1474,7 @@ function toggleSource() {
 
 function renderQ() {
   const q = queue[current];
+  shownQ = q; lastCounted = false;
   answered = false;
   document.getElementById('q-counter').textContent = (current + 1) + ' / ' + queue.length;
   document.getElementById('q-cat').textContent = Array.isArray(q.category) ? q.category.join(', ') : q.category;
@@ -1619,13 +1769,124 @@ function nextQ() {
   window.scrollTo(0, 0);
 }
 
+// ===== Скрыть вопрос =====
+function hideCurrent() {
+  const q = shownQ;
+  if (!q) return;
+  if (!confirm('Скрыть этот вопрос? Он больше не будет попадаться в тесте.\nВернуть можно на главном экране → «Скрытые вопросы».')) return;
+  hidden.add(hkey(deckKey, q)); saveHidden();
+  questions = deckQs(deckKey);
+  if (answered && lastCounted) score--;
+  for (let i = queue.length - 1; i >= 0; i--) {
+    if (queue[i] === q) { queue.splice(i, 1); if (i < current) current--; }
+  }
+  requeued = false;
+  if (!queue.length) { showScreen('home'); return; }
+  if (current >= queue.length) { showResult(); return; }
+  renderQ();
+  window.scrollTo(0, 0);
+}
+
+// ===== Главная: доп. пункты =====
+function renderHomeExtras() {
+  const n = DECKS[deckKey].qs.length - questions.length;
+  const list = document.getElementById('extra-list');
+  if (!list) return;
+  list.innerHTML =
+    (n ? `<button class="extra-btn" onclick="openManage()">Скрытые вопросы: ${n}<span class="arrow">›</span></button>` : '') +
+    `<button class="extra-btn" onclick="openManage()">Сохранение и резервная копия<span class="arrow">›</span></button>`;
+  const note = document.getElementById('home-note');
+  note.innerHTML = !store.ok
+    ? 'Браузер не даёт сохранять данные (например, приватный режим) — скрытые вопросы и статистика пропадут после закрытия страницы.'
+    : (IS_IOS && !IS_STANDALONE
+      ? 'На iPhone добавьте тест на экран «Домой» (Поделиться → «На экран „Домой“»): так Safari не сотрёт ваши данные. <a href="#" onclick="openManage();return false">Подробнее</a>'
+      : '');
+}
+
+// ===== Экран управления =====
+const DECK_POOL_LABEL = { main: 'FCOM / SOP', ozp: 'ОЗП', af: 'AutoFlight' };
+function findHidden(key) {
+  const [pool, id] = key.split(':');
+  const deck = pool === 'main' ? (SOP_IDS.has(+id) ? 'sop' : 'fcom') : pool === 'ozp' ? 'ozp' : 'autoflight';
+  const q = DECKS[deck].qs.find(x => String(x.id) === id);
+  return q ? { deck, q } : null;
+}
+function openManage() {
+  const rows = [...hidden].map(k => ({ k, f: findHidden(k) })).filter(r => r.f);
+  const order = ['fcom', 'sop', 'ozp', 'autoflight'];
+  let html = '';
+  if (!rows.length) html = '<p>Скрытых вопросов нет.</p>';
+  for (const d of order) {
+    const part = rows.filter(r => r.f.deck === d);
+    if (!part.length) continue;
+    html += `<div class="hid-group">${DECKS[d].label} — ${part.length}</div>`;
+    html += part.map(r => `<div class="hid-row"><span>№${r.f.q.id}. ${esc(r.f.q.question)}</span>` +
+      `<button class="small-btn" onclick="unhide('${r.k}')">Вернуть</button></div>`).join('');
+  }
+  if (rows.length > 1) html += `<div class="btn-row"><button class="small-btn" onclick="unhideAll()">Вернуть все</button></div>`;
+  document.getElementById('hidden-list').innerHTML = html;
+
+  let st;
+  if (!store.ok) st = '<span class="warn">Браузер не даёт сохранять данные (приватный режим или запрет сайтов). Всё, что вы отметите, пропадёт после закрытия страницы. Откройте тест в обычном режиме.</span>';
+  else if (IS_IOS && !IS_STANDALONE) st = 'Данные хранятся в этом браузере на этом устройстве. Safari удаляет данные сайтов, которые не открывались 7 дней. Чтобы этого не происходило, добавьте тест на экран «Домой»: кнопка «Поделиться» → «На экран „Домой“» и дальше открывайте его оттуда. У приложения на экране «Домой» свои отдельные данные: перенесите их резервной копией ниже.';
+  else if (IS_IOS) st = 'Тест открыт как приложение с экрана «Домой» — данные сохраняются надёжно. Для переноса на другое устройство используйте резервную копию.';
+  else st = 'Данные хранятся в этом браузере на этом устройстве' + (persistState === 'granted' ? ' (браузер разрешил постоянное хранение).' : '.') + ' Очистка данных сайта сотрёт их — сделайте резервную копию.';
+  document.getElementById('storage-status').innerHTML = st;
+  document.getElementById('backup-code').value = '';
+  showScreen('manage');
+}
+function unhide(k) {
+  hidden.delete(k); saveHidden();
+  questions = deckQs(deckKey);
+  openManage();
+}
+function unhideAll() {
+  if (!confirm('Вернуть все скрытые вопросы?')) return;
+  hidden.clear(); saveHidden();
+  questions = deckQs(deckKey);
+  openManage();
+}
+
+// ===== Резервная копия =====
+const WEAK_KEYS = ['rrj95_weak', 'ozp_weak', 'autoflight_weak'];
+function makeBackup() {
+  const data = { v: 1, hidden: [...hidden], best: bestByDeck, weak: {} };
+  WEAK_KEYS.forEach(k => { data.weak[k] = store.get(k, {}); });
+  return 'RRJ1-' + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+function copyBackup() {
+  const ta = document.getElementById('backup-code'), b = document.getElementById('copy-backup');
+  ta.value = makeBackup();
+  const done = () => { b.textContent = 'Скопировано'; setTimeout(() => b.textContent = 'Скопировать код', 1500); };
+  const fallback = () => { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); try { document.execCommand('copy'); done(); } catch (e) {} };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, fallback);
+  else fallback();
+}
+function importBackup() {
+  const raw = document.getElementById('backup-code').value.trim();
+  if (!raw) { alert('Вставьте код резервной копии в поле ниже кнопок.'); return; }
+  let data;
+  try { data = JSON.parse(decodeURIComponent(escape(atob(raw.replace(/^RRJ1-/, '').replace(/\s+/g, ''))))); }
+  catch (e) { alert('Не удалось прочитать код. Проверьте, что он скопирован целиком.'); return; }
+  if (!data || data.v !== 1) { alert('Это не код резервной копии теста.'); return; }
+  if (!confirm('Заменить текущие данные (скрытые вопросы, слабые карточки, лучшие результаты) данными из кода?')) return;
+  hidden = new Set(data.hidden || []); saveHidden();
+  bestByDeck = Object.assign({ fcom: null, sop: null, ozp: null, autoflight: null }, data.best || {});
+  store.set('rrj95_best', bestByDeck);
+  WEAK_KEYS.forEach(k => store.set(k, (data.weak || {})[k] || {}));
+  loadWeak();
+  questions = deckQs(deckKey);
+  alert('Данные загружены.');
+  openManage();
+}
+
 function restartLast() {
   startQuiz(lastCount);
 }
 
 function showResult() {
   const pct = Math.round(score / queue.length * 100);
-  if (bestByDeck[deckKey] === null || pct > bestByDeck[deckKey]) bestByDeck[deckKey] = pct;
+  if (bestByDeck[deckKey] === null || pct > bestByDeck[deckKey]) { bestByDeck[deckKey] = pct; store.set('rrj95_best', bestByDeck); }
   document.getElementById('res-score').textContent = score + ' / ' + queue.length;
   document.getElementById('res-pct').textContent = pct + '%';
   let txt =
